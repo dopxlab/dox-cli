@@ -1,0 +1,23 @@
+name: Release Dox CLI
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Make CLI tar.gz
+        run: |
+          chmod +x bin/dox
+          tar -czf dox.tar.gz bin/ lib/ actions/ configure/ custom/
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dox.tar.gz
