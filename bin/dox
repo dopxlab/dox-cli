@@ -7,11 +7,9 @@ echo "Arguments: $@"
 DOX_DIR=$(dirname "$(realpath "$0")")/..
 export DOX_DIR
 
-# Source libraries
 source "$DOX_DIR/lib/configure.sh"
 source "$DOX_DIR/lib/action.sh"
 
-# Handle commands
 case "${1:-}" in
   deploy)
     deploy
@@ -22,6 +20,5 @@ case "${1:-}" in
   *)
     echo "❌ Unknown command: ${1:-}"
     echo "Usage: dox [deploy|configure]"
-    exit 1
     ;;
 esac

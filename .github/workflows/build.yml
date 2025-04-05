@@ -1,0 +1,25 @@
+name: Build Release
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Create Tarball
+        run: |
+          tar -czf dox-cli.tar.gz bin/ lib/ customization/
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          name: dox-cli.tar.gz
+          tag_name: monthly-release
+          files: dox-cli.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
