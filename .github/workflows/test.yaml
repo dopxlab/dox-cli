@@ -7,12 +7,23 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Download and Install
+      # Download and install DOX CLI
+      - name: Install DOX CLI
         run: |
-          curl -LO https://github.com/dopxlab/dox-cli/releases/latest/download/dox-cli.tar.gz
-          bash install.sh
+          bash <(curl -s https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh)
+      
+      # Verify the installation
+      - name: Verify DOX CLI installation
+        run: |
+          dox --version
 
-      - name: Run CLI
+      # Run DOX configure command to test functionality
+      - name: Run DOX configure
         run: |
           dox configure
+          
+      # Additional testing or other functionality
+      - name: Additional Test Step
+        run: |
+          # Example: Run DOX CLI deploy command or any other operation
           dox deploy

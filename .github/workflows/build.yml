@@ -26,3 +26,12 @@ jobs:
           files: dox-cli.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Upload Install Script
+        uses: softprops/action-gh-release@v1
+        with:
+          name: install.sh
+          tag_name: monthly-release
+          files: install.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
