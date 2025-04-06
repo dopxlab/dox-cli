@@ -5,8 +5,10 @@ echo "▶️ DOX CLI running..."
 echo "Arguments: $@"
 
 DOX_DIR="/usr/local/lib/dox"
-
 export DOX_DIR
+
+# Set CLI version
+DOX_CLI_VERSION="v0.1.0"  # You can dynamically replace this during build if needed
 
 source "$DOX_DIR/lib/configure.sh"
 source "$DOX_DIR/lib/action.sh"
@@ -18,8 +20,11 @@ case "${1:-}" in
   configure)
     configure
     ;;
+  --version | version)
+    echo "DOX CLI version: $DOX_CLI_VERSION"
+    ;;
   *)
     echo "❌ Unknown command: ${1:-}"
-    echo "Usage: dox [deploy|configure]"
+    echo "Usage: dox [deploy|configure|--version]"
     ;;
 esac
