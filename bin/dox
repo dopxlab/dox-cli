@@ -4,7 +4,8 @@ set -euo pipefail
 echo "▶️ DOX CLI running..."
 echo "Arguments: $@"
 
-DOX_DIR=$(dirname "$(realpath "$0")")/..
+DOX_DIR="/usr/local/lib/dox"
+
 export DOX_DIR
 
 source "$DOX_DIR/lib/configure.sh"
