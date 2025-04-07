@@ -2,42 +2,15 @@
 
 set -e
 
-# Define the URL for the latest release tarball
+# Define the URL for the latest release tarball and the install directory
 DOX_RELEASE_URL="https://github.com/dopxlab/dox-cli/releases/latest/download/dox-cli.tar.gz"
+INSTALL_DIR="$HOME/lib/dox"
+BIN_DIR="$INSTALL_DIR/bin"
 
-# Define the installation directory
-INSTALL_DIR="/usr/local/lib/dox"
+# Download, extract, and set up DOX CLI
+curl -LO $DOX_RELEASE_URL && tar -xzf dox-cli.tar.gz -C "$INSTALL_DIR" && rm -f dox-cli.tar.gz
 
-# Function to install DOX CLI
-install_dox() {
-  echo "🔧 Installing DOX CLI..."
+# Add the bin directory to PATH if it's not already there
+grep -q "$BIN_DIR" "$HOME/.bashrc" || echo "export PATH=\"$INSTALL_DIR/bin:\$PATH\"" >> "$HOME/.bashrc" && source "$HOME/.bashrc"
 
-  # Check if the installation directory exists
-  if [ ! -d "$INSTALL_DIR" ]; then
-    echo "Creating installation directory: $INSTALL_DIR"
-    sudo mkdir -p "$INSTALL_DIR"
-  fi
-
-  # Download the latest release tarball directly into the current directory
-  echo "⬇️ Downloading DOX CLI from $DOX_RELEASE_URL"
-  curl -LO $DOX_RELEASE_URL
-
-  # Extract the tarball contents into the target directory
-  echo "📦 Extracting the tarball..."
-  sudo tar -xzf dox-cli.tar.gz -C "$INSTALL_DIR"
-
-  # Move the binary to /usr/local/bin
-  echo "🔑 Moving dox binary to /usr/local/bin"
-  sudo mv "$INSTALL_DIR/bin/dox" /usr/local/bin/dox
-
-  # Set the correct permissions for the installed binary
-  sudo chmod +x /usr/local/bin/dox
-
-  # Clean up the tarball after extraction
-  rm -f dox-cli.tar.gz
-
-  echo "✅ DOX CLI installed successfully!"
-}
-
-# Call the install function
-install_dox
+echo "✅ DOX CLI installed successfully!"
