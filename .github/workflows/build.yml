@@ -16,7 +16,7 @@ jobs:
 
       - name: Create Tarball
         run: |
-          tar -czf dox-cli.tar.gz bin/ lib/ customization/
+          tar -czf dox-cli.tar.gz bin/ lib/ customize/
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
