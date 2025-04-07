@@ -14,8 +14,8 @@ echo "Arguments: $@"
 
 # Directory paths for DOX (combined in one line for better readability)
 export DOX_CLI_VERSION="v0.1.0"
-export DOX_DIR="$HOME/.dox"
 
+export DOX_DIR="$HOME/lib/dox"
 export DOX_CUSTOM_DIR="$DOX_DIR/customize"
 
 # Function to validate arguments based on min and max
