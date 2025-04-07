@@ -224,7 +224,7 @@ function configure() {
     local run_post_installation=false
 
     if [ -n "$installation_url" ]; then # If installation_url exists give more priority to this
-        local install_dir="${BUILD_RESOURCES_PATH}/${lib}/${lib_version}"
+        local install_dir="${DOX_RESOURCES_DIR}/${lib}/${lib_version}"
         if [ ! -d "$install_dir" ] || [ -z "$(ls -A "$install_dir")" ]; then # If the directory does not exist or is empty
             rm -rf "$install_dir" #Handling empty condition
             echo -e "Download URL: \033[0;36m$installation_url\033[0m"

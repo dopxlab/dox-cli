@@ -17,6 +17,7 @@ export DOX_CLI_VERSION="v0.1.0"
 
 export DOX_DIR="$HOME/.dox"
 export DOX_CUSTOM_DIR="$DOX_DIR/customize"
+export DOX_RESOURCES_DIR="$HOME/dox_resources"
 
 source ${DOX_DIR}/lib/shared/print.sh
 
