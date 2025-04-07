@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source ${DOX_DIR}/lib/shared/print.sh
+source ${DOX_CUSTOM_DIR}/download_files.sh
 
 # JSON File Path
 CONFIGURE_FILE_PATH="${DOX_CUSTOM_DIR}/configure"
@@ -99,7 +100,7 @@ function download_and_extract() {
 
     echo -e "\033[0;32mDownloading to temp file $temp_file\033[0m"
     # Source function to download the file (should be defined elsewhere)
-    download_build_dependency "$lib_url" "$temp_file"
+    download_tool_to_configure "$lib_url" "$temp_file"
     echo -e "\033[0;32mDownload completed. Extracting to $install_dir\033[0m"
 
     if [ "$archive_extension" == "tar.gz" ]; then

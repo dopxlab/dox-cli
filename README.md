@@ -1,5 +1,6 @@
 # dox-cli
 
+    apt update && apt install curl
     curl -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh && bash install.sh
 
     curl -LO https://curl.se/download/curl-8.13.0.tar.gz
