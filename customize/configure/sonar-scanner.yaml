@@ -1,0 +1,23 @@
+# Installation and Configuration
+installation:
+  download:
+    # Define Sonar Scan version download path
+    "7.0.2.4839": "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-7.0.2.4839-linux-x64.zip"
+
+  post_installation_script: |
+    # Optional post-installation script if required
+    echo "Post-installation script executed"
+
+configuration:
+  # Default versioning using an environment variable or fallback to version 1.10.5
+  default_version: "${SONAR_SCANNER_VERSION:-7.0.2.4839}"
+
+  # Environment variable mappings for installation paths
+  environments:
+    PATH: "${install_dir}/bin"
+    SONAR_USER_HOME: "/home/runner/.cache/sonar"
+
+  # Print the installed version of Sonar Scan after installation
+  post_configuration_script: |
+    # Print the installed Sonar Scan version
+    sonar-scanner --version

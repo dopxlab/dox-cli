@@ -1,0 +1,23 @@
+# Installation and Configuration
+installation:
+  download:
+    # Define Syft version download path
+    "1.22.0": "https://github.com/anchore/syft/releases/download/v1.22.0/syft_1.22.0_linux_amd64.tar.gz"
+
+  post_installation_script: |
+    # Optional post-installation script if required
+    echo "Post-installation script executed"
+
+configuration:
+  # Default versioning using an environment variable or fallback to version 1.10.5
+  default_version: "${SYFT_VERSION:-1.22.0}"
+
+  # Environment variable mappings for installation paths
+  environments:
+    PATH: "${install_dir}"
+    SYFT_CHECK_FOR_APP_UPDATE: "false"
+
+  # Print the installed version of Syft after installation
+  post_configuration_script: |
+    # Print the installed Syft version
+    syft version

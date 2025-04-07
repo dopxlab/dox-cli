@@ -1,0 +1,40 @@
+# Installation and Configuration
+installation:
+  download:
+    # Define JDK version download paths based on version
+    "8": "https://download.java.net/openjdk/jdk8u44/ri/openjdk-8u44-linux-x64.tar.gz"
+    "9": "https://download.java.net/openjdk/jdk9/ri/jdk-9+181_linux-x64_ri.zip"
+    "10": "https://download.java.net/openjdk/jdk10/ri/jdk-10_linux-x64_bin_ri.tar.gz"
+    "11": "https://download.java.net/openjdk/jdk11.0.0.2/ri/openjdk-11.0.0.2_linux-x64.tar.gz"
+    "12": "https://download.java.net/openjdk/jdk12/ri/openjdk-12+32_linux-x64_bin.tar.gz"
+    "13": "https://download.java.net/openjdk/jdk13/ri/openjdk-13+33_linux-x64_bin.tar.gz"
+    "14": "https://download.java.net/openjdk/jdk14/ri/openjdk-14+36_linux-x64_bin.tar.gz"
+    "15": "https://download.java.net/openjdk/jdk15/ri/openjdk-15+36_linux-x64_bin.tar.gz"
+    "16": "https://download.java.net/openjdk/jdk16/ri/openjdk-16+36_linux-x64_bin.tar.gz"
+    "17": "https://download.java.net/openjdk/jdk17.0.0.1/ri/openjdk-17.0.0.1+2_linux-x64_bin.tar.gz"
+    "18": "https://download.java.net/openjdk/jdk18/ri/openjdk-18+36_linux-x64_bin.tar.gz"
+    "19": "https://download.java.net/openjdk/jdk19/ri/openjdk-19+36_linux-x64_bin.tar.gz"
+    "20": "https://download.java.net/openjdk/jdk20/ri/openjdk-20+36_linux-x64_bin.tar.gz"
+    "21": "https://download.java.net/openjdk/jdk21/ri/openjdk-21+35_linux-x64_bin.tar.gz"
+    "22": "https://download.java.net/openjdk/jdk22/ri/openjdk-22+36_linux-x64_bin.tar.gz"
+    "23": "https://download.java.net/openjdk/jdk23/ri/openjdk-23+37_linux-x64_bin.tar.gz"
+    "24": "https://download.java.net/openjdk/jdk24/ri/openjdk-24+36_linux-x64_bin.tar.gz"
+
+  post_installation_script: |
+    #!/bin/bash
+    echo "install custom certificates"
+
+
+configuration:
+  # Default JDK versioning using an environment variable or fallback to version 17
+  default_version: "${JDK_VERSION:-24}"
+
+  # Environment variable mappings for installation paths
+  environments:
+    JAVA_HOME: "${install_dir}"
+    PATH: "${install_dir}/bin"
+
+  # Print the installed version of the package
+  post_configuration_script: |
+    # Print the installed Java version
+    java -version

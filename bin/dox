@@ -2,29 +2,69 @@
 set -euo pipefail
 
 echo "▶️ DOX CLI running..."
+
+# Main script execution
+action=$1
+shift  # Remove the first argument (action) from the list
+action_values=("$@")  # Capture the remaining arguments (tool names)
+
+echo "Action: $action"
 echo "Arguments: $@"
 
-DOX_DIR="/usr/local/lib/dox"
-export DOX_DIR
 
-# Set CLI version
-DOX_CLI_VERSION="v0.1.0"  # You can dynamically replace this during build if needed
+# Directory paths for DOX (combined in one line for better readability)
+export DOX_CLI_VERSION="v0.1.0"
+export DOX_DIR="/usr/local/lib/dox" 
+export DOX_CUSTOM_DIR="$DOX_DIR/customize"
 
-source "$DOX_DIR/lib/configure.sh"
-source "$DOX_DIR/lib/action.sh"
+# Function to validate arguments based on min and max
+function validate_args() {
+    local min=$1
+    local max=$2
+    local num_args=$3
 
-case "${1:-}" in
-  deploy)
-    deploy
-    ;;
-  configure)
-    configure
-    ;;
-  --version | version)
+    if [ "$num_args" -lt "$min" ]; then
+        error "Error: Minimum $min argument(s) required."
+        return 1
+    elif [ "$max" != "-1" ] && [ "$num_args" -gt "$max" ]; then
+        error "Error: Maximum $max argument(s) allowed."
+        return 1
+    fi
+    return 0
+}
+
+function configure_env() {
+    # Check if the env_export file exists and source it
+    local env_export="env_export"
+    if [ -f "$env_export" ]; then
+        print "Found $env_export, sourcing the environment variables from it."
+        source "$env_export"  # Source the env_export file directly to apply the environment variables
+    fi
+
+    local env_path="env_path"
+    # Check if the env_path file exists and update PATH
+    if [ -f "$env_path" ]; then
+        print "Found $env_path, updating PATH."
+        export PATH="$(cat "$env_path")$PATH"  # Prepend the new path to the current PATH
+    fi
+}
+
+# Handle actions based on user input
+case "$action" in
+  version | --version)
     echo "DOX CLI version: $DOX_CLI_VERSION"
     ;;
+
+  configure)
+    # For 'configure' action, at least 1 argument is required (min=1, max=unlimited) (Example dox configure helm)
+    validate_args 1 -1 ${#action_values[@]} || exit 1
+    ${DOX_LIB}/configure.sh "${action_values[@]}"
+    configure_env
+    ;;
+  
   *)
-    echo "❌ Unknown command: ${1:-}"
-    echo "Usage: dox [deploy|configure|--version]"
+    # For any other action, call the action.sh script # For 'tool' action, at least 2 argument is required (Example: dox docker build push)
+    validate_args 1 -1 ${#action_values[@]} || exit 1
+    ${DOX_LIB}/action.sh "$action" "${action_values[@]}"
     ;;
 esac

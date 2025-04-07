@@ -1,0 +1,88 @@
+replicaCount: 1
+
+image:
+  repository: ##IMAGE_REPOSITORY##
+  pullPolicy: ##IMAGE_PULL_POLICY##
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "##IMAGE_TAG##"
+
+healthCheck:
+  port: ##APPLICATION_HEALTH_PORT##
+  liveness:
+    path: ##APPLICATION_HEALTH_LIVENESS_PATH##
+    delay: ##APPLICATION_HEALTH_LIVENESS_DELAY##
+  readiness:
+    path: ##APPLICATION_HEALTH_READINESS_PATH##
+    delay: ##APPLICATION_HEALTH_READINESS_DELAY##
+
+imagePullSecrets: []
+
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: 
+  runAsUser: 1000
+  fsGroup: 2000   
+  runAsGroup: 3000  
+
+securityContext:
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  port: ##APPLICATION_PORT##
+  name: ##APPLICATION_NAME##
+
+ingress:
+  annotations: 
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    cert-manager.io/cluster-issuer: letsencrypt
+  hosts: ##INGRESS_HOST##
+  tls:
+    - secretName: ##APPLICATION_NAME##-tls
+      hosts:
+        - ##INGRESS_HOST##
+
+resources:
+   requests:
+     cpu: ##RESOURCE_REQUESTS_CPU##
+     memory: ##RESOURCE_REQUESTS_MEMORY##
+   limits:
+     cpu: ##RESOURCE_LIMITS_CPU##
+     memory: ##RESOURCE_LIMITS_MEMORY##
+
+autoscaling:
+  enabled: ##AUTOSCALING_ENABLED##
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+existingPv:
+  name: ##PERSISTENT_VOLUME_CLAIM##
+
+# Custom values will be added below from the environment variables - Keep two line spaces
+

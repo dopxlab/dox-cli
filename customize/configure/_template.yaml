@@ -1,0 +1,33 @@
+# Installation and Configuration
+installation:
+  # List of required dependencies to be installed
+  dependencies:
+    - dependency_1
+    - dependency_2
+  
+  # Uncomment to use the download option:
+  # download:
+  #   version_archive: "/path/to/version_archive.tar.gz"
+  
+  # Uncomment to use the install option:
+  script:
+    # Define the specific package and version to install
+    package_version: "install something"
+
+  post_installation_script: |
+    # Add post-installation steps here if necessary
+    echo "Post-installation script executed"
+
+configuration:
+  # Default versioning using an environment variable or fallback to a placeholder version
+  default_version: "${LIBRARY_VERSION:-latest}"
+
+  # Environment variable mappings for installation paths
+  environments: # ${install_dir} will replace at runtime with the actual installation folder
+    INSTALL_DIR: "${install_dir}" # this will create export envs
+    PATH: "${install_dir}/bin" # PATH Is reserved key - for updating existing path 
+
+  # Print the installed version of the package
+  post_configuration_script: |
+    # Command to print the installed version of the package
+    echo "Printing installed version..."

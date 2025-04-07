@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+{{- if .Values.service.name }}
+  name: {{ .Values.service.name }}
+{{- else }}
+  name: {{ include "helm-chart.fullname" . }}
+{{- end }}
+  labels:
+    {{- include "helm-chart.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: defaulthttp
+      port: {{ .Values.service.port }}
+      targetPort: defaulthttp
+      protocol: TCP   
+    {{- include "helpers.list-additional-service-ports" . | indent 4 }}
+  selector:
+    {{- include "helm-chart.selectorLabels" . | nindent 4 }}

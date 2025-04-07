@@ -1,0 +1,9 @@
+{{- $configs := include "helpers.env-configmap" . -}}
+{{- if gt (len $configs) 0 -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.service.name }}-configmap
+data:
+  {{- include "helpers.env-configmap" . | indent 2 }}
+{{- end -}}

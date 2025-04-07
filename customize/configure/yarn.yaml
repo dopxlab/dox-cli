@@ -1,0 +1,22 @@
+# Installation and Configuration
+installation:
+  # List of required dependencies to be installed
+  dependencies:
+    - node
+  script:
+    # Define the install commands for specific Yarn versions
+    "1.22.10": "npm install yarn@1.22.10"
+    "1.22.11": "npm install yarn@1.22.11"
+
+  post_installation_script: |
+    # Optional post-installation script if required
+    echo "Post-installation script executed"
+
+configuration:
+  # Default versioning using an environment variable or fallback to version 1.22.11
+  default_version: "${YARN_VERSION:-1.22.11}"
+
+  # Print the installed Yarn version after installation
+  post_configuration_script: |
+    # Print the installed Yarn version
+    yarn -v

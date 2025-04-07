@@ -1,0 +1,26 @@
+# Installation and Configuration
+installation:
+  # List of required dependencies to be installed
+  dependencies:
+    - node
+  script:
+    "16.0.0": "npm install @angular/cli@16.0.0"
+    "17.0.0": "npm install @angular/cli@17.0.0"
+
+  post_installation_script: |
+    # Add post-installation steps here if necessary
+    echo "Post-installation script executed"
+
+configuration:
+  # Default versioning using an environment variable or fallback to a placeholder version
+  default_version: "${ANGULAR_VERSION:-16.0.0}"
+
+  # Environment variable mappings for installation paths
+  environments:
+    INSTALL_DIR: "${install_dir}"
+    BIN_DIR: "${install_dir}/bin"
+
+  # Print the installed version of the package
+  post_configuration_script: |
+    # Print the installed Angular version
+    ng version
