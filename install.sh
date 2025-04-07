@@ -17,10 +17,13 @@ grep -q "$DOX_DIR/bin" "$HOME/.bashrc" || echo "export PATH=\"$DOX_DIR/bin:\$PAT
 
 chmod -R 755 $DOX_DIR
 
-#Ensuring yq is installed
+# Check if yq is installed, if not, install it
 command -v yq &>/dev/null || {
-  curl -sL https://github.com/mikefarah/yq/releases/download/v4.45.1/yq_linux_amd64.tar.gz | tar -xz -C "$DOX_DIR/bin" && \
+  curl -sL https://github.com/mikefarah/yq/releases/download/v4.45.1/yq_linux_amd64.tar.gz -o yq_linux_amd64.tar.gz
+  mkdir -p yq && tar -xzvf yq_linux_amd64.tar.gz -C yq
+  mv yq/yq_linux_amd64 "$DOX_DIR/bin/yq"
   chmod +x "$DOX_DIR/bin/yq"
+  rm -rf yq_linux_amd64.tar.gz yq
   echo "yq installed successfully."
 }
 
