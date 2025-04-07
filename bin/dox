@@ -14,7 +14,8 @@ echo "Arguments: $@"
 
 # Directory paths for DOX (combined in one line for better readability)
 export DOX_CLI_VERSION="v0.1.0"
-export DOX_DIR="$HOME/lib/dox" 
+export DOX_DIR="$HOME/.dox"
+
 export DOX_CUSTOM_DIR="$DOX_DIR/customize"
 
 # Function to validate arguments based on min and max
@@ -58,13 +59,13 @@ case "$action" in
   configure)
     # For 'configure' action, at least 1 argument is required (min=1, max=unlimited) (Example dox configure helm)
     validate_args 1 -1 ${#action_values[@]} || exit 1
-    ${DOX_LIB}/configure.sh "${action_values[@]}"
+    ${DOX_DIR}/lib/configure.sh "${action_values[@]}"
     configure_env
     ;;
   
   *)
     # For any other action, call the action.sh script # For 'tool' action, at least 2 argument is required (Example: dox docker build push)
     validate_args 1 -1 ${#action_values[@]} || exit 1
-    ${DOX_LIB}/action.sh "$action" "${action_values[@]}"
+    ${DOX_DIR}/lib/action.sh "$action" "${action_values[@]}"
     ;;
 esac

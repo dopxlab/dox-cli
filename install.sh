@@ -4,7 +4,7 @@ set -e
 
 # Define the URL for the latest release tarball and the install directory
 DOX_RELEASE_URL="https://github.com/dopxlab/dox-cli/releases/latest/download/dox-cli.tar.gz"
-INSTALL_DIR="$HOME/lib/dox"
+INSTALL_DIR="$HOME/.dox"
 
 mkdir -p "$INSTALL_DIR"
 
