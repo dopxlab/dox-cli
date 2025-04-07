@@ -10,7 +10,7 @@ jobs:
       # Step 1: Download and run the installation script
       - name: Install DOX CLI
         run: |
-          curl https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh | sudo bash install.sh
+          curl -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh && bash install.sh
 
       # Step 2: Verify the installation
       - name: Verify DOX CLI installation
