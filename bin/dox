@@ -18,6 +18,8 @@ export DOX_CLI_VERSION="v0.1.0"
 export DOX_DIR="$HOME/.dox"
 export DOX_CUSTOM_DIR="$DOX_DIR/customize"
 
+source ${DOX_DIR}/lib/shared/print.sh
+
 # Function to validate arguments based on min and max
 function validate_args() {
     local min=$1
