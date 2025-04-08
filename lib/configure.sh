@@ -219,8 +219,10 @@ function configure() {
         return 1
     fi
 
-    local installation_url=$(yq eval ".installation.download.\"$lib_version\"" "$lib_config_file")
-    local installation_script=$(yq eval ".installation.script.\"$lib_version\"" "$lib_config_file")
+    # Using yq to evaluate the keys and set to empty string if they don't exist
+    local installation_url=$(yq eval ".installation.download.\"$lib_version\" // \"\"" "$lib_config_file")
+    local installation_script=$(yq eval ".installation.script.\"$lib_version\" // \"\"" "$lib_config_file")
+
     # Check if either installation_url or installation_script has a value
     if [ -z "$installation_url" ] && [ -z "$installation_script" ]; then
         error "Error: Neither installation download URL nor install script found for $lib_version. Exiting."
