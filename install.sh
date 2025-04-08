@@ -45,6 +45,8 @@ if ! grep -q "$DOX_DIR/bin" "$HOME/.bashrc"; then
 fi
 
 chmod -R 755 $DOX_DIR
+
+echo "BIN : $HOME/bin"
 mkdir -p "$HOME/bin"
 
 # Check if yq is installed, if not, install it
