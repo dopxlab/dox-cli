@@ -39,7 +39,7 @@ mkdir -p "$DOX_DIR"
 curl -LO $DOX_RELEASE_URL && tar -xzf dox-cli.tar.gz -C "$DOX_DIR" && rm -f dox-cli.tar.gz
 $USER
 # Link DOX to user bin
-ln -sf "$DOX_DIR/bin/dox" "$HOME/dox"
+ln -sf "$DOX_DIR/bin/dox" "$HOME/bin/dox"
 chmod +x "$DOX_DIR/bin/dox"
 
 chmod -R 755 $DOX_DIR
@@ -50,7 +50,7 @@ command -v yq &>/dev/null || {
   mkdir -p yq && tar -xzvf yq_linux_amd64.tar.gz -C yq
   mv yq/yq_linux_amd64 "$DOX_DIR/bin/yq"
   chmod +x "$DOX_DIR/bin/yq"
-  ln -sf "$DOX_DIR/bin/yq" "$HOME/yq"
+  ln -sf "$DOX_DIR/bin/yq" "$HOME/bin/yq"
   rm -rf yq_linux_amd64.tar.gz yq
   echo "✅ yq installed successfully."
 }
