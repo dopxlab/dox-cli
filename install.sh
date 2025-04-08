@@ -62,5 +62,8 @@ echo "✅ DOX CLI installed successfully!"
 source "$HOME/.bashrc"
 
 # Test if DOX CLI is working
+echo $PATH
+cat "$HOME/.bashrc"
+
 echo "Testing DOX CLI" 
 dox --version
