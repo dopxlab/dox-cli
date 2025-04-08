@@ -93,6 +93,8 @@ function download_and_extract() {
         archive_extension="tar.gz"
     elif [[ "$lib_url" =~ \.zip$ ]]; then
         archive_extension="zip"
+    elif [[ "$lib_url" =~ \.tar\.xz$ ]]; then
+        archive_extension="tar.xz"
     else
         error "Invalid lib_url format: $lib_url. Must end with .tar.gz or .zip."
         return 1
@@ -110,11 +112,14 @@ function download_and_extract() {
     echo -e "\033[0;32mDownload completed. Extracting to $install_dir\033[0m"
 
     if [ "$archive_extension" == "tar.gz" ]; then
-        echo "Unzipping tar.gz ($temp_file) to $install_dir"
+        echo "Extracting tar.gz ($temp_file) to $install_dir"
         tar -xzf "$temp_file" -C "$install_dir"
     elif [ "$archive_extension" == "zip" ]; then
         echo "Unzipping zip"
         unzip "$temp_file" -d "$install_dir"
+    elif [ "$archive_extension" == "tar.xz" ]; then
+        echo "Extracting tar.xz ($temp_file) to $install_dir"
+        tar -xJf "$temp_file" -C "$install_dir"
     fi
 
     info "Extraction successful. Liberary installed to $install_dir"
