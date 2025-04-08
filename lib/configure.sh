@@ -81,55 +81,39 @@ function configure_env_variables() {
     fi
 }
 
-# Function to download and unzip the specified version if not already present
 function download_and_extract() {
     local lib_url=$1
     local install_dir=$2
+    local temp_file=$(mktemp)
 
     echo -e "Downloading library from \033[0;36m$lib_url\033[0m"
 
-    # Validate that the lib_url ends with ".tar.gz" or ".zip"
-    if [[ "$lib_url" =~ \.tar\.gz$ ]]; then
-        archive_extension="tar.gz"
-    elif [[ "$lib_url" =~ \.zip$ ]]; then
-        archive_extension="zip"
-    elif [[ "$lib_url" =~ \.tar\.xz$ ]]; then
-        archive_extension="tar.xz"
-    else
-        error "Invalid lib_url format: $lib_url. Must end with .tar.gz or .zip."
-        return 1
-    fi
-
-    # Create the target directory
+    # Create target directory
     mkdir -p "$install_dir"
 
-    # Download and unzip the file
-    local temp_file=$(mktemp)
-
+    # Download the file
     echo -e "\033[0;32mDownloading to temp file $temp_file\033[0m"
-    # Source function to download the file (should be defined elsewhere)
     download_tool_to_configure "$lib_url" "$temp_file"
+
     echo -e "\033[0;32mDownload completed. Extracting to $install_dir\033[0m"
 
-    if [ "$archive_extension" == "tar.gz" ]; then
-        echo "Extracting tar.gz ($temp_file) to $install_dir"
-        tar -xzf "$temp_file" -C "$install_dir"
-    elif [ "$archive_extension" == "zip" ]; then
-        echo "Unzipping zip"
-        unzip "$temp_file" -d "$install_dir"
-    elif [ "$archive_extension" == "tar.xz" ]; then
-        echo "Extracting tar.xz ($temp_file) to $install_dir"
-        tar -xJf "$temp_file" -C "$install_dir"
+    # Determine the archive type and extract accordingly
+    if [[ "$lib_url" =~ \.tar\.gz$ ]]; then
+        tar -xzf "$temp_file" -C "$install_dir" && echo "Extracting tar.gz"
+    elif [[ "$lib_url" =~ \.zip$ ]]; then
+        unzip "$temp_file" -d "$install_dir" && echo "Unzipping zip"
+    elif [[ "$lib_url" =~ \.tar\.xz$ ]]; then
+        tar -xJf "$temp_file" -C "$install_dir" && echo "Extracting tar.xz"
+    else
+        error "Invalid lib_url format: $lib_url. Must end with .tar.gz, .zip, or .tar.xz." && return 1
     fi
 
-    info "Extraction successful. Liberary installed to $install_dir"
-    
-    move_contents_and_remove_subfolder $install_dir 
+    info "Extraction successful. Library installed to $install_dir"
+    move_contents_and_remove_subfolder "$install_dir"
 
-    # Clean up
-    #rm "$temp_file"
     echo "Downloaded and extracted the library to $install_dir."
 }
+
 
 # Define the move_contents_and_remove_subfolder function
 function move_contents_and_remove_subfolder() {
