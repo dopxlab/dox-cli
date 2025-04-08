@@ -2,6 +2,32 @@
 
 set -e
 
+#PRE-REQUEST: List of required tools
+REQUIRED_TOOLS=("tar" "unzip" "curl" "yq")
+MISSING_TOOLS=()
+
+# Check if each required tool is installed
+for tool in "${REQUIRED_TOOLS[@]}"; do
+  if ! command -v "$tool" &>/dev/null; then
+    MISSING_TOOLS+=("$tool")
+  fi
+done
+
+# If there are missing tools, print the message
+if [ ${#MISSING_TOOLS[@]} -gt 0 ]; then
+  echo "Note:"
+  echo "The following required tools are missing: ${MISSING_TOOLS[*]}"
+  echo "To install them, run the following command:"
+  echo
+  echo "  sudo apt update && sudo apt install -y ${MISSING_TOOLS[*]}"
+  echo
+  echo "This will update your package lists and install the missing tools."
+else
+  echo "All required tools are already installed."
+fi
+
+
+# INSTALLATION 
 export DOX_DIR="$HOME/.dox"
 
 # Define the URL for the latest release tarball and the install directory
@@ -27,7 +53,7 @@ command -v yq &>/dev/null || {
   mv yq/yq_linux_amd64 "$DOX_DIR/bin/yq"
   chmod +x "$DOX_DIR/bin/yq"
   rm -rf yq_linux_amd64.tar.gz yq
-  echo "✅ yq installed successfully."
+  echo "yq installed successfully."
 }
 
 echo "✅ DOX CLI installed successfully!"
