@@ -3,7 +3,7 @@
 set -e
 
 #PRE-REQUEST: List of required tools
-REQUIRED_TOOLS=("tar" "unzip" "curl" "yq")
+REQUIRED_TOOLS=("tar" "unzip" "curl")
 MISSING_TOOLS=()
 
 # Check if each required tool is installed
@@ -53,7 +53,7 @@ command -v yq &>/dev/null || {
   mv yq/yq_linux_amd64 "$DOX_DIR/bin/yq"
   chmod +x "$DOX_DIR/bin/yq"
   rm -rf yq_linux_amd64.tar.gz yq
-  echo "yq installed successfully."
+  echo "✅ yq installed successfully."
 }
 
 echo "✅ DOX CLI installed successfully!"
