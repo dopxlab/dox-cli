@@ -38,8 +38,11 @@ mkdir -p "$DOX_DIR"
 # Download, extract, and set up DOX CLI
 curl -LO $DOX_RELEASE_URL && tar -xzf dox-cli.tar.gz -C "$DOX_DIR" && rm -f dox-cli.tar.gz
 
-# Add the bin directory to PATH if it's not already there
-grep -q "$DOX_DIR/bin" "$HOME/.bashrc" || echo "export PATH=\"$DOX_DIR/bin:\$PATH\"" >> "$HOME/.bashrc"
+# Append the bin directory to PATH in .bashrc if it's not already present
+if ! grep -q "$DOX_DIR/bin" "$HOME/.bashrc"; then
+  echo "export PATH=\"$DOX_DIR/bin:\$PATH\"" >> "$HOME/.bashrc"
+  echo "Added DOX bin to PATH in .bashrc"
+fi
 
 chmod -R 755 $DOX_DIR
 
@@ -56,8 +59,8 @@ command -v yq &>/dev/null || {
 echo "✅ DOX CLI installed successfully!"
 
 # Reload .bashrc to apply changes
-source "$HOME/.bashrc"
+#source "$HOME/.bashrc"
 
 # Test if DOX CLI is working
-echo "Testing DOX CLI" 
-dox --version
+#echo "Testing DOX CLI" 
+#dox --version
