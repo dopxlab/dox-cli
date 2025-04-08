@@ -46,16 +46,12 @@ fi
 
 chmod -R 755 $DOX_DIR
 
-echo "BIN : $HOME/bin"
-mkdir -p "$HOME/bin"
-
 # Check if yq is installed, if not, install it
 command -v yq &>/dev/null || {
   curl -sL https://github.com/mikefarah/yq/releases/download/v4.45.1/yq_linux_amd64.tar.gz -o yq_linux_amd64.tar.gz
   mkdir -p yq && tar -xzvf yq_linux_amd64.tar.gz -C yq
   mv yq/yq_linux_amd64 "$DOX_DIR/bin/yq"
   chmod +x "$DOX_DIR/bin/yq"
-  ln -sf "$DOX_DIR/bin/yq" "$HOME/bin/yq"
   rm -rf yq_linux_amd64.tar.gz yq
   echo "✅ yq installed successfully."
 }
@@ -63,7 +59,7 @@ command -v yq &>/dev/null || {
 echo "✅ DOX CLI installed successfully!"
 
 # Export path 
-ln -sf "$DOX_DIR/bin/dox" "$HOME/bin/dox"
+export PATH="$DOX_DIR/bin:$PATH"
 
 # Test if DOX CLI is working
 echo $PATH
