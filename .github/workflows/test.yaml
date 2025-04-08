@@ -21,6 +21,7 @@ jobs:
       # Step 2: Add the new path for DOX to the $PATH and verify the installation
       - name: Verify DOX CLI installation
         run: |
+          source "$HOME/.bashrc"  # Reload the bashrc to update $PATH after installation
           dox --version  # Verify that DOX CLI is now available
 
       # Step 3: Run DOX configure command to test functionality (Ensuring java and maven are installed)
