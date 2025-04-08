@@ -27,9 +27,7 @@ jobs:
       # Step 3: Run DOX configure command to test functionality (Ensuring java and maven are installed)
       - name: Run DOX configure
         run: |
-          dox configure maven
-          java -version 
-          mvn -v
+          dox configure angular helm maven sonar-scanner syft terraform twistcli yarn
 
       # Step 4: Additional testing or usage
       - name: Additional Test Step
