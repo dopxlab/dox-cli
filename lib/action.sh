@@ -94,8 +94,10 @@ function run_action_script(){
         echo ""
         echo -e "\033[0;32m$script\033[0m"
         echo ""
-
-        eval "$script"
+        script_with_vars=$(echo "$script" | envsubst)
+        echo -e "\033[0;32mExecuting:\033[0m"
+        echo "$script_with_vars"
+        eval "$script_with_vars"
     else
         info "No script found $lib_config_file in $script_path for $lib. Skipping script execution."
     fi
