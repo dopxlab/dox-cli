@@ -39,11 +39,7 @@ mkdir -p "$DOX_DIR"
 curl -LO $DOX_RELEASE_URL && tar -xzf dox-cli.tar.gz -C "$DOX_DIR" && rm -f dox-cli.tar.gz
 
 # Add the bin directory to PATH if it's not already there
-if ! grep -q "$DOX_DIR/bin" "$HOME/.bashrc"; then
-  echo "export PATH=\"$DOX_DIR/bin:\$PATH\"" >> "$HOME/.bashrc"
-  export PATH="$DOX_DIR/bin:$PATH"
-  echo "Added the dox bin directory to PATH "
-fi
+grep -q "$DOX_DIR/bin" "$HOME/.bashrc" || echo "export PATH=\"$DOX_DIR/bin:\$PATH\"" >> "$HOME/.bashrc" && source "$HOME/.bashrc"
 
 chmod -R 755 $DOX_DIR
 
