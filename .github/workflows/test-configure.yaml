@@ -25,7 +25,7 @@ jobs:
           dox --version  # Verify that DOX CLI is now available
 
       # Step 3: Run DOX configure command to test functionality (Ensuring java and maven are installed)
-      - name: Run DOX Configure - angular
+      - name: Run DOX Configure - angular & node
         run: |
           dox configure angular
 
@@ -55,6 +55,6 @@ jobs:
           dox configure terraform
 
       # Step 9: Run DOX configure command to test functionality (Ensuring java and maven are installed)
-      - name: Run DOX Configure - yarn
+      - name: Run DOX Configure - yarn & node
         run: |
           dox configure yarn
