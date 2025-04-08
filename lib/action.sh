@@ -95,10 +95,10 @@ function run_action_script(){
         echo -e "\033[1;36mOriginal script:\033[0m"  # Bold cyan for the label
         echo -e "\033[0;36m$script\033[0m"  # Cyan color for the original script
         echo ""
-        echo ""
         script_with_vars=$(echo "$script" | envsubst)
         echo -e "\033[1;32mSubstituted script:\033[0m"  # Bold green for the label
         echo -e "\033[0;32m$script_with_vars\033[0m"  # Green color for the substituted script
+        echo ""
         eval "$script_with_vars"
     else
         info "No script found $lib_config_file in $script_path for $lib. Skipping script execution."
