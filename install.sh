@@ -37,7 +37,7 @@ mkdir -p "$DOX_DIR"
 
 # Download, extract, and set up DOX CLI
 curl -LO $DOX_RELEASE_URL && tar -xzf dox-cli.tar.gz -C "$DOX_DIR" && rm -f dox-cli.tar.gz
-$USER
+
 # Link DOX to user bin
 ln -sf "$DOX_DIR/bin/dox" "$HOME/bin/dox"
 chmod +x "$DOX_DIR/bin/dox"
