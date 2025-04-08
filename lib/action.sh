@@ -118,10 +118,10 @@ function configure_action() {
         
         # Creates a unique temporary directory and copy the files to template_folder
         local template_folder=$(mktemp -d)
-
+        
         echo "Temporary folder created at: $template_folder"
         
-        cp -r "$ref_template_folder/*" "$template_folder"
+        cp -r "$ref_template_folder/." "$template_folder"
         echo "Templates copied to: $template_folder"
 
         #Generate SED Command
