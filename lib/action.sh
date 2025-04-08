@@ -108,7 +108,6 @@ function configure_action() {
 
   #Step 1: Configuration Run Configure script
   run_action_script $lib ".configure"
-
   #Step 2: Process Template # Reference template folder based on lib
   local ref_template_folder=$(yq eval ".template_folder // \"\"" "$ACTION_FILE_PATH/$lib.yaml")
   ref_template_folder=$(eval echo "$ref_template_folder")
@@ -118,10 +117,11 @@ function configure_action() {
         # Create a real temporary folder and export the path as an environment variable
         
         # Creates a unique temporary directory and copy the files to template_folder
-        export template_folder=$(mktemp -d)  
+        local template_folder=$(mktemp -d)
+
         echo "Temporary folder created at: $template_folder"
         
-        cp -r "$ref_template_folder" "$template_folder"
+        cp -r "$ref_template_folder/*" "$template_folder"
         echo "Templates copied to: $template_folder"
 
         #Generate SED Command
@@ -138,7 +138,6 @@ configure_action $lib
 for action in "${@:2}"; do
     echo "⚙️ Executing action: '$lib $action'"
     run_action_script $lib ".actions.$action"
-    
 done
 
 echo "✅ Actions completed for tool: $lib"
