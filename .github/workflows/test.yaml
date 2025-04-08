@@ -32,4 +32,4 @@ jobs:
       # Step 4: Additional testing or usage
       - name: Additional Test Step
         run: |
-          echo "dox <action>"
+          echo "dox helm template"
