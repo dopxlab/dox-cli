@@ -27,7 +27,7 @@ command -v yq &>/dev/null || {
   mv yq/yq_linux_amd64 "$DOX_DIR/bin/yq"
   chmod +x "$DOX_DIR/bin/yq"
   rm -rf yq_linux_amd64.tar.gz yq
-  echo "yq installed successfully."
+  echo "✅ yq installed successfully."
 }
 
 echo "✅ DOX CLI installed successfully!"

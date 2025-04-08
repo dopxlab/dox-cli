@@ -30,6 +30,23 @@ print() {
     echo -e "\033[${fg_color};${bg_color}m${text}\033[0m"
 }
 
+# Function to print environment variables in a simple stylish format
+# Usage: print_envs VAR1 VAR2 VAR3 ...
+print_envs() {
+    local border="--------------------------------------------------"
+    print "36" "40" "$border"  # Cyan on black
+    for var in "$@"; do
+        local value="${!var}"
+        if [ -z "$value" ]; then
+            value="<Not Set>"
+            print "31" "40" "$(printf '%-25s : %s' "$var" "$value")"  # Red for unset
+        else
+            print "32" "40" "$(printf '%-25s : %s' "$var" "$value")"  # Green for set
+        fi
+    done
+    print "36" "40" "$border"
+}
+
 # Function to print a warning message in yellow text on black background
 # Usage: warn <text>
 info() {

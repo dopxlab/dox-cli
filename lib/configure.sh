@@ -1,13 +1,19 @@
 #!/bin/bash
 
+#Optional: As its already configured in dox
+export DOX_DIR="${DOX_DIR:-$HOME/.dox}"
+export DOX_CUSTOM_DIR="${DOX_CUSTOM_DIR:-$DOX_DIR/customize}"
+export DOX_RESOURCES_DIR="${DOX_RESOURCES_DIR:-$HOME/dox_resources}"
+
 source ${DOX_DIR}/lib/shared/print.sh
 source ${DOX_CUSTOM_DIR}/download_files.sh
 
-# JSON File Path
+# configuration yaml location
 CONFIGURE_FILE_PATH="${DOX_CUSTOM_DIR}/configure"
-
 ENV_PATH="env_path"
 ENV_EXPORT="env_export"
+
+print_envs DOX_RESOURCES_DIR CONFIGURE_FILE_PATH DOX_DIR DOX_CUSTOM_DIR ENV_PATH ENV_EXPORT
 
 # Function to set environment variables for a given library
 function generate_env_files() {
@@ -116,7 +122,7 @@ function download_and_extract() {
     move_contents_and_remove_subfolder $install_dir 
 
     # Clean up
-    rm "$temp_file"
+    #rm "$temp_file"
     echo "Downloaded and extracted the library to $install_dir."
 }
 
