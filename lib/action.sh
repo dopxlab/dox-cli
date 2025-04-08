@@ -65,10 +65,10 @@ function generate_utility_script() {
 }
 
 function run_replace_variables(){
-    local tool_name=$1
+    local lib=$1
     local template_dir=$2
 
-    replace_utility_script="${tool_name}_replace_utility.sh"
+    replace_utility_script="${lib}_replace_utility.sh"
     generate_utility_script "$ACTION_FILE_PATH/$lib.yaml" $replace_utility_script
 
     source $replace_utility_script
@@ -104,14 +104,14 @@ function run_action_script(){
 
 # Function to run a specific action
 function configure_action() {
-  local tool_name=$1
-  echo "🛠️ Configuring Tool: $tool_name"
+  local lib=$1
+  echo "🛠️ Configuring Tool: $lib"
 
   #Step 1: Configuration Run Configure script
-  run_action_script $tool_name ".configure"
+  run_action_script $lib ".configure"
 
-  #Step 2: Process Template # Reference template folder based on tool_name
-  local ref_template_folder=$(yq eval ".template_folder // \"\"" "$ACTION_FILE_PATH/$tool_name.yaml")
+  #Step 2: Process Template # Reference template folder based on lib
+  local ref_template_folder=$(yq eval ".template_folder // \"\"" "$ACTION_FILE_PATH/$lib.yaml")
   ref_template_folder=$(eval echo "$ref_template_folder")
   
     if [ -d "$ref_template_folder" ]; then
@@ -126,16 +126,8 @@ function configure_action() {
         echo "Templates copied to: $template_folder"
 
         #Generate SED Command
-        run_replace_variables $tool_name $template_folder
+        run_replace_variables $lib $template_folder
     fi
-}
-
-# Function to run a specific action
-function run_action() {
-  local tool_name=$1
-  local action=$2
-  echo "⚙️ Executing action: $action using tool: $tool_name"
-  run_action
 }
 
 echo "🚀 Running action for tool: $1"
