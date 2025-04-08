@@ -1,4 +1,4 @@
-name: Install and Test DOX CLI
+name: Install and Test DOX CLI - Configure
 
 on:
   workflow_dispatch:
