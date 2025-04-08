@@ -58,12 +58,11 @@ command -v yq &>/dev/null || {
 
 echo "✅ DOX CLI installed successfully!"
 
-# Reload .bashrc to apply changes
-source "$HOME/.bashrc"
+# Export path 
+export PATH="$DOX_DIR/bin:$PATH"
 
 # Test if DOX CLI is working
 echo $PATH
-cat "$HOME/.bashrc"
 
 echo "Testing DOX CLI" 
 dox --version
