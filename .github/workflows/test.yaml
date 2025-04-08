@@ -18,13 +18,13 @@ jobs:
         run: |
           curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh && bash install.sh
 
-      # Step 2: Verify the installation
+      # Step 2: Add the new path for DOX to the $PATH and verify the installation
       - name: Verify DOX CLI installation
         run: |
-          cat "$HOME/.bashrc"
-          dox --version
+          source "$HOME/.bashrc"  # Reload the bashrc to update $PATH after installation
+          dox --version  # Verify that DOX CLI is now available
 
-      # Step 3: Run DOX configure command to test functionality ( Ensuring java and maven are installed)
+      # Step 3: Run DOX configure command to test functionality (Ensuring java and maven are installed)
       - name: Run DOX configure
         run: |
           dox configure maven
