@@ -38,8 +38,9 @@ mkdir -p "$DOX_DIR"
 # Download, extract, and set up DOX CLI
 curl -LO $DOX_RELEASE_URL && tar -xzf dox-cli.tar.gz -C "$DOX_DIR" && rm -f dox-cli.tar.gz
 
-# Add the bin directory to PATH if it's not already there
-grep -q "$DOX_DIR/bin" "$HOME/.bashrc" || echo "export PATH=\"$DOX_DIR/bin:\$PATH\"" >> "$HOME/.bashrc" && source "$HOME/.bashrc"
+# Link DOX to user bin
+ln -sf "$DOX_DIR/bin/dox" "$LOCAL_BIN/dox"
+chmod +x "$DOX_DIR/bin/dox"
 
 chmod -R 755 $DOX_DIR
 
@@ -49,6 +50,7 @@ command -v yq &>/dev/null || {
   mkdir -p yq && tar -xzvf yq_linux_amd64.tar.gz -C yq
   mv yq/yq_linux_amd64 "$DOX_DIR/bin/yq"
   chmod +x "$DOX_DIR/bin/yq"
+  ln -sf "$DOX_DIR/bin/yq" "$LOCAL_BIN/yq"
   rm -rf yq_linux_amd64.tar.gz yq
   echo "✅ yq installed successfully."
 }
