@@ -1,0 +1,23 @@
+configure: |
+  "<optional: configuration_command>" # Optional, configuration command (e.g., 'dox configure helm') 
+  # If not needed, you can leave this section out or define your own command.
+
+# Optional, name of the template folder (If you give 'helm', it will replace ${DOX_CUSTOM_DIR}/action/templates/helm)
+template_folder: "<optional: template_folder>" 
+
+variables:
+  # Optional: Define any variable here with its value (custom keys and values).
+  # Users can add any key-value pair as needed.
+  # Example: "BUILD_VERSION": "1.0.0"
+  # Example: "NAMESPACE": "production"
+  <variable-name>: "<optional: variable-value>" # Optional, users can define any custom variable and its value.
+  # Example: "CUSTOM_VAR": "value"
+
+actions:
+  <action-name>: |
+    "<optional: action_script>" # Optional, custom action name and script.
+    # Users can define any action name (e.g., 'build', 'deploy', etc.) 
+    # and the corresponding action script.
+  # Example: "build": "npm run build"
+  # Example: "deploy": "kubectl apply -f deployment.yaml"
+  # Any custom action can be added here.

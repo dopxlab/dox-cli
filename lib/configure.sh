@@ -276,7 +276,7 @@ function run_installation_script(){
         echo -e "\033[0;32m$script\033[0m"
         echo ""
 
-        echo "$script" | bash
+        eval "$script"
     else
         info "No script found $lib_config_file in $script_path for $lib. Skipping script execution."
     fi
