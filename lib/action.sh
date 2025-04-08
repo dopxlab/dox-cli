@@ -137,7 +137,7 @@ configure_action $tool_name
 # Loop through the actions (starting from $2 as the first argument is the tool name)
 for action in "${@:2}"; do
     echo "⚙️ Executing action: $action using tool: $tool_name"
-    run_action_script $tool_name ".$action"
+    run_action_script $tool_name ".actions.$action"
 done
 
 echo "✅ Actions completed for tool: $tool_name"
