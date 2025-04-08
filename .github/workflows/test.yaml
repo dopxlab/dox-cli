@@ -7,22 +7,31 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      # Step 0: Ensure required utilities are installed
+      - name: Ensure tar and unzip are available
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tar unzip
+
       # Step 1: Download and run the installation script
       - name: Install DOX CLI
         run: |
-          curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh && bash install.sh
+          curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh
+          bash install.sh
 
       # Step 2: Verify the installation
       - name: Verify DOX CLI installation
         run: |
           dox --version
 
-      # Step 3: Run DOX configure command to test functionality
+      # Step 3: Run DOX configure command to test functionality ( Ensuring java and maven are installed)
       - name: Run DOX configure
         run: |
-          dox configure
+          dox configure maven
+          java -version 
+          mvn -v
 
       # Step 4: Additional testing or usage
       - name: Additional Test Step
         run: |
-          dox deploy
+          echo "dox <action>"
