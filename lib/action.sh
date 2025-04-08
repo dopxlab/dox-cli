@@ -134,13 +134,12 @@ function configure_action() {
 }
 
 lib=$1
-echo "🚀 Running action for tool: $lib"
 ensure_file_exists "$ACTION_FILE_PATH/$lib.yaml"
 configure_action $lib
 
 # Loop through the actions (starting from $2 as the first argument is the tool name)
 for action in "${@:2}"; do
-    echo "⚙️ Executing action: '$lib $action'"
+    echo "🚀 Executing action: '$lib $action'"
     run_action_script $lib ".actions.$action"
 done
 
