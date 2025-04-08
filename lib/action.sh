@@ -86,7 +86,7 @@ function run_action_script(){
     local lib_config_file="$ACTION_FILE_PATH/$lib.yaml"
 
     # Extract the script value using yq
-    script=$(yq eval ".${script_path} // \"\"" "$lib_config_file")
+    script=$(yq eval "${script_path} // \"\"" "$lib_config_file")
 
     # Check if the script is empty, if it's not, then run it
     if [[ -n "$script" ]]; then
@@ -129,15 +129,16 @@ function configure_action() {
     fi
 }
 
-tool_name=$1
-echo "🚀 Running action for tool: $tool_name"
-ensure_file_exists "$ACTION_FILE_PATH/$tool_name.yaml"
-configure_action $tool_name
+lib=$1
+echo "🚀 Running action for tool: $lib"
+ensure_file_exists "$ACTION_FILE_PATH/$lib.yaml"
+configure_action $lib
 
 # Loop through the actions (starting from $2 as the first argument is the tool name)
 for action in "${@:2}"; do
-    echo "⚙️ Executing action: '$tool_name $action'"
-    run_action_script $tool_name ".actions.$action"
+    echo "⚙️ Executing action: '$lib $action'"
+    run_action_script $lib ".actions.$action"
+    
 done
 
-echo "✅ Actions completed for tool: $tool_name"
+echo "✅ Actions completed for tool: $lib"
