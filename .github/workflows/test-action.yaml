@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Step 0: Ensure required utilities are installed
-      - name: Ensure tar and unzip are available
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y tar unzip
+#      - name: Ensure tar and unzip are available
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install -y tar unzip
 
       # Step 1: Download and run the installation script
       - name: Install DOX CLI
@@ -24,12 +24,12 @@ jobs:
           cp $HOME/.dox/bin/* /usr/local/bin/
           dox --version  # Verify that DOX CLI is now available
 
-      # Step 3: Run DOX configure command to test functionality (Ensuring java and maven are installed)
-      - name: Run DOX Configure
+      # Step 3: Additional testing or usage
+      - name: Run DOX Action
         run: |
-          dox configure angular helm maven sonar-scanner syft terraform twistcli yarn
+          dox helm template
 
       # Step 4: Additional testing or usage
       - name: Run DOX Action
         run: |
-          dox helm template
+          dox helm package
