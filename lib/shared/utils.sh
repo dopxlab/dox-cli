@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source ${SCRIPTS_PATH}/shared/print.sh
-
 # Function to escape slashes in a string
 function escape_slashes() {
     local input_string="$1"
@@ -20,7 +18,7 @@ function get_workspace_path() {
 function cd_workspace() {
     local workspace
     workspace=$(get_workspace_path)
-    print "Workspace: $workspace"
+    echo "Workspace: $workspace"
     # Change to the workspace directory
     cd "$workspace" || { echo "Failed to change directory to $workspace"; exit 1; }
 }
