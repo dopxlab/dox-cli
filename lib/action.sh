@@ -119,7 +119,7 @@ function configure_action() {
         # Create a real temporary folder and export the path as an environment variable
         
         # Creates a unique temporary directory and copy the files to template_folder
-        local template_folder=$(mktemp -d)
+        export template_folder=$(mktemp -d)
         
         echo "Temporary folder created at: $template_folder"
         
