@@ -24,12 +24,12 @@ jobs:
           cp $HOME/.dox/bin/* /usr/local/bin/
           dox --version  # Verify that DOX CLI is now available
 
-      # Step 3: Additional testing or usage
-      - name: Run DOX Action
+      # Step 3: DOX Action 1
+      - name: dox helm template
         run: |
           dox helm template
 
-      # Step 4: Additional testing or usage
-      - name: Run DOX Action
+      # Step 4: DOX Action 2
+      - name: dox helm package
         run: |
           dox helm package
