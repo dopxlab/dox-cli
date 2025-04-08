@@ -33,7 +33,7 @@ export DOX_DIR="$HOME/.dox"
 # Define the URL for the latest release tarball and the install directory
 DOX_RELEASE_URL="https://github.com/dopxlab/dox-cli/releases/latest/download/dox-cli.tar.gz"
 
-mkdir -p "$DOX_DIR"
+rm -rf "$DOX_DIR" && mkdir -p "$DOX_DIR"
 
 # Download, extract, and set up DOX CLI
 curl -LO $DOX_RELEASE_URL && tar -xzf dox-cli.tar.gz -C "$DOX_DIR" && rm -f dox-cli.tar.gz
