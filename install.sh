@@ -59,8 +59,8 @@ command -v yq &>/dev/null || {
 echo "✅ DOX CLI installed successfully!"
 
 # Reload .bashrc to apply changes
-#source "$HOME/.bashrc"
+source "$HOME/.bashrc"
 
 # Test if DOX CLI is working
-#echo "Testing DOX CLI" 
-#dox --version
+echo "Testing DOX CLI" 
+dox --version
