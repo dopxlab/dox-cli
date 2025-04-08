@@ -25,11 +25,11 @@ jobs:
           dox --version  # Verify that DOX CLI is now available
 
       # Step 3: Run DOX configure command to test functionality (Ensuring java and maven are installed)
-      - name: Run DOX configure
+      - name: Run DOX Configure
         run: |
           dox configure angular helm maven sonar-scanner syft terraform twistcli yarn
 
       # Step 4: Additional testing or usage
-      - name: Additional Test Step
+      - name: Run DOX Action
         run: |
-          echo "dox helm template"
+          dox helm template
