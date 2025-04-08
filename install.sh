@@ -54,5 +54,3 @@ command -v yq &>/dev/null || {
 }
 
 echo "✅ DOX CLI installed successfully!"
-
-dox --version
