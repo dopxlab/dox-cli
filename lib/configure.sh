@@ -98,14 +98,14 @@ function download_and_extract() {
     echo -e "\033[0;32mDownload completed. Extracting to $install_dir\033[0m"
 
     # Determine the archive type and extract accordingly
-    if [[ "$lib_url" =~ \.tar\.gz$ ]]; then
-        tar -xzf "$temp_file" -C "$install_dir" && echo "Extracting tar.gz"
+    if [[ "$lib_url" =~ \.tar\.gz$ || "$lib_url" =~ \.tgz$ ]]; then
+        tar -xzf "$temp_file" -C "$install_dir" && echo "Extracting tar.gz or tgz"
     elif [[ "$lib_url" =~ \.zip$ ]]; then
         unzip "$temp_file" -d "$install_dir" && echo "Unzipping zip"
     elif [[ "$lib_url" =~ \.tar\.xz$ ]]; then
         tar -xJf "$temp_file" -C "$install_dir" && echo "Extracting tar.xz"
     else
-        error "Invalid lib_url format: $lib_url. Must end with .tar.gz, .zip, or .tar.xz." && return 1
+        error "Invalid lib_url format: $lib_url. Must end with .tar.gz, .zip, .tgz, or .tar.xz." && return 1
     fi
 
     info "Extraction successful. Library installed to $install_dir"
