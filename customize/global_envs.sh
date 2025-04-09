@@ -22,26 +22,24 @@ export GIT_COMMIT_ID="$(get_git_commit_id)"              # Full commit hash (SHA
 export GIT_COMMIT_SHORT_ID="$(get_git_commit_short_id)"  # Short commit hash (e.g., first 7 characters)
 export GIT_COMMIT_MESSAGE="$(get_git_commit_message)"    # Full commit message
 
-# Function to generate a version string based on the current date and time
-# This helps to create a unique version string for each build or deployment.
-# Format: YYYY.MM.DD.HHMMSS
-# Example output: 2025.04.09.142310
-
-function get_version() {
-    local year=$(date +%Y)   # Get the current year (e.g., 2025)
-    local month=$(date +%m)  # Get the current month (e.g., 04)
-    local day=$(date +%d)    # Get the current day of the month (e.g., 09)
-    local time=$(date +%H%M%S)  # Get the current time in HHMMSS format (e.g., 142310)
-
-    # Return the version string
-    echo "${year}.${month}.${day}.${time}"  # Result: e.g., '2025.04.09.142310'
-}
-
 # Exported environment variables that are useful for versioning, builds, and deployments
 # These variables are commonly used in CI/CD pipelines, Helm charts, etc.
 
+function get_build_version() {
+  # Get the current date in the format YYYYMMDD.HHMMSS
+  pipeline_id=0
+  timestamp=$(date +"%Y%m%d.%H%M%S")
+  
+  # Remove the leading zero from the hour (if applicable)
+  formatted_timestamp=$(echo $timestamp | sed 's/\([0-9]\{8\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1\2\3/')
+
+  # Output the formatted timestamp with the pipeline_id
+  echo "$formatted_timestamp.$pipeline_id"
+}
+
+
 export APPLICATION_NAME="$GIT_REPOSITORY_NAME"    # Use the Git repository name as the application name
-export BUILD_VERSION="$(get_version)"             # Generate the build version based on current date and time
+export BUILD_VERSION="${BUILD_VERSION:-$(get_build_version)}"
 
 # The variables `APPLICATION_NAME` and `BUILD_VERSION` are used throughout the pipeline, 
 # Helm chart deployment, and other related tools to ensure consistency and traceability.
