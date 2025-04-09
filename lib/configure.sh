@@ -80,7 +80,6 @@ function configure_env_variables() {
         echo "Warning: $ENV_PATH file not found...!"
     fi
 }
-
 function download_and_extract() {
     local lib_url=$1
     local install_dir=$2
@@ -97,15 +96,30 @@ function download_and_extract() {
 
     echo -e "\033[0;32mDownload completed. Extracting to $install_dir\033[0m"
 
-    # Determine the archive type and extract accordingly
-    if [[ "$lib_url" =~ \.tar\.gz$ || "$lib_url" =~ \.tgz$ ]]; then
-        tar -xzf "$temp_file" -C "$install_dir" && echo "Extracting tar.gz or tgz"
-    elif [[ "$lib_url" =~ \.zip$ ]]; then
-        unzip "$temp_file" -d "$install_dir" && echo "Unzipping zip"
-    elif [[ "$lib_url" =~ \.tar\.xz$ ]]; then
-        tar -xJf "$temp_file" -C "$install_dir" && echo "Extracting tar.xz"
+    # Get the file name and extension
+    local filename=$(basename "$lib_url")
+    local extension="${filename##*.}"
+
+    # Check if the file has an extension
+    if [[ "$filename" == "$extension" ]]; then
+        # No extension, assume it's a regular file and copy ( Example kubectl )
+        mv "$temp_file" "$install_dir/$filename" && echo "Moving $filename to: $install_dir"
     else
-        error "Invalid lib_url format: $lib_url. Must end with .tar.gz, .zip, .tgz, or .tar.xz." && return 1
+        # File has an extension, determine its type and extract accordingly
+        case "$extension" in
+            gz|tgz)
+                tar -xzf "$temp_file" -C "$install_dir" && echo "Extracting tar.gz or tgz"
+                ;;
+            zip)
+                unzip "$temp_file" -d "$install_dir" && echo "Unzipping zip"
+                ;;
+            xz)
+                tar -xJf "$temp_file" -C "$install_dir" && echo "Extracting tar.xz"
+                ;;
+            *)
+                error "Unsupported file extension: $extension" && return 1
+                ;;
+        esac
     fi
 
     info "Extraction successful. Library installed to $install_dir"
@@ -113,6 +127,7 @@ function download_and_extract() {
 
     echo "Downloaded and extracted the library to $install_dir."
 }
+
 
 
 # Define the move_contents_and_remove_subfolder function
