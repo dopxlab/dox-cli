@@ -9,6 +9,19 @@ set -euo pipefail
 # Source the git_helpers.sh file to load git-related helper functions
 source "${DOX_DIR}/lib/shared/git_helpers.sh"
 
+#------- Preventing from re-initializing the environment variables ---------
+# Check if the environment has already been initialized.
+# The check is done by inspecting the GLOBAL_ENV_INITIALIZED variable.
+if [[ "${GLOBAL_ENV_INITIALIZED:-false}" == "true" ]]; then
+  # If the environment is already initialized, exit the script to avoid re-initialization.
+  echo "Environment already initialized. Exiting..."
+  exit 0
+fi
+
+# Mark the environment as initialized by setting GLOBAL_ENV_INITIALIZED to true.
+# This ensures the script won't re-run the initialization steps next time.
+echo "GLOBAL_ENV_INITIALIZED=true" >> $GITHUB_ENV
+
 # Export Git-based environment variables for the current repository
 # These variables are useful for logging, versioning, and deployment contexts
 
@@ -37,9 +50,8 @@ function get_build_version() {
   echo "$formatted_timestamp.$pipeline_id"
 }
 
-
-export APPLICATION_NAME="$GIT_REPOSITORY_NAME"    # Use the Git repository name as the application name
-export BUILD_VERSION="${BUILD_VERSION:-$(get_build_version)}"
-
 # The variables `APPLICATION_NAME` and `BUILD_VERSION` are used throughout the pipeline, 
 # Helm chart deployment, and other related tools to ensure consistency and traceability.
+
+export APPLICATION_NAME="${APPLICATION_NAME:-$GIT_REPOSITORY_NAME}"
+export BUILD_VERSION="${BUILD_VERSION:-$(get_build_version)}"
