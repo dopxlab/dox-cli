@@ -16,5 +16,6 @@ configuration:
   # Print the installed version of the package
   post_configuration_script: |
     # Print the installed version
+    docker --version
+    whereis docker
     tree ${DOX_RESOURCES_DIR}/docker/${DOCKER_CLI_VERSION}
-    ${DOX_RESOURCES_DIR}/docker/${DOCKER_CLI_VERSION}/docker --version
