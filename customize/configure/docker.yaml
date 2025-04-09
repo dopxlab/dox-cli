@@ -11,10 +11,10 @@ configuration:
 
   # Environment variable mappings for the installation paths
   environments:
-    PATH: "${install_dir}"
+    PATH: "${install_dir}/docker"
 
   # Print the installed version of the package
   post_configuration_script: |
     # Print the installed version
     tree ${DOX_RESOURCES_DIR}/docker/${DOCKER_CLI_VERSION}
-    ${DOX_RESOURCES_DIR}/docker/${DOCKER_CLI_VERSION}/docker/docker --version
+    ${DOX_RESOURCES_DIR}/docker/${DOCKER_CLI_VERSION}/docker --version

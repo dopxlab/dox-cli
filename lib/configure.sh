@@ -271,10 +271,14 @@ function run_installation_script(){
     if [[ -n "$script" ]]; then
         print "33" "40" "Running $script_path Script"  # Yellow text on black background
         echo ""
-        echo -e "\033[0;32m$script\033[0m"
+        echo -e "\033[1;36mOriginal script:\033[0m"  # Bold cyan for the label
+        echo -e "\033[0;36m$script\033[0m"  # Cyan color for the original script
         echo ""
-
-        eval "$script"
+        script_with_vars=$(echo "$script" | envsubst)
+        echo -e "\033[1;32mSubstituted script:\033[0m"  # Bold green for the label
+        echo -e "\033[0;32m$script_with_vars\033[0m"  # Green color for the substituted script
+        echo ""
+        eval "$script_with_vars"
     else
         info "No script found $lib_config_file in $script_path for $lib. Skipping script execution."
     fi
