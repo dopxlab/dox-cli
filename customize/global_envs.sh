@@ -7,7 +7,7 @@
 set -euo pipefail
 
 # Source the git_helpers.sh file to load git-related helper functions
-source "${DOX_DIR}/shared/git_helpers.sh"
+source "${DOX_DIR}/lib/shared/git_helpers.sh"
 
 # Export Git-based environment variables for the current repository
 # These variables are useful for logging, versioning, and deployment contexts
