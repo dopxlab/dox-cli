@@ -16,15 +16,9 @@ function get_git_branch_name() {
     fi
 }
 
-# Function to get the Git committer's sanitized name
+# Function to get the Git committer's name without sanitizing
 function get_git_committer_name() {
     local git_committer_name=$(git -C . log -1 --pretty=format:'%an')
-    # Remove leading and trailing spaces
-    git_committer_name=$(echo "$git_committer_name" | sed 's/^[ \t]*//;s/[ \t]*$//')
-    # Replace non-alphabetic characters with underscores
-    git_committer_name=$(echo "$git_committer_name" | sed 's/[^a-zA-Z]/_/g')
-    # Remove consecutive underscores
-    git_committer_name=$(echo "$git_committer_name" | sed 's/_\+/_/g')
     echo "${git_committer_name}"
 }
 
