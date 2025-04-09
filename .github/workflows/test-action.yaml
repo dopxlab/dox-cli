@@ -1,8 +1,10 @@
 name: Install and Test DOX CLI - Action
 
 on:
-  workflow_dispatch:
-
+  workflow_run:
+    workflows: ["Build Release"]  # Trigger this workflow after "Build Release" is completed
+    types:
+      - completed  # Trigger after the workflow completes
 jobs:
   test:
     runs-on: ubuntu-latest
