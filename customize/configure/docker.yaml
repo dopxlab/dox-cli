@@ -16,4 +16,4 @@ configuration:
   # Print the installed version of the package
   post_configuration_script: |
     # Print the installed version
-    docker --version
+    /home/runner/dox_resources/docker/${DOCKER_CLI_VERSION}/docker --version

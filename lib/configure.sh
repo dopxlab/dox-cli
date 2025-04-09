@@ -204,6 +204,8 @@ function configure() {
 
     # Evaluate shell variable expansion for the default version
     lib_version=$(eval echo "$lib_version")
+    #Exporting variable name 
+    export "$variable_name"="$lib_version"
 
     echo -e "Resolved $lib version: \033[0;33m$lib_version\033[0m"
 
