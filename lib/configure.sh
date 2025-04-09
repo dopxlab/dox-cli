@@ -138,6 +138,11 @@ function move_contents_and_remove_subfolder() {
     else
         echo "No subdirectory found, skipping the move."
     fi
+    # List the contents of the target directory with detailed and colorized output
+    echo ""
+    echo "$target_dir"
+    ls -l --color=auto "$target_dir"
+    echo ""
 }
 
 
