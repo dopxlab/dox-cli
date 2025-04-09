@@ -5,8 +5,8 @@ installation:
     "28.0.4": "https://download.docker.com/linux/static/stable/x86_64/docker-28.0.4.tgz"
     "27.5.1": "https://download.docker.com/linux/static/stable/x86_64/docker-27.5.1.tgz"
     "26.1.4": "https://download.docker.com/linux/static/stable/x86_64/docker-26.1.4.tgz"
+
 configuration:
-  # Default versioning using an environment variable or fallback to version 
   default_version: "${DOCKER_CLI_VERSION:-28.0.4}"
 
   # Environment variable mappings for the installation paths

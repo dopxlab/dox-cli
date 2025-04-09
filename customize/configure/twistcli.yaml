@@ -4,10 +4,6 @@ installation:
     # Define version download path
     #"32.06.132": "<PATH>//twistcli/twistcli-32.06.132.tar.gz"
 
-  post_installation_script: |
-    # Optional post-installation script if required
-    echo "Post-installation script executed"
-
 configuration:
   # Default versioning using an environment variable or fallback to version 1.10.5
   default_version: "${TWIST_CLI_VERSION:-32.06.132}"

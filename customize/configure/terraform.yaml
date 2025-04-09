@@ -4,10 +4,6 @@ installation:
     # Define Terraform version download path
     "1.10.5": "https://releases.hashicorp.com/terraform/1.10.5/terraform_1.10.5_linux_amd64.zip"
 
-  post_installation_script: |
-    # Optional post-installation script if required
-    echo "Post-installation script executed"
-
 configuration:
   # Default versioning using an environment variable or fallback to version 1.10.5
   default_version: "${TERRAFORM_VERSION:-1.10.5}"

@@ -7,10 +7,6 @@ installation:
     "16.0.0": "npm install @angular/cli@16.0.0"
     "17.0.0": "npm install @angular/cli@17.0.0"
 
-  post_installation_script: |
-    # Add post-installation steps here if necessary
-    echo "Post-installation script executed"
-
 configuration:
   # Default versioning using an environment variable or fallback to a placeholder version
   default_version: "${ANGULAR_VERSION:-16.0.0}"
