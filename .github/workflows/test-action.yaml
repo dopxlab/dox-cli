@@ -15,6 +15,9 @@ jobs:
 #          sudo apt-get update
 #          sudo apt-get install -y tar unzip
 
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
       # Step 1: Download and run the installation script
       - name: Install DOX CLI
         run: |

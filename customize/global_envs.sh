@@ -4,30 +4,13 @@
 # - `-e`: Exit script on error.
 # - `-u`: Treat unset variables as an error.
 # - `-o pipefail`: Fail the script if any part of a pipeline fails.
-#set -euo pipefail
+set -euo pipefail
 
 # Source the git_helpers.sh file to load git-related helper functions
 source "${DOX_DIR}/lib/shared/git_helpers.sh"
 
 # Export Git-based environment variables for the current repository
 # These variables are useful for logging, versioning, and deployment contexts
-function get_workspace_path() {
-    local workspace="$GITHUB_WORKSPACE"
-    if [ -n "$BUILD_PATH" ]; then
-        workspace="$GITHUB_WORKSPACE/$BUILD_PATH"
-    fi   
-    echo "$workspace"
-}
-
-function cd_workspace() {
-    local workspace
-    workspace=$(get_workspace_path)
-    echo "Workspace: $workspace"
-    # Change to the workspace directory
-    cd "$workspace" || { echo "Failed to change directory to $workspace"; exit 1; }
-}
-
-cd_workspace
 
 export GIT_REPOSITORY_NAME="$(get_git_repository_name)"  # Full repository name, e.g., 'my-repo'
 export GIT_BRANCH_NAME="$(get_git_branch_name)"          # Current branch name, e.g., 'feature-xyz'
