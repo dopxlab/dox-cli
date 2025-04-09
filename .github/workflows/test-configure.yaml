@@ -67,12 +67,17 @@ jobs:
         run: |
           dox configure docker
 
-      # Step 11: Run DOX configure command to test functionality (Ensuring docker installed)
+      # Step 11: Run DOX configure command to test functionality (Ensuring kubectl installed)
       - name: dox configure kubectl
         run: |
           dox configure kubectl
 
-      # Step 12: Run DOX configure command to test functionality (Ensuring docker installed)
+      # Step 12: Run DOX configure command to test functionality (Ensuring argocd installed)
       - name: dox configure argocd
         run: |
           dox configure argocd
+
+      # Step 13: Run DOX configure command to test functionality (Ensuring trivy installed)
+      - name: dox configure trivy
+        run: |
+          dox configure trivy

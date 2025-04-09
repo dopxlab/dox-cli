@@ -1,0 +1,17 @@
+configure: |
+  dox configure docker
+  docker login $username $password
+
+template_folder: "${DOX_CUSTOM_DIR}/action/templates/docker" # ${template_folder} will be resolved path of the template folder 
+
+variables:
+  APPLICATION_NAME: "${APPLICATION_NAME:-demo-application-name}"
+  IMAGE_TAG: "${BUILD_VERSION:-1.0.0}"
+  DOCKER_IMAGE_PUSH_PREFIX: "${DOCKER_IMAGE_PUSH_PREFIX}"
+  DOCKER_FILE_PATH: "${DOCKER_FILE_PATH:-.}"
+
+actions:
+  build: |
+    docker build
+  push: |
+    docker push
