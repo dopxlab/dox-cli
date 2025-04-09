@@ -1,0 +1,26 @@
+# Installation and Configuration
+installation:
+  download:
+    # Define version download paths # https://github.com/argoproj/argo-cd/blob/master/docs/cli_installation.md
+    "2.14.9": "https://github.com/argoproj/argo-cd/releases/download/v2.14.9/argocd-linux-amd64"
+    "2.13.6": "https://github.com/argoproj/argo-cd/releases/download/v2.13.6/argocd-linux-amd64"
+    "2.12.11": "https://github.com/argoproj/argo-cd/releases/download/v2.12.11/argocd-linux-amd64"
+  
+  post_installation_script: |
+    #!/bin/bash
+    echo "Configuring argocd cli"
+    mv "${DOX_RESOURCES_DIR}/argocd/${ARGOCD_VERSION}/"* "${DOX_RESOURCES_DIR}/argocd/${ARGOCD_VERSION}/argocd"
+
+configuration:
+  # Default versioning using an environment variable or fallback to version 
+  default_version: "${ARGOCD_VERSION:-2.14.9}"
+
+  # Environment variable mappings for the installation paths
+  environments:
+    PATH: "${install_dir}/docker"
+
+  # Print the installed version of the package
+  post_configuration_script: |
+    # Print the installed version
+    argocd version
+    whereis argocd

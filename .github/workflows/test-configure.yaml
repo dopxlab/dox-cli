@@ -71,3 +71,8 @@ jobs:
       - name: dox configure kubectl
         run: |
           dox configure kubectl
+
+      # Step 12: Run DOX configure command to test functionality (Ensuring docker installed)
+      - name: dox configure argocd
+        run: |
+          dox configure argocd
