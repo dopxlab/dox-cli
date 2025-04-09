@@ -66,3 +66,8 @@ jobs:
       - name: dox configure docker
         run: |
           dox configure docker
+
+      # Step 11: Run DOX configure command to test functionality (Ensuring docker installed)
+      - name: dox configure kubectl
+        run: |
+          dox configure kubectl
