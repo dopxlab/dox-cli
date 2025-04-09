@@ -42,5 +42,8 @@ function get_build_version() {
 
 export APPLICATION_NAME="${APPLICATION_NAME:-$GIT_REPOSITORY_NAME}"
 
-#GLOBAL initilization GitHub 
-echo "BUILD_VERSION=${BUILD_VERSION:-$(get_build_version)}" >> $GITHUB_ENV
+export BUILD_VERSION="${BUILD_VERSION:-$(get_build_version)}"
+
+#GLOBAL BUILD_VERSION initilization for GitHub 
+echo "BUILD_VERSION=${BUILD_VERSION}" >> $GITHUB_ENV
+
