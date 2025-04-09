@@ -17,7 +17,7 @@ configuration:
 
   # Environment variable mappings for the installation paths
   environments:
-    PATH: "${install_dir}/docker"
+    PATH: "${install_dir}"
 
   # Print the installed version of the package
   post_configuration_script: |
