@@ -1,0 +1,24 @@
+configure: |
+  dox configure helm
+  source ${DOX_CUSTOM_DIR}/global_envs.sh
+
+template_folder: "${DOX_CUSTOM_DIR}/action/templates/argocd" # ${template_folder} will be resolved path of the template folder 
+
+variables:
+  APPLICATION_NAME: "${APPLICATION_NAME:-demo-application-name}"
+  MAINTAINER_NAME: "${GIT_COMMITTER_NAME:-Dox Engine}"
+  MAINTAINER_EMAIL: "${GIT_COMMITTER_EMAIL:-johndoe@example.com}"
+  GIT_COMMIT_URL: "${GIT_COMMIT_URL}"
+  GIT_COMMIT_ID: "${GIT_COMMIT_ID}"
+  GIT_COMMIT_SHORT_ID: "${GIT_COMMIT_SHORT_ID}"
+  GIT_BRANCH_NAME: "${GIT_BRANCH_NAME}"
+  GIT_COMMIT_MESSAGE: "${GIT_COMMIT_MESSAGE}"
+  BUILD_VERSION: "${BUILD_VERSION:-1.0.0}"
+
+  PIPELINE_URL: "${PIPELINE_URL:-}"
+  REPO_URL: "${REPO_URL:-}"
+  NAMESPACE: "${NAMESPACE:-default}"
+
+actions:
+  deploy: |
+    cat "${template_folder}/application.yaml"

@@ -1,0 +1,60 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "##APPLICATION_NAME##"
+  namespace: argocd
+  annotations:
+    maintainer-name: "##MAINTAINER_NAME##"
+    maintainer-email: "##MAINTAINER_EMAIL##"
+    git-commit-url: "##GIT_COMMIT_URL##"
+    git-commit-id: "##GIT_COMMIT_ID##"
+    git-commit-short-id: "##GIT_COMMIT_SHORT_ID##"
+    pipeline-url: "##PIPELINE_URL##"
+    pipeline-id: "##BUILD_VERSION##"
+spec:
+  project: default
+  revisionHistoryLimit: 5  
+  source:
+    repoURL: "##REPO_URL##"
+    targetRevision: "##BUILD_VERSION##-helm"
+    chart: "##APPLICATION_NAME##"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ##NAMESPACE##
+# Sync policy
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false 
+    syncOptions:     # Sync options which modifies sync behavior
+    - Validate=false # disables resource validation (equivalent to 'kubectl apply --validate=false') ( true by default ).
+    - CreateNamespace=true # Namespace Auto-Creation ensures that namespace specified as the application destination exists in the destination cluster.
+    - PrunePropagationPolicy=foreground # Supported policies are background, foreground and orphan.
+    - PruneLast=true # Allow the ability for resource pruning to happen as a final, implicit wave of a sync operation
+    retry:
+      limit: 5 # number of failed sync attempt retries; unlimited number of attempts if less than 0
+      backoff:
+        duration: 5s # the amount to back off. Default unit is seconds, but could also be a duration (e.g. "2m", "1h")
+        factor: 2 # a factor to multiply the base duration after each failed retry
+        maxDuration: 3m # the maximum amount of time allowed for the backoff strategy       
+  # Extra information to show in the Argo CD Application details tab     
+  info:
+    - name: 'Git Branch:'
+      value: "##GIT_BRANCH_NAME##"
+    - name: 'Git Commit URL:'
+      value: "##GIT_COMMIT_URL##" 
+    - name: 'Git Commit Message:'
+      value: "##GIT_COMMIT_MESSAGE##"
+    - name: 'Maintainer Name:'
+      value: "##MAINTAINER_NAME##"       
+    - name: 'Maintainer Email:'
+      value: "##MAINTAINER_EMAIL##"    
+    - name: 'Full Git Commit ID:'
+      value: "##GIT_COMMIT_ID##"
+    - name: 'Short Git Commit ID:'
+      value: "##GIT_COMMIT_SHORT_ID##"
+    - name: 'Pipeline URL:'
+      value: "##PIPELINE_URL##"
+    - name: 'Build Version:'
+      value: "##BUILD_VERSION##"     

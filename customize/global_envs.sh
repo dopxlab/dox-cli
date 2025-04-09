@@ -41,7 +41,6 @@ function get_build_version() {
 # Helm chart deployment, and other related tools to ensure consistency and traceability.
 
 export APPLICATION_NAME="${APPLICATION_NAME:-$GIT_REPOSITORY_NAME}"
-
 export BUILD_VERSION="${BUILD_VERSION:-$(get_build_version)}"
 
 #GLOBAL BUILD_VERSION initilization for GitHub 

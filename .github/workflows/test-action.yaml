@@ -38,3 +38,8 @@ jobs:
       - name: dox helm package
         run: |
           dox helm package
+
+      # Step 5: DOX Action 3
+      - name: dox argocd deploy
+        run: |
+          dox argocd deploy
