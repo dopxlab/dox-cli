@@ -1,0 +1,14 @@
+<html>
+<head><title>404 Not Found</title></head>
+<body>
+<h1>404 Not Found</h1>
+<ul>
+<li>Code: NoSuchKey</li>
+<li>Message: The specified key does not exist.</li>
+<li>Key: linux/static/stable/amd64/docker-20.10.8.tgz</li>
+<li>RequestId: VGCGXCNJB2KYERW6</li>
+<li>HostId: c9J6gYayhmNqNZN1RAs6YHV0TQp63Dpqf/GEjvJXIIof0z+QPlqp6CKJwoAM9z9joBwYL1ZJ3k0=</li>
+</ul>
+<hr/>
+</body>
+</html>

@@ -24,12 +24,12 @@ jobs:
           cp $HOME/.dox/bin/* /usr/local/bin/
           dox --version  # Verify that DOX CLI is now available
 
-      # Step 3: Run DOX configure command to test functionality (Ensuring java and maven are installed)
+      # Step 3: Run DOX configure command to test functionality (Ensuring angular and manodeven are installed)
       - name: dox configure angular +node
         run: |
           dox configure angular
 
-      # Step 4: Run DOX configure command to test functionality (Ensuring java and maven are installed)
+      # Step 4: Run DOX configure command to test functionality (Ensuring helm installed)
       - name: dox configure helm
         run: |
           dox configure helm
@@ -39,7 +39,7 @@ jobs:
         run: |
           dox configure maven
 
-      # Step 6: Run DOX configure command to test functionality (Ensuring java and maven are installed)
+      # Step 6: Run DOX configure command to test functionality (Ensuring sonar-scanner installed)
       - name: dox configure sonar-scanner
         run: |
           dox configure sonar-scanner
@@ -49,12 +49,17 @@ jobs:
         run: |
           dox configure syft
 
-      # Step 8: Run DOX configure command to test functionality (Ensuring java and maven are installed)
+      # Step 8: Run DOX configure command to test functionality (Ensuring terraform installed)
       - name: dox configure terraform
         run: |
           dox configure terraform
 
-      # Step 9: Run DOX configure command to test functionality (Ensuring java and maven are installed)
+      # Step 9: Run DOX configure command to test functionality (Ensuring yarn and node are installed)
       - name: dox configure yarn +node
         run: |
           dox configure yarn
+
+      # Step 10: Run DOX configure command to test functionality (Ensuring docker installed)
+      - name: dox configure docker
+        run: |
+          dox configure docker
