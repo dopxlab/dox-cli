@@ -43,6 +43,9 @@ function get_build_version() {
 export APPLICATION_NAME="${APPLICATION_NAME:-$GIT_REPOSITORY_NAME}"
 export BUILD_VERSION="${BUILD_VERSION:-$(get_build_version)}"
 
+#Using GitHub Variables
+export PIPELINE_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+
 #GLOBAL BUILD_VERSION initilization for GitHub 
 echo "BUILD_VERSION=${BUILD_VERSION}" >> $GITHUB_ENV
 

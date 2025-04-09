@@ -4,7 +4,6 @@ metadata:
   name: "##APPLICATION_NAME##"
   namespace: argocd
   annotations:
-    maintainer-name: "##MAINTAINER_NAME##"
     maintainer-email: "##MAINTAINER_EMAIL##"
     git-commit-url: "##GIT_COMMIT_URL##"
     git-commit-id: "##GIT_COMMIT_ID##"
