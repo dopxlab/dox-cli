@@ -9,7 +9,7 @@ metadata:
     git-commit-id: "##GIT_COMMIT_ID##"
     git-commit-short-id: "##GIT_COMMIT_SHORT_ID##"
     pipeline-url: "##PIPELINE_URL##"
-    pipeline-id: "##BUILD_VERSION##"
+    build-version: "##BUILD_VERSION##"
 spec:
   project: default
   revisionHistoryLimit: 5  
