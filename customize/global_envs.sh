@@ -4,7 +4,7 @@
 # - `-e`: Exit script on error.
 # - `-u`: Treat unset variables as an error.
 # - `-o pipefail`: Fail the script if any part of a pipeline fails.
-set -euo pipefail
+#set -euo pipefail
 
 # Source the git_helpers.sh file to load git-related helper functions
 source "${DOX_DIR}/lib/shared/git_helpers.sh"
