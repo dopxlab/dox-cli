@@ -130,29 +130,21 @@ The configuration file for the maven setup is located at:
   <summary>Example: Maven Configuration</summary>
 
   ```yaml
-# Installation and Configuration
-installation:
-  # List of required dependencies to be installed
-  dependencies:
-    - jdk
-  download:
-    # Define Maven version download paths
-    "3.9.9": "https://dlcdn.apache.org/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz"
-    "4.0.0-rc-3": "https://dlcdn.apache.org/maven/maven-4/4.0.0-rc-3/binaries/apache-maven-4.0.0-rc-3-bin.tar.gz"
+    installation:
+    dependencies:
+        - jdk
+    download:
+        "3.9.9": "https://dlcdn.apache.org/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz"
+        "4.0.0-rc-3": "https://dlcdn.apache.org/maven/maven-4/4.0.0-rc-3/binaries/apache-maven-4.0.0-rc-3-bin.tar.gz"
 
-configuration:
-  # Default Maven versioning using an environment variable or fallback to version 3.9.8
-  default_version: "${MAVEN_VERSION:-3.9.9}"
-
-  # Environment variable mappings for Maven installation paths
-  environments:
-    M2_HOME: "${install_dir}"
-    PATH: "${install_dir}/bin"
-
-  # Print the installed version of the package
-  post_configuration_script: |
-    # Print the installed Maven version
-    mvn -v
+    configuration:
+    default_version: "${MAVEN_VERSION:-3.9.9}"
+    environments:
+        M2_HOME: "${install_dir}"
+        PATH: "${install_dir}/bin"
+    post_configuration_script: |
+        # Print the installed Maven version
+        mvn -v
   ```
 </details> 
     
