@@ -6,7 +6,6 @@
 [![License](https://img.shields.io/github/license/dopxlab/dox-cli?style=flat-square)](LICENSE)
 
 **`dox-cli`** is a zero-config DevOps CLI that bootstraps your tools and DevOps actions in seconds. Easily configure common tools like Maven, Helm, Docker, Terraform, and more, or run pre-defined DevOps actions such as Helm packaging — all with a single command.
-Absolutely! Here's your **production-ready `README.md`** file for the DOX CLI open-source project, including everything you've asked for—modular breakdown, how the configuration engine works, template explanation, GitHub Actions use case, examples, and license.
 
 # 🧰 DOX CLI - Unified DevOps Tooling Framework
 
@@ -37,22 +36,22 @@ Managing build tools, actions, and infrastructure can be **complex and inconsist
 
 DOX CLI consists of two main modules:
 
-### 1. ⚙️ Base CLI Scripts
+### Module 1. ⚙️ Base CLI Scripts
 
 These are reusable logic for parsing, variable resolution, folder structure, and execution engine.
 
-### 2. 🧩 Custom Modules
+### Module 2. 🧩 Custom Modules
+
+Custom configuration templates you could provide here
 
 - `configure/`: Contains configuration scripts for DevOps tools (e.g., Node, Maven, Terraform, Trivy, etc.)
 - `action/`: Contains reusable action templates like Helm packaging, Docker build/push, ArgoCD deploy, etc.
 
 ---
 
-## 🔧 Setup
+# 🔧 Install the CLI
 
-### 1. Install the CLI
-
-Just clone this repo and alias the CLI:
+Just run the installation script:
 
 ```bash
 curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh && bash install.sh
@@ -65,14 +64,13 @@ Then verify:
 dox --version
 ```
 
-
-#### For the customization you can use the following Environment Variables 
-Refer [install.sh](./install.sh)
+#### For the customization you can use the following Environment Variables (Refer [install.sh](./install.sh))
 
 
 ```bash
 export DOX_DIR="${DOX_DIR:-$HOME/.dox}" # Base cli-framework
 export DOX_CUSTOM_DIR="${DOX_CUSTOM_DIR:-$HOME/.dox/customize}" # customization part
+export DOX_RESOURCES_DIR="${DOX_RESOURCES_DIR:-$HOME/dox_resources}" #the resources downloaded and kept in cache. If you are using Kubernetes you could make a persistnce volume with (RWX) and bind to the path
 ```
 
 ---
@@ -126,6 +124,7 @@ The configuration file for the maven setup is located at:
 - [Maven Configuration](./customize/configure/maven.yaml): The Maven configuration file.
 - [JDK Configuration Template](./customize/configure/jdk.yaml): The template used in Maven template for JDK configuration.
 
+##### Note: If you need to customize the download from an internal repostiory like, nexus s3 or a pvc then adjust the [download_files.sh](./customize/download_files.sh) 
 
 <details>
   <summary>Example: Maven Configuration</summary>
@@ -297,7 +296,7 @@ actions:
 
 ```
 
-### 🧠 Template Engine
+### 🧠 Template Engine Module
 
 The action module uses a dynamic template engine:
 
