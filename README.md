@@ -55,8 +55,8 @@ These are reusable logic for parsing, variable resolution, folder structure, and
 Set your base folders:
 
 ```bash
-export DOX_CUSTOM_DIR=$(pwd)/customize
-export DOX_INSTALL_DIR=$HOME/.dox/tools
+export DOX_DIR="${DOX_DIR:-$HOME/.dox}" # Base cli-framework
+export DOX_CUSTOM_DIR="${DOX_CUSTOM_DIR:-$HOME/.dox/customize}" # customization part
 ```
 
 ### 2. Install the CLI
@@ -64,8 +64,7 @@ export DOX_INSTALL_DIR=$HOME/.dox/tools
 Just clone this repo and alias the CLI:
 
 ```bash
-curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh
-bash install.sh
+curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh && bash install.sh
 cp $HOME/.dox/bin/* /usr/local/bin/
 ```
 
