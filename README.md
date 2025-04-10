@@ -50,16 +50,7 @@ These are reusable logic for parsing, variable resolution, folder structure, and
 
 ## 🔧 Setup
 
-### 1. Environment Variables
-
-Set your base folders:
-
-```bash
-export DOX_DIR="${DOX_DIR:-$HOME/.dox}" # Base cli-framework
-export DOX_CUSTOM_DIR="${DOX_CUSTOM_DIR:-$HOME/.dox/customize}" # customization part
-```
-
-### 2. Install the CLI
+### 1. Install the CLI
 
 Just clone this repo and alias the CLI:
 
@@ -72,6 +63,16 @@ Then verify:
 
 ```bash
 dox --version
+```
+
+
+#### For the customization you can use the following Environment Variables 
+Refer [install.sh](./install.sh)
+
+
+```bash
+export DOX_DIR="${DOX_DIR:-$HOME/.dox}" # Base cli-framework
+export DOX_CUSTOM_DIR="${DOX_CUSTOM_DIR:-$HOME/.dox/customize}" # customization part
 ```
 
 ---
