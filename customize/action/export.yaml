@@ -3,12 +3,14 @@ configure: |
   if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
     echo "[git-utils] Error: Not a Git repository. Exiting..."
     exit 1
+  else
+    echo "[git-utils] Git repository validated."
   fi
-  echo "[git-utils] Git repository validated."
   
 actions:
   # Call each export action by the prefix dox export-vars
   global-vars: |
+
     dox export BUILD_VERSION
     dox export REPOSITORY_NAME
     dox export BRANCH_NAME
@@ -23,6 +25,7 @@ actions:
 
   # Generate BUILD_VERSION using a different method
   BUILD_VERSION: |
+  
     timestamp=$(date +"%Y%m%d.%H%M%S")
     formatted_timestamp=$(date +"%Y%m%d.%H%M%S" | sed 's/^0//')  # Clean up leading zero if needed
     pipeline_id=0  # If dynamic, replace with an environment variable
