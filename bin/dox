@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo ""
 echo "▶️ DOX CLI running..."
 
 # Main script execution

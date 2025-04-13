@@ -157,5 +157,4 @@ for action in "${@:2}"; do
     run_action_script $lib ".actions.$action"
 done
 
-echo "✅ Actions completed for tool: $lib"
-echo ""
+echo -e "✅ Actions completed for tool: $lib\n"
