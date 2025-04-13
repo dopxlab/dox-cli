@@ -157,15 +157,13 @@ if [[ -f "$DOX_ENV" ]]; then
 fi
 
 lib=$1
-actions=${@:2}
-
 ensure_file_exists "$ACTION_FILE_PATH/$lib.yaml"
 configure_action $lib
 
 # Loop through the actions (starting from $2 as the first argument is the tool name)
-for action in "${actions}"; do
+for action in "${@:2}"; do
     #echo "🚀 Executing action: '$lib $action'"
     run_action_script $lib ".actions.$action"
 done
 
-echo  "✅ Actions completed for tool: $lib with actions: ${actions}"
+echo  "✅ Actions completed for tool: $lib with actions: ${@:2}"
