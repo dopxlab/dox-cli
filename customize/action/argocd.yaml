@@ -1,5 +1,5 @@
 configure: |
-  dox configure helm
+  dox configure argocd
   dox export global-vars
 
 template_folder: "${DOX_CUSTOM_DIR}/action/templates/argocd" # ${template_folder} will be resolved path of the template folder 
@@ -22,3 +22,4 @@ variables:
 actions:
   deploy: |
     cat "${template_folder}/application.yaml"
+    whereis argocd

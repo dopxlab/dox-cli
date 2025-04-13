@@ -86,6 +86,7 @@ case "$action" in
   *)
     # For any other action, call the action.sh script # For 'tool' action, at least 2 argument is required (Example: dox docker build push)
     validate_args 1 -1 ${#action_values[@]} || exit 1
+    configure_env
     # Capture the environment before the action
     source ${DOX_DIR}/lib/action.sh "$action" "${action_values[@]}"
     ;;
