@@ -7,8 +7,8 @@ AFTER_FILE="env_after.txt"
 
 # Export DOX_ENV variable (this will be part of the environment)
 export DOX_ENV="dox_env"
-#echo "Exported DOX_ENV=$DOX_ENV"
-#cat $DOX_ENV
+echo "Exported DOX_ENV=$DOX_ENV"
+cat $DOX_ENV
 
 # Function to capture environment variables and save them to a file
 capture_env() {
