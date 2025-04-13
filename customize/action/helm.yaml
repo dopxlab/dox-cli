@@ -1,18 +1,21 @@
 configure: |
   dox configure helm
   # source ${DOX_CUSTOM_DIR}/global_envs.sh
-  #dox export global-vars 
+  #dox export global-vars
+
   dox export BUILD_VERSION
-  dox export GIT_REPOSITORY_NAME
-  dox export GIT_BRANCH_NAME
-  dox export GIT_COMMITTER_NAME
-  dox export GIT_COMMITTER_EMAIL
-  dox export GIT_COMMIT_URL
-  dox export GIT_COMMIT_ID
-  dox export GIT_COMMIT_SHORT_ID
-  dox export GIT_COMMIT_MESSAGE
-  dox export GIT_BRANCH_PREFIX
-  dox export GIT_PIPELINE_URL
+  dox export REPOSITORY_NAME
+  dox export BRANCH_NAME
+  dox export COMMITTER_NAME
+  dox export COMMITTER_EMAIL
+  dox export COMMIT_URL
+  dox export COMMIT_ID
+  dox export COMMIT_SHORT_ID
+  dox export COMMIT_MESSAGE
+  dox export BRANCH_PREFIX
+  dox export PIPELINE_URL    
+
+  env 
 
 template_folder: "${DOX_CUSTOM_DIR}/action/templates/helm" # ${template_folder} will be resolved path of the template folder 
 
@@ -28,7 +31,7 @@ variables:
   IMAGE_PULL_POLICY: "${IMAGE_PULL_POLICY:-Always}"
   IMAGE_PULL_SECRETS: "${IMAGE_PULL_SECRETS:-image-pull-secret}"
 
-  APPLICATION_NAME: "${APPLICATION_NAME:-$GIT_REPOSITORY_NAME}"
+  APPLICATION_NAME: "${APPLICATION_NAME:-$REPOSITORY_NAME}"
   IMAGE_REPOSITORY: "${IMAGE_REPOSITORY:-$DOCKER_IMAGE_PUSH_PREFIX/$APPLICATION_NAME}"
   APPLICATION_PORT: "${APPLICATION_PORT:-8080}"
   APPLICATION_HEALTH_PORT: "${APPLICATION_HEALTH_PORT:-$APPLICATION_PORT}"

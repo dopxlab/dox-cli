@@ -1,18 +1,19 @@
+
 actions:
   # Call each export action by the prefix dox export-vars
   global-vars: |
 
     dox export BUILD_VERSION
-    dox export GIT_REPOSITORY_NAME
-    dox export GIT_BRANCH_NAME
-    dox export GIT_COMMITTER_NAME
-    dox export GIT_COMMITTER_EMAIL
-    dox export GIT_COMMIT_URL
-    dox export GIT_COMMIT_ID
-    dox export GIT_COMMIT_SHORT_ID
-    dox export GIT_COMMIT_MESSAGE
-    dox export GIT_BRANCH_PREFIX
-    dox export GIT_PIPELINE_URL
+    dox export REPOSITORY_NAME
+    dox export BRANCH_NAME
+    dox export COMMITTER_NAME
+    dox export COMMITTER_EMAIL
+    dox export COMMIT_URL
+    dox export COMMIT_ID
+    dox export COMMIT_SHORT_ID
+    dox export COMMIT_MESSAGE
+    dox export BRANCH_PREFIX
+    dox export PIPELINE_URL
 
   # Generate BUILD_VERSION using a different method
   BUILD_VERSION: |
@@ -31,66 +32,66 @@ actions:
 
 
   # Get Git repository name
-  GIT_REPOSITORY_NAME: |
+  REPOSITORY_NAME: |
     remote_url=$(git config --get remote.origin.url)
     repo_name=$(basename "$remote_url" .git)
-    export GIT_REPOSITORY_NAME="${repo_name}"
-    echo "Repository Name: ${GIT_REPOSITORY_NAME}"
+    export REPOSITORY_NAME="${repo_name}"
+    echo "Repository Name: ${REPOSITORY_NAME}"
 
   # Get Git branch name
-  GIT_BRANCH_NAME: |
+  BRANCH_NAME: |
     if [[ -n "$GITHUB_REF" && "$GITHUB_REF" == refs/heads/* ]]; then
-        export GIT_BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+        export BRANCH_NAME="${GITHUB_REF#refs/heads/}"
     else
-        export GIT_BRANCH_NAME="unknown"
+        export BRANCH_NAME="unknown"
     fi
-    echo "Git Branch: ${GIT_BRANCH_NAME}"
+    echo "Git Branch: ${BRANCH_NAME}"
 
   # Get Git committer name
-  GIT_COMMITTER_NAME: |
+  COMMITTER_NAME: |
     git_committer_name=$(git -C . log -1 --pretty=format:'%an')
-    export GIT_COMMITTER_NAME="${git_committer_name}"
-    echo "Committer Name: ${GIT_COMMITTER_NAME}"
+    export COMMITTER_NAME="${git_committer_name}"
+    echo "Committer Name: ${COMMITTER_NAME}"
 
   # Get Git committer email
-  GIT_COMMITTER_EMAIL: |
+  COMMITTER_EMAIL: |
     git_committer_email=$(git -C . log -1 --pretty=format:'%ae')
-    export GIT_COMMITTER_EMAIL="${git_committer_email}"
-    echo "Committer Email: ${GIT_COMMITTER_EMAIL}"
+    export COMMITTER_EMAIL="${git_committer_email}"
+    echo "Committer Email: ${COMMITTER_EMAIL}"
 
   # Get Git commit URL
-  GIT_COMMIT_URL: |
+  COMMIT_URL: |
     input_url=$(git config --get remote.origin.url)
     git_hash_id=$(git rev-parse HEAD)
-    export GIT_COMMIT_URL="${input_url/tatasteel-dod@/}/commit/${git_hash_id}"
-    echo "Commit URL: ${GIT_COMMIT_URL}"
+    export COMMIT_URL="${input_url/tatasteel-dod@/}/commit/${git_hash_id}"
+    echo "Commit URL: ${COMMIT_URL}"
 
   # Get Git commit ID (hash)
-  GIT_COMMIT_ID: |
+  COMMIT_ID: |
     git_commit_id=$(git rev-parse HEAD)
-    export GIT_COMMIT_ID="${git_commit_id}"
-    echo "Commit ID: ${GIT_COMMIT_ID}"
+    export COMMIT_ID="${git_commit_id}"
+    echo "Commit ID: ${COMMIT_ID}"
 
   # Get short Git commit ID (short hash)
-  GIT_COMMIT_SHORT_ID: |
+  COMMIT_SHORT_ID: |
     git_commit_short_id=$(git rev-parse --short HEAD)
-    export GIT_COMMIT_SHORT_ID="${git_commit_short_id}"
-    echo "Short Commit ID: ${GIT_COMMIT_SHORT_ID}"
+    export COMMIT_SHORT_ID="${git_commit_short_id}"
+    echo "Short Commit ID: ${COMMIT_SHORT_ID}"
 
   # Get Git commit message
-  GIT_COMMIT_MESSAGE: |
+  COMMIT_MESSAGE: |
     git_commit_message=$(git log -1 --pretty=%B)
     git_commit_message="$(echo "$git_commit_message" | tr -d '\n' | tr -d "'" | tr -d '"')"
-    export GIT_COMMIT_MESSAGE="${git_commit_message}"
-    echo "Commit Message: ${GIT_COMMIT_MESSAGE}"
+    export COMMIT_MESSAGE="${git_commit_message}"
+    echo "Commit Message: ${COMMIT_MESSAGE}"
 
   # Get Git branch prefix
-  GIT_BRANCH_PREFIX: |
+  BRANCH_PREFIX: |
     branch=$(git rev-parse --abbrev-ref HEAD)
-    export GIT_BRANCH_PREFIX="${branch%%/*}"
-    echo "Git Branch Prefix: ${GIT_BRANCH_PREFIX}"
+    export BRANCH_PREFIX="${branch%%/*}"
+    echo "Git Branch Prefix: ${BRANCH_PREFIX}"
 
   # Get Pipeline URL
-  GIT_PIPELINE_URL: |
-    export GIT_PIPELINE_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
-    echo "Pipeline URL: ${GIT_PIPELINE_URL}"
+  PIPELINE_URL: |
+    export PIPELINE_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+    echo "Pipeline URL: ${PIPELINE_URL}"
