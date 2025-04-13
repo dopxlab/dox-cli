@@ -27,8 +27,10 @@ actions:
     formatted_timestamp=$(date +"%Y%m%d.%H%M%S" | sed 's/^0//')  # Clean up leading zero if needed
     pipeline_id=0  # If dynamic, replace with an environment variable
 
-    BUILD_VERSION="${formatted_timestamp}.${pipeline_id}"
-    export BUILD_VERSION="${BUILD_VERSION}"
+    timestamp_version="${formatted_timestamp}.${pipeline_id}"
+    export BUILD_VERSION="${BUILD_VERSION-timestamp_version}"
+
+    export BUILD_VERSION="${BUILD_VERSION:-$(get_build_version)}"
 
     echo "BUILD_VERSION=${BUILD_VERSION}" >> $GITHUB_ENV
     echo "BUILD_VERSION=${BUILD_VERSION}"
