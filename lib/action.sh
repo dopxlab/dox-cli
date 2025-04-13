@@ -60,7 +60,7 @@ function generate_utility_script() {
         # Echo the evaluated value
         #eval "echo export $key=\$$key"
 
-        echo "    -e \"s|##$key##|${!key}|g\" \\" >> "$sed_utility_script"
+        #echo "    -e \"s|##$key##|${!key}|g\" \\" >> "$sed_utility_script"
 
     done
     echo "    \$input_file > \$temp_file" >> "$sed_utility_script"
