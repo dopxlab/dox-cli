@@ -166,4 +166,6 @@ for action in "${@:2}"; do
 
 done
 
+echo "TEST 4: $TEST_NAME"
+
 echo  "✅ Actions completed for tool: $lib with actions: ${@:2}"
