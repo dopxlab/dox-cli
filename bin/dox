@@ -6,7 +6,8 @@ action=$1
 shift  # Remove the first argument (action) from the list
 action_values=("$@")  # Capture the remaining arguments (tool names)
 
-echo -e "\n▶️ DOX CLI running... Action: $action; Arguments: $@"
+echo ""
+echo -e "\n▶️ DOX CLI running... Action: $action; Arguments: $action_values"
 
 # Directory paths for DOX (combined in one line for better readability)
 export DOX_CLI_VERSION="v0.1.0"
