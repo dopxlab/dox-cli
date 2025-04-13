@@ -35,6 +35,13 @@ function escape_slashes() {
 function generate_utility_script() {
     config_file="$1"
     echo "📄 Extracting variables from $config_file... and generating utility script 🛠️"
+    # Check if the file exists and then source it
+    if [[ -f "$DOX_ENV" ]]; then
+        echo "Sourcing $DOX_ENV"
+        cat $DOX_ENV
+        echo "---"
+        source "$DOX_ENV"
+    fi
     echo "TESTING: BUILD_VERSION: ${BUILD_VERSION:-empty}"
     # Declare an associative array to store variables
     sed_utility_script="$2"
@@ -146,17 +153,14 @@ function configure_action() {
     fi
 }
 
+# Check if the file exists and then source it
+if [[ -f "$DOX_ENV" ]]; then
+    source "$DOX_ENV"
+fi
+
 lib=$1
 ensure_file_exists "$ACTION_FILE_PATH/$lib.yaml"
 configure_action $lib
-
-# Check if the file exists and then source it
-if [[ -f "$DOX_ENV" ]]; then
-    echo "Sourcing $DOX_ENV"
-    cat $DOX_ENV
-    echo "---"
-    source "$DOX_ENV"
-fi
 
 # Loop through the actions (starting from $2 as the first argument is the tool name)
 for action in "${@:2}"; do
