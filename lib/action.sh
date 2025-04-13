@@ -34,7 +34,7 @@ function escape_slashes() {
 function generate_utility_script() {
     config_file="$1"
     echo "📄 Extracting variables from $config_file... and generating utility script 🛠️"
-    echo " TESTING: BUILD_VERSION : $BUILD_VERSION"
+    #echo " TESTING: BUILD_VERSION : $BUILD_VERSION"
     # Declare an associative array to store variables
     sed_utility_script="$2"
     echo "#!/bin/bash" >"$sed_utility_script"
