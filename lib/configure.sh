@@ -263,16 +263,24 @@ function run_installation_script(){
 
     # Check if the script is empty, if it's not, then run it
     if [[ -n "$script" ]]; then
-        print "33" "40" "Running $script_path Script"  # Yellow text on black background
-        echo ""
-        echo -e "\033[1;36mOriginal script:\033[0m"  # Bold cyan for the label
-        echo -e "\033[0;36m$script\033[0m"  # Cyan color for the original script
-        echo ""
-        script_with_vars=$(echo "$script" | envsubst)
-        echo -e "\033[1;32mSubstituted script:\033[0m"  # Bold green for the label
-        echo -e "\033[0;32m$script_with_vars\033[0m"  # Green color for the substituted script
-        echo ""
-        eval "$script_with_vars"
+        print "33" "40" "🚀 Running $script_path Script"  # Yellow text on black background
+       
+        # Create a temporary file for the script
+        temp_script_file=$(mktemp /tmp/temp_script.XXXXXX)
+
+        # Write the substituted script to the temporary file
+        echo "$script_with_vars" > "$temp_script_file"
+
+        # Make the temporary script executable
+        chmod +x "$temp_script_file"
+
+        # Execute the temporary script by sourcing it (to run in the same shell)
+        echo "🚀 Executing installation script..."
+        source "$temp_script_file"  # Execute the script on the same shell (!IMPORTANT)
+
+        # Optionally, remove the temporary script file after execution
+        rm -f "$temp_script_file"
+
     else
         info "No script found $lib_config_file in $script_path for $lib. Skipping script execution."
     fi
