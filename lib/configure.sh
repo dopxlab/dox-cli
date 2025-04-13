@@ -11,11 +11,12 @@ source ${DOX_CUSTOM_DIR}/download_files.sh
 # configuration yaml location
 CONFIGURE_FILE_PATH="${DOX_CUSTOM_DIR}/configure"
 ENV_PATH="env_path"
+ENV_EXPORT="env_export"
 
-print_envs DOX_RESOURCES_DIR CONFIGURE_FILE_PATH DOX_DIR DOX_CUSTOM_DIR
+print_envs DOX_RESOURCES_DIR CONFIGURE_FILE_PATH DOX_DIR DOX_CUSTOM_DIR ENV_PATH ENV_EXPORT
 
 # Function to set environment variables for a given library
-function configure_env_variables() {
+function generate_env_files() {
     local lib=$1
     local version=$2
     local install_dir=$3
@@ -37,28 +38,48 @@ function configure_env_variables() {
             local evaluated_value=$(eval echo "$value")
             # Print the evaluated value
             #echo "Evaluated Value: $evaluated_value"
-            if [ "$key" == "PATH" ]; then # If key is PATH, save it to PATH
-                append_if_not_exists "$evaluated_value"
+            if [ "$key" == "PATH" ]; then # If key is PATH, save it to ENV_PATH
+                append_if_not_exists $ENV_PATH "$evaluated_value:"
             else # For other keys, save them to the env.sh script
-                export "$key=$evaluated_value"
+                append_if_not_exists $ENV_EXPORT "export $key=\"$evaluated_value\";"
             fi
         done
     fi
+    configure_env_variables # used for post_installation_scripts
 }
 
 # Function to append a value to a file if it doesn't already exist
 function append_if_not_exists() {
-    local new_path=$1
-    # Check if the new_path is already in the $PATH
-    if [[ ":$PATH:" != *":$new_path:"* ]]; then
-        # If not, append it to the $PATH
-        export PATH="$new_path:$PATH"
-        echo "$new_path has been added to the PATH."
+    local file_path=$1
+    local value_to_append=$2
+    # Check if the value already exists in the file
+    if ! grep -q "^$value_to_append" "$file_path"; then
+        # If not found, append the value_to_append to the file
+        echo -n "$value_to_append" >> "$file_path"
+        echo "Appended '$value_to_append' to $file_path"
     else
-        echo "$new_path is already in the PATH. Skipping."
+        echo "'$value_to_append' already exists in $file_path. Skipping append."
     fi
 }
 
+# Function to configure environment variables
+function configure_env_variables() {
+    # Check if the env_export file exists and source it
+    if [ -f "$ENV_EXPORT" ]; then
+        echo -e "ENV_EXPORT: \033[0;35m$(cat "$ENV_EXPORT")\033[0m"
+        source "$ENV_EXPORT"  # Source the file to set the environment variables
+    else
+        echo "Warning: $ENV_EXPORT file not found...!"
+    fi
+
+    # Check if the ENV_PATH file exists and update PATH
+    if [ -f "$ENV_PATH" ]; then
+        echo -e "ENV_PATH: \033[0;35m$(cat "$ENV_PATH")\033[0m"
+        export PATH="$(cat "$ENV_PATH")$PATH"  # Prepend the value from ENV_PATH to the PATH variable
+    else
+        echo "Warning: $ENV_PATH file not found...!"
+    fi
+}
 function download_and_extract() {
     local lib_url=$1
     local install_dir=$2
@@ -239,7 +260,7 @@ function configure() {
     fi
 
     # Set environment variables for the library
-    configure_env_variables "$lib" "$lib_version" "$install_dir"
+    generate_env_files "$lib" "$lib_version" "$install_dir"
     
     if $run_post_installation; then
         run_installation_script "$lib" "installation.post_installation_script"
@@ -251,6 +272,7 @@ function configure() {
     echo -e "\033[0;32m$lib installation completed successfully.\033[0m"
     echo ""
 }
+
 function run_installation_script(){
     local lib=$1
     local script_path=$2
@@ -262,26 +284,16 @@ function run_installation_script(){
 
     # Check if the script is empty, if it's not, then run it
     if [[ -n "$script" ]]; then
-        print "33" "40" "🚀 Running $script_path Script"  # Yellow text on black background
-
-        # Perform variable substitution with envsubst
+        print "33" "40" "Running $script_path Script"  # Yellow text on black background
+        echo ""
+        echo -e "\033[1;36mOriginal script:\033[0m"  # Bold cyan for the label
+        echo -e "\033[0;36m$script\033[0m"  # Cyan color for the original script
+        echo ""
         script_with_vars=$(echo "$script" | envsubst)
-
-        temp_script_file=$(mktemp /tmp/temp_script.XXXXXX)
-
-        # Write the substituted script to the temporary file
-        echo "$script_with_vars" > "$temp_script_file"
-
-        # Make the temporary script executable
-        chmod +x "$temp_script_file"
-
-        # Execute the temporary script by sourcing it (to run in the same shell)
-        echo "🚀 Executing installation script..."
-        source "$temp_script_file"  # Execute the script on the same shell (!IMPORTANT)
-
-        # Optionally, remove the temporary script file after execution
-        rm -f "$temp_script_file"
-
+        echo -e "\033[1;32mSubstituted script:\033[0m"  # Bold green for the label
+        echo -e "\033[0;32m$script_with_vars\033[0m"  # Green color for the substituted script
+        echo ""
+        eval "$script_with_vars"
     else
         info "No script found $lib_config_file in $script_path for $lib. Skipping script execution."
     fi
@@ -295,6 +307,9 @@ if [ $# -eq 0 ]; then
     # No argument provided, print a message
     warn "No argument provided. Example: configure jdk"
 else  
+    # Clean up environment files
+    rm -rf "$ENV_PATH" "$ENV_EXPORT"
+
     # Iterate over all the provided arguments and call configure for each
     for tool in "$@"; do
         echo "Configuring tool: $tool"
