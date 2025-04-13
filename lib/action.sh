@@ -111,6 +111,7 @@ function run_action_script() {
         # Execute the temporary script
         #echo -e "\033[1;32mExecuting temporary script:\033[0m"  # Bold green for the label
         source $temp_script_file  # Execute the script on the same shell (!IMPORTANT)
+        echo "TEST 2: $TEST_NAME"
 
         # Optionally, remove the temporary script file after execution
         rm -f "$temp_script_file"
