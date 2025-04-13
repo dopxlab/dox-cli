@@ -9,6 +9,7 @@ AFTER_FILE="env_after.txt"
 export DOX_ENV="dox_env"
 echo "Exported DOX_ENV=$DOX_ENV"
 cat $DOX_ENV
+echo "----"
 
 # Function to capture environment variables and save them to a file
 capture_env() {
