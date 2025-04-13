@@ -1,5 +1,6 @@
 configure: |
   dox configure helm
+  dox export BUILD_VERSION
   dox export GIT_REPOSITORY_NAME 
   dox export GIT_COMMITTER_NAME 
   dox export GIT_COMMITTER_EMAIL 
