@@ -1,7 +1,8 @@
 configure: |
   dox configure helm
-  dox export global-vars
-  
+  source ${DOX_CUSTOM_DIR}/global_envs.sh
+  # dox export global-vars
+    
 template_folder: "${DOX_CUSTOM_DIR}/action/templates/helm" # ${template_folder} will be resolved path of the template folder 
 
 variables:
