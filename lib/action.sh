@@ -8,6 +8,7 @@ source ${DOX_DIR}/lib/shared/print.sh
 #Optional: As its already configured in dox
 export DOX_DIR="${DOX_DIR:-$HOME/.dox}"
 export DOX_CUSTOM_DIR="${DOX_CUSTOM_DIR:-$DOX_DIR/customize}"
+export DOX_ENV="dox_env"
 
 # action yaml location
 ACTION_FILE_PATH="${DOX_CUSTOM_DIR}/action"
@@ -145,6 +146,10 @@ function configure_action() {
     fi
 }
 
+lib=$1
+ensure_file_exists "$ACTION_FILE_PATH/$lib.yaml"
+configure_action $lib
+
 # Check if the file exists and then source it
 if [[ -f "$DOX_ENV" ]]; then
     echo "Sourcing $DOX_ENV"
@@ -152,10 +157,6 @@ if [[ -f "$DOX_ENV" ]]; then
     echo "---"
     source "$DOX_ENV"
 fi
-
-lib=$1
-ensure_file_exists "$ACTION_FILE_PATH/$lib.yaml"
-configure_action $lib
 
 # Loop through the actions (starting from $2 as the first argument is the tool name)
 for action in "${@:2}"; do
