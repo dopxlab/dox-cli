@@ -36,6 +36,10 @@ function generate_utility_script() {
     config_file="$1"
     # Check if the file exists and then source it
     if [[ -f "$DOX_ENV" ]]; then
+        echo ""
+        echo "DOX Env Variables: "
+        cat "$DOX_ENV"
+        echo ""
         source "$DOX_ENV"
     fi
     echo "📄 Extracting variables from $config_file... and generating utility script 🛠️"
