@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Enable case-insensitive matching for the script
-#shopt -s nocasematch
+shopt -s nocasematch
 
 source ${DOX_DIR}/lib/shared/print.sh
 
