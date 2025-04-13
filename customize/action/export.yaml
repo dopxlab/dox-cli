@@ -31,9 +31,9 @@ actions:
 
     # Remove the leading zero from the hour (if applicable)
     formatted_timestamp=$(echo $timestamp | sed 's/\([0-9]\{8\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1\2\3/')
-
-    export BUILD_VERSION="${BUILD_VERSION:-${$formatted_timestamp.$pipeline_id}}"
+    export BUILD_VERSION="${BUILD_VERSION:-${formatted_timestamp}.${pipeline_id}}"
     echo "BUILD_VERSION=${BUILD_VERSION}" >> $GITHUB_ENV
+    echo "BUILD_VERSION=${BUILD_VERSION}"
 
   # Get Git repository name
   REPOSITORY_NAME: |
