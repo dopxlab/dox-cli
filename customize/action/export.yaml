@@ -8,7 +8,7 @@ configure: |
   
 actions:
   # Call each export action by the prefix dox export-vars
-  global-vars:
+  global-vars: |
     dox export BUILD_VERSION
     dox export REPOSITORY_NAME
     dox export BRANCH_NAME
