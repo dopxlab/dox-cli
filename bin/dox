@@ -76,7 +76,7 @@ case "$action" in
   configure)
     # For 'configure' action, at least 1 argument is required (min=1, max=unlimited) (Example dox configure helm)
     validate_args 1 -1 ${#action_values[@]} || exit 1
-    source ${DOX_DIR}/lib/configure.sh "${action_values[@]}"
+    ${DOX_DIR}/lib/configure.sh "${action_values[@]}"
     configure_env
     ;;
   
