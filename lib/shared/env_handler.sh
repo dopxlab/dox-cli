@@ -73,15 +73,3 @@ function on_after_execution() {
     rm -f "$BEFORE_FILE" "$AFTER_FILE"
 }
 
-# Main execution flow
-# on_before_execution
-
-# Example of setting a new environment variable
-# export NAME="DOX-CLI"
-# export NAME1="DOX-CLI1"
-# export NAME2="DOX-CLI2"
-
-# Step 2: After execution
-# on_after_execution
-
-# echo "Diffing and saving environment changes complete."
