@@ -97,13 +97,26 @@ function run_action_script() {
         echo -e "\033[0;36m$script\033[0m"  # Cyan color for the original script
         echo ""
 
-        # Now, directly evaluate the script using `eval`
-        echo -e "\033[1;32mExecuting script:\033[0m"  # Bold green for the label
-        eval "$script"  # This will execute the script and evaluate commands like `$(date)`
+        # Create a temporary file for the script
+        temp_script_file=$(mktemp /tmp/temp_script.XXXXXX)
+
+        # Write the script to the temporary file
+        echo "$script" > "$temp_script_file"
+
+        # Make the temporary script executable
+        chmod +x "$temp_script_file"
+
+        # Execute the temporary script
+        echo -e "\033[1;32mExecuting temporary script:\033[0m"  # Bold green for the label
+        $temp_script_file  # Execute the script
+
+        # Optionally, remove the temporary script file after execution
+        rm -f "$temp_script_file"
     else
         info "No script found $lib_config_file in $script_path for $lib. Skipping script execution."
     fi
 }
+
 
 
 # Function to run a specific action
