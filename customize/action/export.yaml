@@ -1,0 +1,101 @@
+# git-utils.yaml
+configure: |
+  if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+    echo "[git-utils] Error: Not a Git repository. Exiting..."
+    exit 1
+  fi
+  echo "[git-utils] Git repository validated."
+  
+actions:
+  # Call each export action by the prefix dox export-vars
+  global-vars:
+    dox export BUILD_VERSION
+    dox export REPOSITORY_NAME
+    dox export BRANCH_NAME
+    dox export COMMITTER_NAME
+    dox export COMMITTER_EMAIL
+    dox export COMMIT_URL
+    dox export COMMIT_ID
+    dox export COMMIT_SHORT_ID
+    dox export COMMIT_MESSAGE
+    dox export BRANCH_PREFIX
+    dox export PIPELINE_URL
+
+  # Generate BUILD_VERSION using a different method
+  BUILD_VERSION: |
+
+    # Get the current date in the format YYYYMMDD.HHMMSS
+    pipeline_id=0
+    
+    timestamp=$(date +"%Y%m%d.%H%M%S")
+
+    # Remove the leading zero from the hour (if applicable)
+    formatted_timestamp=$(echo $timestamp | sed 's/\([0-9]\{8\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1\2\3/')
+
+    export BUILD_VERSION="${BUILD_VERSION:-${$formatted_timestamp.$pipeline_id}}"
+    echo "BUILD_VERSION=${BUILD_VERSION}" >> $GITHUB_ENV
+
+  # Get Git repository name
+  REPOSITORY_NAME: |
+    remote_url=$(git config --get remote.origin.url)
+    repo_name=$(basename "$remote_url" .git)
+    export REPOSITORY_NAME="${repo_name}"
+    echo "Repository Name: ${REPOSITORY_NAME}"
+
+  # Get Git branch name
+  BRANCH_NAME: |
+    if [[ -n "$GITHUB_REF" && "$GITHUB_REF" == refs/heads/* ]]; then
+        export BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+    else
+        export BRANCH_NAME="unknown"
+    fi
+    echo "Git Branch: ${BRANCH_NAME}"
+
+  # Get Git committer name
+  COMMITTER_NAME: |
+    git_committer_name=$(git -C . log -1 --pretty=format:'%an')
+    export COMMITTER_NAME="${git_committer_name}"
+    echo "Committer Name: ${COMMITTER_NAME}"
+
+  # Get Git committer email
+  COMMITTER_EMAIL: |
+    git_committer_email=$(git -C . log -1 --pretty=format:'%ae')
+    export COMMITTER_EMAIL="${git_committer_email}"
+    echo "Committer Email: ${COMMITTER_EMAIL}"
+
+  # Get Git commit URL
+  COMMIT_URL: |
+    input_url=$(git config --get remote.origin.url)
+    git_hash_id=$(git rev-parse HEAD)
+    export COMMIT_URL="${input_url/tatasteel-dod@/}/commit/${git_hash_id}"
+    echo "Commit URL: ${COMMIT_URL}"
+
+  # Get Git commit ID (hash)
+  COMMIT_ID: |
+    git_commit_id=$(git rev-parse HEAD)
+    export COMMIT_ID="${git_commit_id}"
+    echo "Commit ID: ${COMMIT_ID}"
+
+  # Get short Git commit ID (short hash)
+  COMMIT_SHORT_ID: |
+    git_commit_short_id=$(git rev-parse --short HEAD)
+    export COMMIT_SHORT_ID="${git_commit_short_id}"
+    echo "Short Commit ID: ${COMMIT_SHORT_ID}"
+
+  # Get Git commit message
+  COMMIT_MESSAGE: |
+    git_commit_message=$(git log -1 --pretty=%B)
+    git_commit_message="$(echo "$git_commit_message" | tr -d '\n' | tr -d "'" | tr -d '"')"
+    export COMMIT_MESSAGE="${git_commit_message}"
+    echo "Commit Message: ${COMMIT_MESSAGE}"
+
+  # Get Git branch prefix
+  BRANCH_PREFIX: |
+    branch=$(git rev-parse --abbrev-ref HEAD)
+    export BRANCH_PREFIX="${branch%%/*}"
+    echo "Git Branch Prefix: ${BRANCH_PREFIX}"
+
+  # Get Pipeline URL
+  PIPELINE_URL: |
+    export PIPELINE_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+    echo "Pipeline URL: ${PIPELINE_URL}"

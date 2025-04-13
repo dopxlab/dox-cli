@@ -32,7 +32,7 @@ function get_git_committer_email(){
 function get_git_commit_url(){
     local input_url=$(git config --get remote.origin.url)
     local git_hash_id=$(git rev-parse HEAD)
-    echo "${input_url/tatasteel-dod@/}/commit/${git_hash_id}"
+    echo "${input_url/dod@/}/commit/${git_hash_id}"
 }
 
 # Function to get the current Git commit ID (hash)

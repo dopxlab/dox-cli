@@ -709,4 +709,3 @@ Contributions are welcome! [Fork it](https://github.com/dopxlab/dox-cli), add yo
 ---
 
 > Built with ❤️ by [Joby Pooppillikudiyil](https://github.com/jobythomasp)
-```
