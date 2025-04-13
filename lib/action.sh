@@ -162,6 +162,8 @@ configure_action $lib
 for action in "${@:2}"; do
     #echo "🚀 Executing action: '$lib $action'"
     run_action_script $lib ".actions.$action"
+    echo "TEST 3: $TEST_NAME"
+
 done
 
 echo  "✅ Actions completed for tool: $lib with actions: ${@:2}"
