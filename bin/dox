@@ -17,6 +17,7 @@ export DOX_CLI_VERSION="v0.1.0"
 export DOX_DIR="${DOX_DIR:-$HOME/.dox}"
 export DOX_CUSTOM_DIR="${DOX_CUSTOM_DIR:-$DOX_DIR/customize}"
 export DOX_RESOURCES_DIR="${DOX_RESOURCES_DIR:-$HOME/dox_resources}"
+export DOX_ENV="dox_env"
 
 source ${DOX_DIR}/lib/shared/print.sh
 
@@ -66,6 +67,12 @@ function check_tools() {
 
 # Check all tools
 check_tools
+
+# Check if the file exists and then source it
+if [[ -f "$DOX_ENV" ]]; then
+    echo "Sourcing $DOX_ENV"
+    source "$DOX_ENV"
+fi
 
 # Handle actions based on user input
 case "$action" in

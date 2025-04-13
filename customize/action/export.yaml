@@ -27,7 +27,7 @@ actions:
     export BUILD_VERSION="${BUILD_VERSION:-$timestamp_version}"
     export BUILD_VERSION="${BUILD_VERSION:-$(get_build_version)}"
 
-    echo "BUILD_VERSION=${BUILD_VERSION}" >> $GITHUB_ENV
+    echo "BUILD_VERSION=${BUILD_VERSION}" >> $DOX_ENV
     echo "BUILD_VERSION=${BUILD_VERSION}"
 
 
@@ -36,7 +36,7 @@ actions:
     remote_url=$(git config --get remote.origin.url)
     repo_name=$(basename "$remote_url" .git)
     export REPOSITORY_NAME="${repo_name}"
-    echo "REPOSITORY_NAME=${REPOSITORY_NAME}" >> $GITHUB_ENV
+    echo "REPOSITORY_NAME=${REPOSITORY_NAME}" >> $DOX_ENV
     echo "Repository Name: ${REPOSITORY_NAME}"
 
   # Get Git branch name
@@ -46,21 +46,21 @@ actions:
     else
         export BRANCH_NAME="unknown"
     fi
-    echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
+    echo "BRANCH_NAME=${BRANCH_NAME}" >> $DOX_ENV
     echo "Git Branch: ${BRANCH_NAME}"
 
   # Get Git committer name
   COMMITTER_NAME: |
     git_committer_name=$(git -C . log -1 --pretty=format:'%an')
     export COMMITTER_NAME="${git_committer_name}"
-    echo "COMMITTER_NAME=${COMMITTER_NAME}" >> $GITHUB_ENV
+    echo "COMMITTER_NAME=${COMMITTER_NAME}" >> $DOX_ENV
     echo "Committer Name: ${COMMITTER_NAME}"
 
   # Get Git committer email
   COMMITTER_EMAIL: |
     git_committer_email=$(git -C . log -1 --pretty=format:'%ae')
     export COMMITTER_EMAIL="${git_committer_email}"
-    echo "COMMITTER_EMAIL=${COMMITTER_EMAIL}" >> $GITHUB_ENV
+    echo "COMMITTER_EMAIL=${COMMITTER_EMAIL}" >> $DOX_ENV
     echo "Committer Email: ${COMMITTER_EMAIL}"
 
   # Get Git commit URL
@@ -68,21 +68,21 @@ actions:
     input_url=$(git config --get remote.origin.url)
     git_hash_id=$(git rev-parse HEAD)
     export COMMIT_URL="${input_url/tatasteel-dod@/}/commit/${git_hash_id}"
-    echo "COMMIT_URL=${COMMIT_URL}" >> $GITHUB_ENV
+    echo "COMMIT_URL=${COMMIT_URL}" >> $DOX_ENV
     echo "Commit URL: ${COMMIT_URL}"
 
   # Get Git commit ID (hash)
   COMMIT_ID: |
     git_commit_id=$(git rev-parse HEAD)
     export COMMIT_ID="${git_commit_id}"
-    echo "COMMIT_ID=${COMMIT_ID}" >> $GITHUB_ENV
+    echo "COMMIT_ID=${COMMIT_ID}" >> $DOX_ENV
     echo "Commit ID: ${COMMIT_ID}"
 
   # Get short Git commit ID (short hash)
   COMMIT_SHORT_ID: |
     git_commit_short_id=$(git rev-parse --short HEAD)
     export COMMIT_SHORT_ID="${git_commit_short_id}"
-    echo "COMMIT_SHORT_ID=${COMMIT_SHORT_ID}" >> $GITHUB_ENV
+    echo "COMMIT_SHORT_ID=${COMMIT_SHORT_ID}" >> $DOX_ENV
     echo "Short Commit ID: ${COMMIT_SHORT_ID}"
 
   # Get Git commit message
@@ -90,18 +90,18 @@ actions:
     git_commit_message=$(git log -1 --pretty=%B)
     git_commit_message="$(echo "$git_commit_message" | tr -d '\n' | tr -d "'" | tr -d '"')"
     export COMMIT_MESSAGE="${git_commit_message}"
-    echo "COMMIT_MESSAGE=${COMMIT_MESSAGE}" >> $GITHUB_ENV
+    echo "COMMIT_MESSAGE=${COMMIT_MESSAGE}" >> $DOX_ENV
     echo "Commit Message: ${COMMIT_MESSAGE}"
 
   # Get Git branch prefix
   BRANCH_PREFIX: |
     branch=$(git rev-parse --abbrev-ref HEAD)
     export BRANCH_PREFIX="${branch%%/*}"
-    echo "BRANCH_PREFIX=${BRANCH_PREFIX}" >> $GITHUB_ENV
+    echo "BRANCH_PREFIX=${BRANCH_PREFIX}" >> $DOX_ENV
     echo "Git Branch Prefix: ${BRANCH_PREFIX}"
 
   # Get Pipeline URL
   PIPELINE_URL: |
     export PIPELINE_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
-    echo "PIPELINE_URL=${PIPELINE_URL}" >> $GITHUB_ENV
+    echo "PIPELINE_URL=${PIPELINE_URL}" >> $DOX_ENV
     echo "Pipeline URL: ${PIPELINE_URL}"
