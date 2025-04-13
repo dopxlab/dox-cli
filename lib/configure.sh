@@ -251,7 +251,6 @@ function configure() {
     echo -e "\033[0;32m$lib installation completed successfully.\033[0m"
     echo ""
 }
-
 function run_installation_script(){
     local lib=$1
     local script_path=$2
@@ -264,8 +263,10 @@ function run_installation_script(){
     # Check if the script is empty, if it's not, then run it
     if [[ -n "$script" ]]; then
         print "33" "40" "🚀 Running $script_path Script"  # Yellow text on black background
-       
-        # Create a temporary file for the script
+
+        # Perform variable substitution with envsubst
+        script_with_vars=$(echo "$script" | envsubst)
+
         temp_script_file=$(mktemp /tmp/temp_script.XXXXXX)
 
         # Write the substituted script to the temporary file
