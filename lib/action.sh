@@ -35,11 +35,9 @@ function escape_slashes() {
 function generate_utility_script() {
     config_file="$1"
     echo "📄 Extracting variables from $config_file... and generating utility script 🛠️"
+    
     # Check if the file exists and then source it
     if [[ -f "$DOX_ENV" ]]; then
-        echo "Sourcing $DOX_ENV"
-        cat $DOX_ENV
-        echo "---"
         source "$DOX_ENV"
     fi
 
