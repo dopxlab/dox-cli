@@ -104,7 +104,7 @@ function run_action_script() {
 
         # Execute the temporary script
         echo -e "\033[1;32mExecuting temporary script:\033[0m"  # Bold green for the label
-        bash $temp_script_file  # Execute the script on the same shell (!IMPORTANT)
+        source $temp_script_file  # Execute the script on the same shell (!IMPORTANT)
 
         # Optionally, remove the temporary script file after execution
         rm -f "$temp_script_file"
@@ -112,8 +112,6 @@ function run_action_script() {
         info "No script found $lib_config_file in $script_path for $lib. Skipping script execution."
     fi
 }
-
-
 
 # Function to run a specific action
 function configure_action() {
