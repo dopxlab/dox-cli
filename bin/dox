@@ -83,7 +83,12 @@ case "$action" in
   *)
     # For any other action, call the action.sh script # For 'tool' action, at least 2 argument is required (Example: dox docker build push)
     validate_args 1 -1 ${#action_values[@]} || exit 1
+    # Capture the environment before the action
+    env > env_before.txt
     source ${DOX_DIR}/lib/action.sh "$action" "${action_values[@]}"
-    echo "TEST 5: $TEST_NAME"
+    env > env_after.txt
+    diff env_before.txt env_after.txt > env_diff.txt
+    echo "The DIFF: "
+    cat env_diff.txt
     ;;
 esac
