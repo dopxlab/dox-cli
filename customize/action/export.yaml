@@ -1,17 +1,18 @@
 actions:
   # Call each export action by the prefix dox export-vars
   global-vars: |
-    source <(dox export BUILD_VERSION)
-    source <(dox export REPOSITORY_NAME)
-    source <(dox export BRANCH_NAME)
-    source <(dox export COMMITTER_NAME)
-    source <(dox export COMMITTER_EMAIL)
-    source <(dox export COMMIT_URL)
-    source <(dox export COMMIT_ID)
-    source <(dox export COMMIT_SHORT_ID)
-    source <(dox export COMMIT_MESSAGE)
-    source <(dox export BRANCH_PREFIX)
-    source <(dox export PIPELINE_URL)
+
+    dox export BUILD_VERSION
+    dox export REPOSITORY_NAME
+    dox export BRANCH_NAME
+    dox export COMMITTER_NAME
+    dox export COMMITTER_EMAIL
+    dox export COMMIT_URL
+    dox export COMMIT_ID
+    dox export COMMIT_SHORT_ID
+    dox export COMMIT_MESSAGE
+    dox export BRANCH_PREFIX
+    dox export PIPELINE_URL
 
   # Generate BUILD_VERSION using a different method
   BUILD_VERSION: |
