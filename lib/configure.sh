@@ -38,7 +38,7 @@ function configure_env_variables() {
             # Print the evaluated value
             #echo "Evaluated Value: $evaluated_value"
             if [ "$key" == "PATH" ]; then # If key is PATH, save it to PATH
-                append_if_not_exists "$evaluated_value:"
+                append_if_not_exists "$evaluated_value"
             else # For other keys, save them to the env.sh script
                 export "$key=$evaluated_value"
             fi
