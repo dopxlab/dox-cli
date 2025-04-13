@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Enable case-insensitive matching for the script
-shopt -s nocasematch
+#shopt -s nocasematch
 
 source ${DOX_DIR}/lib/shared/print.sh
 
@@ -151,6 +151,7 @@ function configure_action() {
 #if [[ -f "$DOX_ENV" ]]; then
 #    source "$DOX_ENV"
 #fi
+echo "TEST 1: $TEST_NAME"
 
 lib=$1
 ensure_file_exists "$ACTION_FILE_PATH/$lib.yaml"

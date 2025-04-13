@@ -17,6 +17,7 @@ actions:
   BUILD_VERSION: |
     timestamp_version=$(date +"%Y%m%d.%H%M%S" | sed 's/^0//').0
     echo "BUILD_VERSION=\"${BUILD_VERSION:-$timestamp_version}\"" | tee -a $DOX_ENV
+    export TEST_NAME="DOX_TEST"
 
   # Git Repository Name
   GIT_REPOSITORY_NAME: |
