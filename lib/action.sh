@@ -35,7 +35,7 @@ function escape_slashes() {
 function generate_utility_script() {
     config_file="$1"
     echo "📄 Extracting variables from $config_file... and generating utility script 🛠️"
-
+    
     # Check if the file exists and then source it
     if [[ -f "$DOX_ENV" ]]; then
         source "$DOX_ENV"
@@ -60,9 +60,10 @@ function generate_utility_script() {
 
         # Evaluate and export the key-value pair
         eval "export $key=\"$value\""
-
+        # Echo the evaluated value
+        eval "echo export $key=\$$key"
+        
         echo "    -e \"s|##$key##|${!key}|g\" \\" >> "$sed_utility_script"
-
     done
     echo "    \$input_file > \$temp_file" >> "$sed_utility_script"
     echo "    mv \$temp_file \$input_file" >> "$sed_utility_script"
