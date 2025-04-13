@@ -23,15 +23,13 @@ actions:
 
   # Generate BUILD_VERSION using a different method
   BUILD_VERSION: |
-
-    # Get the current date in the format YYYYMMDD.HHMMSS
-    pipeline_id=0
-    
     timestamp=$(date +"%Y%m%d.%H%M%S")
+    formatted_timestamp=$(date +"%Y%m%d.%H%M%S" | sed 's/^0//')  # Clean up leading zero if needed
+    pipeline_id=0  # If dynamic, replace with an environment variable
 
-    # Remove the leading zero from the hour (if applicable)
-    formatted_timestamp=$(echo $timestamp | sed 's/\([0-9]\{8\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1\2\3/')
-    export BUILD_VERSION="${BUILD_VERSION:-${formatted_timestamp}.${pipeline_id}}"
+    BUILD_VERSION="${formatted_timestamp}.${pipeline_id}"
+    export BUILD_VERSION="${BUILD_VERSION}"
+
     echo "BUILD_VERSION=${BUILD_VERSION}" >> $GITHUB_ENV
     echo "BUILD_VERSION=${BUILD_VERSION}"
 
