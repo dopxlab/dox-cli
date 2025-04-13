@@ -148,9 +148,9 @@ function configure_action() {
 }
 
 # Check if the file exists and then source it
-if [[ -f "$DOX_ENV" ]]; then
-    source "$DOX_ENV"
-fi
+#if [[ -f "$DOX_ENV" ]]; then
+#    source "$DOX_ENV"
+#fi
 
 lib=$1
 ensure_file_exists "$ACTION_FILE_PATH/$lib.yaml"
