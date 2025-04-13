@@ -68,12 +68,6 @@ function check_tools() {
 # Check all tools
 check_tools
 
-# Check if the file exists and then source it
-if [[ -f "$DOX_ENV" ]]; then
-    echo "Sourcing $DOX_ENV"
-    source "$DOX_ENV"
-fi
-
 # Handle actions based on user input
 case "$action" in
   version | --version)
