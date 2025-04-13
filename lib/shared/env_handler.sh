@@ -60,6 +60,9 @@ function on_before_execution() {
 
 # Step 2: After execution
 function on_after_execution() {
+    # Check if the BEFORE_FILE exists
+    [[ ! -f "$BEFORE_FILE" ]] && return
+
     # Capture the environment after running the DOX command
     capture_env "$AFTER_FILE"
 
