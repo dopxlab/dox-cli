@@ -1,6 +1,8 @@
 configure: |
   dox configure helm
-  dox export global-vars 
+  dox export GIT_REPOSITORY_NAME 
+  dox export GIT_COMMITTER_NAME 
+  dox export GIT_COMMITTER_EMAIL 
 
 template_folder: "${DOX_CUSTOM_DIR}/action/templates/helm" # ${template_folder} will be resolved path of the template folder 
 
@@ -8,7 +10,7 @@ variables:
   BUILD_VERSION: "${BUILD_VERSION:-1.0.0}"
 
   CHART_VERSION: ${BUILD_VERSION}-helm
-  GIT_DIR: "${GITHUB_WORKSPACE}/.git"
+  #GIT_DIR: "${GITHUB_WORKSPACE}/.git"
   NAMESPACE: "${NAMESPACE:-default}"
   DOCKER_IMAGE_PUSH_PREFIX: "${DOCKER_IMAGE_PUSH_PREFIX:-docker.io/myusername}"  # DOCKER_HOST
   CUSTOM_PROJECT_VARIABLES: "${CUSTOM_PROJECT_VARIABLES:-}"
@@ -37,7 +39,7 @@ variables:
   IMAGE_PULL_SECRET: "${IMAGE_PULL_SECRET:-}"
   CONFIG_MAP_REF_NAME: "${CONFIG_MAP_REF_NAME:-}"
   SECRETS_REF_NAME: "${SECRETS_REF_NAME:-}"
-  ENVIRONMENT_STAGE: "${ENVIRONMENT_STAGE:-unknown}"
+  #ENVIRONMENT_STAGE: "${ENVIRONMENT_STAGE:-unknown}"
   PERSISTENT_VOLUME_CLAIM: "${PERSISTENT_VOLUME_CLAIM:-}"
   
   MAINTAINER_NAME: "${GIT_COMMITTER_NAME:-Dox Engine}"
