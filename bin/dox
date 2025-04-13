@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "▶️ DOX CLI running..."
-
+echo -e "▶️ DOX CLI running...\n"
 # Main script execution
 action=$1
 shift  # Remove the first argument (action) from the list
