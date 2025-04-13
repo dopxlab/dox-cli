@@ -42,6 +42,7 @@ function generate_utility_script() {
         echo "---"
         source "$DOX_ENV"
     fi
+    
     echo "TESTING: BUILD_VERSION: ${BUILD_VERSION:-empty}"
     # Declare an associative array to store variables
     sed_utility_script="$2"
