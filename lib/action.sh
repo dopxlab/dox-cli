@@ -118,7 +118,7 @@ function run_action_script() {
 
         # Optionally, remove the temporary script file after execution
         rm -f "$temp_script_file"
-    else
+    #else
         #info "No script found $lib_config_file in $script_path for $lib. Skipping script execution."
     fi
 }
