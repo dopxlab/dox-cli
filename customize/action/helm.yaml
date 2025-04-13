@@ -1,7 +1,19 @@
 configure: |
   dox configure helm
   # source ${DOX_CUSTOM_DIR}/global_envs.sh
-  dox export global-vars 
+  #dox export global-vars 
+  dox export BUILD_VERSION
+  dox export GIT_REPOSITORY_NAME
+  dox export GIT_BRANCH_NAME
+  dox export GIT_COMMITTER_NAME
+  dox export GIT_COMMITTER_EMAIL
+  dox export GIT_COMMIT_URL
+  dox export GIT_COMMIT_ID
+  dox export GIT_COMMIT_SHORT_ID
+  dox export GIT_COMMIT_MESSAGE
+  dox export GIT_BRANCH_PREFIX
+  dox export GIT_PIPELINE_URL
+
 template_folder: "${DOX_CUSTOM_DIR}/action/templates/helm" # ${template_folder} will be resolved path of the template folder 
 
 variables:
