@@ -19,6 +19,7 @@ export DOX_RESOURCES_DIR="${DOX_RESOURCES_DIR:-$HOME/dox_resources}"
 export DOX_ENV="dox_env"
 
 source ${DOX_DIR}/lib/shared/print.sh
+source ${DOX_DIR}/lib/shared/env_handler.sh
 
 # Function to validate arguments based on min and max
 function validate_args() {
@@ -67,6 +68,8 @@ function check_tools() {
 # Check all tools
 check_tools
 
+on_before_execution #Handling env variables
+
 # Handle actions based on user input
 case "$action" in
   version | --version)
@@ -84,11 +87,8 @@ case "$action" in
     # For any other action, call the action.sh script # For 'tool' action, at least 2 argument is required (Example: dox docker build push)
     validate_args 1 -1 ${#action_values[@]} || exit 1
     # Capture the environment before the action
-    env > env_before.txt
     source ${DOX_DIR}/lib/action.sh "$action" "${action_values[@]}"
-    env > env_after.txt
-    diff env_before.txt env_after.txt > env_diff.txt
-    echo "The DIFF: "
-    cat env_diff.txt
     ;;
 esac
+
+on_after_execution #Handling env variables
