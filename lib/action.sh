@@ -111,7 +111,6 @@ function run_action_script() {
         # Execute the temporary script
         #echo -e "\033[1;32mExecuting temporary script:\033[0m"  # Bold green for the label
         source $temp_script_file  # Execute the script on the same shell (!IMPORTANT)
-        echo "TEST 2: $TEST_NAME"
 
         # Optionally, remove the temporary script file after execution
         rm -f "$temp_script_file"
@@ -148,12 +147,6 @@ function configure_action() {
     fi
 }
 
-# Check if the file exists and then source it
-#if [[ -f "$DOX_ENV" ]]; then
-#    source "$DOX_ENV"
-#fi
-echo "TEST 1: $TEST_NAME"
-
 lib=$1
 ensure_file_exists "$ACTION_FILE_PATH/$lib.yaml"
 configure_action $lib
@@ -162,10 +155,6 @@ configure_action $lib
 for action in "${@:2}"; do
     #echo "🚀 Executing action: '$lib $action'"
     run_action_script $lib ".actions.$action"
-    echo "TEST 3: $TEST_NAME"
-
 done
-
-echo "TEST 4: $TEST_NAME"
 
 echo  "✅ Actions completed for tool: $lib with actions: ${@:2}"
