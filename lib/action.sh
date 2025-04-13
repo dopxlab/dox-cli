@@ -80,7 +80,7 @@ function run_replace_variables(){
     done
 }
 
-function run_action_script(){
+function run_action_script() {
     local lib=$1
     local script_path=$2
     local lib_config_file="$ACTION_FILE_PATH/$lib.yaml"
@@ -90,20 +90,21 @@ function run_action_script(){
 
     # Check if the script is empty, if it's not, then run it
     if [[ -n "$script" ]]; then
+        # Print script and debug info
         print "33" "40" "Running $script_path Script"  # Yellow text on black background
         echo ""
         echo -e "\033[1;36mOriginal script:\033[0m"  # Bold cyan for the label
         echo -e "\033[0;36m$script\033[0m"  # Cyan color for the original script
         echo ""
-        script_with_vars=$(echo "$script" | envsubst)
-        echo -e "\033[1;32mSubstituted script:\033[0m"  # Bold green for the label
-        echo -e "\033[0;32m$script_with_vars\033[0m"  # Green color for the substituted script
-        echo ""
-        eval "$script_with_vars"
+
+        # Now, directly evaluate the script using `eval`
+        echo -e "\033[1;32mExecuting script:\033[0m"  # Bold green for the label
+        eval "$script"  # This will execute the script and evaluate commands like `$(date)`
     else
         info "No script found $lib_config_file in $script_path for $lib. Skipping script execution."
     fi
 }
+
 
 # Function to run a specific action
 function configure_action() {

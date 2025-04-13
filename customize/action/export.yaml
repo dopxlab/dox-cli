@@ -25,18 +25,19 @@ actions:
 
   # Generate BUILD_VERSION using a different method
   BUILD_VERSION: |
-  
     timestamp=$(date +"%Y%m%d.%H%M%S")
     formatted_timestamp=$(date +"%Y%m%d.%H%M%S" | sed 's/^0//')  # Clean up leading zero if needed
     pipeline_id=0  # If dynamic, replace with an environment variable
 
     timestamp_version="${formatted_timestamp}.${pipeline_id}"
-    export BUILD_VERSION="${BUILD_VERSION-timestamp_version}"
 
+    # If BUILD_VERSION is not already set, use the default generated value
+    export BUILD_VERSION="${BUILD_VERSION:-$timestamp_version}"
     export BUILD_VERSION="${BUILD_VERSION:-$(get_build_version)}"
 
     echo "BUILD_VERSION=${BUILD_VERSION}" >> $GITHUB_ENV
     echo "BUILD_VERSION=${BUILD_VERSION}"
+
 
   # Get Git repository name
   REPOSITORY_NAME: |
