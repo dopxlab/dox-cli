@@ -101,7 +101,7 @@ function run_action_script() {
     # Check if the script is empty, if it's not, then run it
     if [[ -n "$script" ]]; then
         # Print script and debug info
-        print "33" "40" "Running $script_path Script"  # Yellow text on black background
+        print "33" "40" "🚀 Running $script_path Script"  # Yellow text on black background
 
         # Create a temporary file for the script
         temp_script_file=$(mktemp /tmp/temp_script.XXXXXX)
@@ -113,20 +113,20 @@ function run_action_script() {
         chmod +x "$temp_script_file"
 
         # Execute the temporary script
-        echo -e "\033[1;32mExecuting temporary script:\033[0m"  # Bold green for the label
+        #echo -e "\033[1;32mExecuting temporary script:\033[0m"  # Bold green for the label
         source $temp_script_file  # Execute the script on the same shell (!IMPORTANT)
 
         # Optionally, remove the temporary script file after execution
         rm -f "$temp_script_file"
     else
-        info "No script found $lib_config_file in $script_path for $lib. Skipping script execution."
+        #info "No script found $lib_config_file in $script_path for $lib. Skipping script execution."
     fi
 }
 
 # Function to run a specific action
 function configure_action() {
   local lib=$1
-  echo "🛠️ Configuring Tool: $lib"
+  #info "🛠️ Configuring Tool: $lib"
 
   #Step 1: Configuration Run Configure script
   run_action_script $lib ".configure"
@@ -162,7 +162,7 @@ configure_action $lib
 
 # Loop through the actions (starting from $2 as the first argument is the tool name)
 for action in "${@:2}"; do
-    echo "🚀 Executing action: '$lib $action'"
+    #echo "🚀 Executing action: '$lib $action'"
     run_action_script $lib ".actions.$action"
 done
 
