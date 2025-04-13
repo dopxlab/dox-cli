@@ -54,8 +54,9 @@ function generate_utility_script() {
 
         echo "KEY # $key  and VALUE # $value"
 
+
         # Evaluate and export the key-value pair
-        eval "export $key=\"$value\""
+        #eval "export $key=\"$value\""
         # Echo the evaluated value
         #eval "echo export $key=\$$key"
 
