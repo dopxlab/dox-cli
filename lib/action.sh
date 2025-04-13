@@ -158,3 +158,4 @@ for action in "${@:2}"; do
 done
 
 echo "✅ Actions completed for tool: $lib"
+echo ""
