@@ -9,7 +9,7 @@ configure: |
 template:
   folder: "${DOX_CUSTOM_DIR}/action/templates/docker" # ${template_folder} will be resolved path of the template folder 
   variables:
-    IMAGE: "${DOCKER_IMAGE:-jre}"
+    FROM_IMAGE: "${FROM_IMAGE:-jre}"
 
 actions:
   build_push: |
