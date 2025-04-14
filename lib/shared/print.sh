@@ -77,11 +77,16 @@ print_step() {
     echo ""
 }
 
-# Prints debug messages in a special color (bright yellow text on dark blue background)
-# Usage: debug <text>
-debug() {    
+# Debug function: prints only if DEBUG_MODE is true
+debug() {
     if [ -n "$DEBUG_MODE" ] && [ "$DEBUG_MODE" = "true" ]; then
-        print "93" "44" "DEBUG: $1"  # Bright yellow text (93) on dark blue background (44)
+        # Print header
+        print "93" "44" "DEBUG:"
+
+        # Print message line by line with dark background
+        while IFS= read -r line; do
+            print "93" "40" "$line"
+        done <<< "$1"
     fi
 }
 
