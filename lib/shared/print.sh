@@ -82,7 +82,7 @@ debug() {
     if [ -n "$DEBUG_MODE" ] && [ "$DEBUG_MODE" = "true" ]; then
         # Print message line by line with dark background
         while IFS= read -r line; do
-            print "93" "40" "  $line"
+            printf "\033[93;40m  %s\033[0m\n" "$line"
         done <<< "$1"
     fi
 }
