@@ -294,7 +294,7 @@ actions:
 
 The action module uses a dynamic template engine:
 
-- All files in the `template_folder` will have `##VARIABLE_KEY##` replaced with the respective env variable.
+- All files in the `template.folder` will have `##VARIABLE_KEY##` replaced with the respective env variable.
 - Example:  
   A Dockerfile can include `##BUILD_VERSION##` and will be auto-filled before execution.
 - This makes the system extremely **modular** and **reusable**.
@@ -320,10 +320,10 @@ configure: |
   dox configure helm
   source ${DOX_CUSTOM_DIR}/global_envs.sh
 
-template_folder: "${DOX_CUSTOM_DIR}/action/templates/helm" # ${template_folder} will be resolved path of the template folder 
-
-variables:
-  BUILD_VERSION: "${BUILD_VERSION:-1.0.0}"
+template:
+  folder: "${DOX_CUSTOM_DIR}/action/templates/helm" # ${template_folder} will be resolved path of the template folder 
+  variables:
+    BUILD_VERSION: "${BUILD_VERSION:-1.0.0}"
   ...
 
 actions:
