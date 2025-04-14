@@ -52,7 +52,7 @@ function generate_utility_script() {
     echo "    temp_file=$(mktemp)" >> "$sed_utility_script"
     echo "    sed \\" >> "$sed_utility_script"
     # Extract YAML key-value pairs
-    yq eval '.variables | to_entries | .[] | "\(.key)=\(.value)"' "$config_file" | while read -r line; do
+    yq eval '.template.variables | to_entries | .[] | "\(.key)=\(.value)"' "$config_file" | while read -r line; do
         # Handle command substitution
         key=$(echo "$line" | cut -d'=' -f1)
         value=$(echo "$line" | cut -d'=' -f2-)
@@ -126,7 +126,7 @@ function configure_action() {
   #Step 1: Configuration Run Configure script
   run_action_script $lib ".configure"
   #Step 2: Process Template # Reference template folder based on lib
-  local ref_template_folder=$(yq eval ".template_folder // \"\"" "$ACTION_FILE_PATH/$lib.yaml")
+  local ref_template_folder=$(yq eval ".template.folder // \"\"" "$ACTION_FILE_PATH/$lib.yaml")
   ref_template_folder=$(eval echo "$ref_template_folder")
   
     if [ -d "$ref_template_folder" ]; then
