@@ -50,6 +50,10 @@ template:
 
 actions:
   template: |
+    echo "----"
+    echo "demo-values.yaml"
+    echo ${template_folder}/values.yaml
+    echo "----"
     helm template ${template_folder}
   package: |
     helm package ${template_folder}
