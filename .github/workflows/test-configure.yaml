@@ -83,3 +83,9 @@ jobs:
       - name: dox configure trivy
         run: |
           dox configure trivy
+
+      # Step 14: Run DOX configure command to test functionality (Ensuring aws installed)
+      - name: dox configure aws
+        run: |
+          dox configure aws
+          

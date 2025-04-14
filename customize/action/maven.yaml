@@ -1,6 +1,0 @@
-configure: |
-  dox configure maven
-
-actions:
-  build: |
-    mvn clean package

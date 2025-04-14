@@ -1,0 +1,19 @@
+# Installation and Configuration
+installation:
+  download:
+    # Define version download path # https://github.com/aquasecurity/trivy/releases/
+    "1.32.0": "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+
+configuration:
+  # Default versioning using an environment variable
+  default_version: "${AWS_CLI_VERSION:-1.32.0}"
+
+  # Environment variable mappings for installation paths
+  environments:
+    PATH: "${install_dir}/dist"
+
+  # Print the installed version after installation
+  post_configuration_script: |
+    # Print the installed version
+    aws --version
+

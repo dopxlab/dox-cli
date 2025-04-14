@@ -652,9 +652,7 @@ jobs:
 
 ---
 
-## 📚 Supported Tools (Configuration)
-
-These templates are already included:
+## 📚 Configuration Templates
 
 - `angular.yaml`
 - `argocd.yaml`
@@ -673,9 +671,7 @@ These templates are already included:
 
 ---
 
-## ⚙️ Supported Actions
-
-Templates provided for:
+## ⚙️ Actions Templates
 
 - `helm` (template, package, push)
 - `docker` (build, tag, push)
