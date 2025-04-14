@@ -6,7 +6,6 @@ configure: |
   dox export GIT_REPOSITORY_NAME 
   dox export GIT_COMMITTER_NAME 
   dox export GIT_COMMITTER_EMAIL 
-  dox export HELM_OCI_URL 
 
 template:
   folder: "${DOX_CUSTOM_DIR}/action/templates/helm" # ${template_folder} will be resolved path of the template folder 
@@ -57,6 +56,8 @@ actions:
   push: |
     helm_chart=${GIT_REPOSITORY_NAME}-${BUILD_VERSION}-helm.tgz
     echo "Helm Chart: $helm_chart"
-    echo "OCI URL: $HELM_OCI_URL"
 
-    helm push $helm_chart $HELM_OCI_URL;
+    helm_oci_url="oci://${DOCKER_IMAGE_PUSH_PREFIX}"
+    echo "OCI URL: $helm_oci_url"
+
+    helm push $helm_chart $helm_oci_url;
