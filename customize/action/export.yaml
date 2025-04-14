@@ -12,6 +12,7 @@ actions:
     dox export GIT_COMMIT_MESSAGE
     dox export GIT_BRANCH_PREFIX
     dox export GIT_PIPELINE_URL
+    dox export GIT_REPO_URL
 
   # Generate BUILD_VERSION
   BUILD_VERSION: |
