@@ -38,7 +38,7 @@ function generate_utility_script() {
     if [[ -f "$DOX_ENV" ]]; then
         debug ""
         debug "DOX Env Variables: "
-        debug "$DOX_ENV"
+        debug $(cat DOX_ENV)
         debug ""
         source "$DOX_ENV"
     fi
@@ -79,7 +79,7 @@ function run_replace_variables(){
     generate_utility_script "$ACTION_FILE_PATH/$lib.yaml" $replace_utility_script
 
     source $replace_utility_script
-    
+
     debug "$(cat $replace_utility_script)"
 
     find "$template_dir" -type f | while read -r file; do

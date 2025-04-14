@@ -81,7 +81,7 @@ print_step() {
 # Usage: debug <text>
 debug() {    
     if [ -n "$DEBUG_MODE" ] && [ "$DEBUG_MODE" = "true" ]; then
-            print "93" "44" "DEBUG: $1"  # Bright yellow text (93) on dark blue background (44)
+        print "93" "44" "DEBUG: $1"  # Bright yellow text (93) on dark blue background (44)
     fi
 }
 
