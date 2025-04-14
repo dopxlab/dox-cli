@@ -21,7 +21,7 @@ actions:
     echo "Exported BUILD_VERSION=\"$BUILD_VERSION\""
 
   HELM_OCI_URL: |
-    export HELM_OCI_URL="${HELM_OCI_URL:-oci://${DOCKER_IMAGE_PUSH_PREFIX}"
+    export HELM_OCI_URL="${HELM_OCI_URL:-oci://${DOCKER_IMAGE_PUSH_PREFIX}}"
     echo "Exported HELM_OCI_URL=\"$HELM_OCI_URL\""
 
   # Git Repository Name
