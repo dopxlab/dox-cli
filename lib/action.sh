@@ -97,7 +97,7 @@ function run_action_script() {
     # Check if the script is empty, if it's not, then run it
     if [[ -n "$script" ]]; then
         # Print script and debug info
-        print "33" "40" "🚀 Running $script_path Script"  # Yellow text on black background
+        print "34" "40" "🚀 Running $script_path Script"  # Yellow text on black background
 
         # Create a temporary file for the script
         temp_script_file=$(mktemp /tmp/temp_script.XXXXXX)
