@@ -38,7 +38,7 @@ function generate_utility_script() {
     if [[ -f "$DOX_ENV" ]]; then
         debug ""
         debug "DOX Env Variables: "
-        debug $(cat DOX_ENV)
+        debug "$(cat "$DOX_ENV")"
         debug ""
         source "$DOX_ENV"
     fi
