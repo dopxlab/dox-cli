@@ -255,6 +255,9 @@ Found env_path, updating PATH.
   ```
 </details> 
 
+
+#### 🔬 Lab [Hand-on AWS CLI Installation & Configuration with DOX](./docs/aws-configuration.md)
+
 ---
 
 ## 🛠️ 2. Action Module
