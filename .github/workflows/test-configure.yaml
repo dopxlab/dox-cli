@@ -5,6 +5,8 @@ on:
     workflows: ["Build Release"]
     types:
       - completed  # Trigger after the "Build Release" workflow is completed
+env:
+  DEBUG_MODE: ${{ vars.DEBUG_MODE }}
 
 jobs:
   test:
