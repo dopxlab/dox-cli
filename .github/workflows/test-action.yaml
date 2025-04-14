@@ -8,6 +8,8 @@ on:
       
 env:
   DEBUG_MODE: ${{ vars.DEBUG_MODE }}
+  OCI_REG_USER: ${{ vars.OCI_REG_USER }}
+  OCI_REG_PASSWORD: ${{ secrets.OCI_REG_PASSWORD }}
 
 jobs:
   test:
