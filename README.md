@@ -275,11 +275,11 @@ This uses the action template from `customize/action/<tool>.yaml`.
 configure: |
   "<optional: configuration_command>" 
 
-template_folder: "<optional: template_folder>" 
-
-variables:
-  <variable-name>: "<optional: variable-value>" 
-  # Example: "CUSTOM_VAR": "value"
+template:
+  folder: "<optional: template_folder>" 
+  variables:
+    <template-variable-name>: "<optional: template-variable-value>" 
+    # Example: "CUSTOM_VAR": "value"
 
 actions:
   <action-name>: |
