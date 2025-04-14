@@ -80,9 +80,6 @@ print_step() {
 # Debug function: prints only if DEBUG_MODE is true
 debug() {
     if [ -n "$DEBUG_MODE" ] && [ "$DEBUG_MODE" = "true" ]; then
-        # Print header
-        print "93" "44" "DEBUG:"
-
         # Print message line by line with dark background
         while IFS= read -r line; do
             print "93" "40" "$line"
