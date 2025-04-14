@@ -54,5 +54,6 @@ actions:
   package: |
     helm package ${template_folder}
   push: |
+    helm_chart=${GIT_REPOSITORY_NAME}-${BUILD_VERSION}-helm.tgz
     oci_reg_url="${HELM_OCI_URL:-oci://${DOCKER_IMAGE_PUSH_PREFIX:-}}"
     helm push $helm_chart $oci_reg_url;
