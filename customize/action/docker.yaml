@@ -1,17 +1,19 @@
 configure: |
   dox configure docker
-  docker login $username $password
+  echo "$OCI_REG_PASSWORD" | docker login -u "$OCI_REG_USER" --password-stdin docker.io
+
+  dox export GIT_REPOSITORY_NAME
+  dox export BUILD_VERSION
 
 template_folder: "${DOX_CUSTOM_DIR}/action/templates/docker" # ${template_folder} will be resolved path of the template folder 
 
 variables:
-  APPLICATION_NAME: "${APPLICATION_NAME:-demo-application-name}"
-  IMAGE_TAG: "${BUILD_VERSION:-1.0.0}"
-  DOCKER_IMAGE_PUSH_PREFIX: "${DOCKER_IMAGE_PUSH_PREFIX}"
-  DOCKER_FILE_PATH: "${DOCKER_FILE_PATH:-.}"
+  FROM_IMAGE: "eclipse-temurin:17-jre-alpine"
+  IMAGE: ${DOCKER_IMAGE_PUSH_PREFIX}/${GIT_REPOSITORY_NAME}:${BUILD_VERSION}
 
 actions:
   build: |
-    docker build
+    cp ${template_folder}/Dockerfile ./
+    docker build -t ${IMAGE}
   push: |
-    docker push
+    docker push ${IMAGE}
