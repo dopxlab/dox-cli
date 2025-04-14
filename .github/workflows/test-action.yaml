@@ -35,17 +35,12 @@ jobs:
         run: |
           dox --version  # Verify that DOX CLI is now available
 
-      # Step 3: DOX Action 1
+      # Step 3: DOX Action for helm build and push
       - name: dox helm template
         run: |
-          dox helm template
+          dox helm template package push
 
-      # Step 4: DOX Action 2
-      - name: dox helm package
-        run: |
-          dox helm package
-
-      # Step 5: DOX Action 3
+      # Step 5: DOX Action for argocd deploy
       - name: dox argocd deploy
         run: |
           dox argocd deploy
