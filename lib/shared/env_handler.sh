@@ -35,11 +35,19 @@ update_env_file() {
     while IFS='=' read -r key value; do
         # If the key is already in the current environment, use the latest value
         eval "current_value=\$$key"
-        
+
         if [[ -n "$current_value" ]]; then
+            #IMPORTANT - to fix with spaced names "John Rambo" needs to be in double quotes
+            if [[ ! "$current_value" =~ ^-?[0-9]+(\.[0-9]+)?$ && ! "$current_value" =~ ^\".*\"$ ]]; then
+                current_value="\"$current_value\""
+            fi
             # Update the variable with the latest value
             echo "$key=$current_value" >> "$temp_env_file"
         else
+            #IMPORTANT - to fix with spaced names "John Rambo" needs to be in double quotes
+            if [[ ! "$value" =~ ^-?[0-9]+(\.[0-9]+)?$ && ! "$value" =~ ^\".*\"$ ]]; then
+                value="\"$value\""
+            fi
             # If the variable doesn't exist, append it with the last known value from DOX_ENV
             echo "$key=$value" >> "$temp_env_file"
         fi
