@@ -64,14 +64,6 @@ function generate_utility_script() {
         # Evaluate and export the key-value pair
         eval "export $key=\"$value\""
 
-        if [[ "${!key}" =~ ^[0-9]+$ ]]; then
-            # If the value is a number, no quotes
-            echo "    -e \"s|##$key##|${!key}|g\" \\" >> "$sed_utility_script"
-        else
-            # If the value is not a number, add double quotes
-            echo "    -e \"s|##$key##|\"${!key}\"|g\" \\" >> "$sed_utility_script"
-        fi
-
         echo "    -e \"s|##$key##|${!key}|g\" \\" >> "$sed_utility_script"
     done
     echo "    \$input_file > \$temp_file" >> "$sed_utility_script"
