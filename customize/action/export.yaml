@@ -13,11 +13,6 @@ actions:
     dox export GIT_BRANCH_PREFIX
     dox export GIT_PIPELINE_URL
     dox export GIT_REPO_URL
-    dox export DOCKER_IMAGE
-
-  DOCKER_IMAGE: | 
-    export DOCKER_IMAGE=${DOCKER_IMAGE_PUSH_PREFIX}/${GIT_REPOSITORY_NAME}:${BUILD_VERSION}
-    echo "Exported DOCKER_IMAGE=\"$DOCKER_IMAGE\""
 
   # Generate BUILD_VERSION
   BUILD_VERSION: |

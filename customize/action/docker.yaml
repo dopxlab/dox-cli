@@ -4,7 +4,6 @@ configure: |
 
   dox export GIT_REPOSITORY_NAME
   dox export BUILD_VERSION
-  dox export DOCKER_IMAGE
 
 template:
   folder: "${DOX_CUSTOM_DIR}/action/templates/docker" # ${template_folder} will be resolved path of the template folder 
@@ -15,6 +14,9 @@ actions:
   build_push: |
     cp ${template_folder}/Dockerfile ./
     cat Dockerfile
+
+    DOCKER_IMAGE=${DOCKER_IMAGE_PUSH_PREFIX}/${GIT_REPOSITORY_NAME}:${BUILD_VERSION}
     echo "Docker Image: $DOCKER_IMAGE"
+
     docker build -t ${DOCKER_IMAGE} .
     docker push ${DOCKER_IMAGE}
