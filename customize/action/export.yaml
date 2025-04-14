@@ -45,7 +45,7 @@ actions:
 
   # Git Commit URL
   GIT_COMMIT_URL: |
-    commit_url=$(git config --get remote.origin.url | sed 's/tatasteel-dod@//')/commit/$(git rev-parse HEAD)
+    commit_url=$(git config --get remote.origin.url)/commit/$(git rev-parse HEAD)
     export GIT_COMMIT_URL="\"$commit_url\""
     echo "Exported GIT_COMMIT_URL=\"$GIT_COMMIT_URL\""
 
@@ -78,3 +78,9 @@ actions:
     pipeline_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
     export GIT_PIPELINE_URL="\"$pipeline_url\""
     echo "Exported GIT_PIPELINE_URL=\"$GIT_PIPELINE_URL\""
+
+# Git Repo URL
+  GIT_REPO_URL: |
+    repo_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git"
+    export GIT_REPO_URL="\"$repo_url\""
+    echo "Exported GIT_REPO_URL=\"$GIT_REPO_URL\""
