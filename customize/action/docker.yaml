@@ -12,8 +12,6 @@ variables:
   IMAGE: ${DOCKER_IMAGE_PUSH_PREFIX}/${GIT_REPOSITORY_NAME}:${BUILD_VERSION}
 
 actions:
-  build: |
+  build_push: |
     cp ${template_folder}/Dockerfile ./
-    docker build -t ${IMAGE}
-  push: |
-    docker push ${IMAGE}
+    docker buildx build --platform linux/amd64,linux/arm64 -t ${IMAGE} --push .
