@@ -36,10 +36,10 @@ function generate_utility_script() {
     config_file="$1"
     # Check if the file exists and then source it
     if [[ -f "$DOX_ENV" ]]; then
-        echo ""
-        echo "DOX Env Variables: "
-        cat "$DOX_ENV"
-        echo ""
+        debug ""
+        debug "DOX Env Variables: "
+        debug "$DOX_ENV"
+        debug ""
         source "$DOX_ENV"
     fi
     echo "📄 Extracting variables from $config_file... and generating utility script 🛠️"
@@ -79,7 +79,8 @@ function run_replace_variables(){
     generate_utility_script "$ACTION_FILE_PATH/$lib.yaml" $replace_utility_script
 
     source $replace_utility_script
-    cat $replace_utility_script
+    
+    debug "$(cat $replace_utility_script)"
 
     find "$template_dir" -type f | while read -r file; do
         echo "Processing: $file"
@@ -110,13 +111,12 @@ function run_action_script() {
         chmod +x "$temp_script_file"
 
         # Execute the temporary script
-        #echo -e "\033[1;32mExecuting temporary script:\033[0m"  # Bold green for the label
         source $temp_script_file  # Execute the script on the same shell (!IMPORTANT)
 
         # Optionally, remove the temporary script file after execution
         rm -f "$temp_script_file"
-    #else
-        #info "No script found $lib_config_file in $script_path for $lib. Skipping script execution."
+    else
+        debug "No script found $lib_config_file in $script_path for $lib. Skipping script execution."
     fi
 }
 

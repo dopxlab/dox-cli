@@ -77,6 +77,14 @@ print_step() {
     echo ""
 }
 
+# Prints debug messages in a special color (bright yellow text on dark blue background)
+# Usage: debug <text>
+debug() {    
+    if [ -n "$DEBUG_MODE" ] && [ "$DEBUG_MODE" = "true" ]; then
+            print "93" "44" "DEBUG: $1"  # Bright yellow text (93) on dark blue background (44)
+    fi
+}
+
 # Color Codes Documentation:
 
 # Foreground (Text) Color Codes:

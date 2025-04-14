@@ -41,14 +41,14 @@ function configure_env() {
     # Check if the env_export file exists and source it
     local env_export="env_export"
     if [ -f "$env_export" ]; then
-        print "Found $env_export, sourcing the environment variables from it."
+        debug "Found $env_export, sourcing the environment variables from it."
         source "$env_export"  # Source the env_export file directly to apply the environment variables
     fi
 
     local env_path="env_path"
     # Check if the env_path file exists and update PATH
     if [ -f "$env_path" ]; then
-        print "Found $env_path, updating PATH."
+        debug "Found $env_path, updating PATH."
         export PATH="$(cat "$env_path")$PATH"  # Prepend the new path to the current PATH
     fi
 }
