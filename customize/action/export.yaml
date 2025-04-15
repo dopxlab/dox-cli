@@ -35,6 +35,7 @@ actions:
   # Git Committer Name
   GIT_COMMITTER_NAME: |
     committer_name=$(git -C . log -1 --pretty=format:'%an')
+    committer_name="${committer_name// /_}" 
     export GIT_COMMITTER_NAME="$committer_name"
     echo "Exported GIT_COMMITTER_NAME=\"$GIT_COMMITTER_NAME\""
 
