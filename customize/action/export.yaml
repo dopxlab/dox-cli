@@ -15,6 +15,12 @@ actions:
     dox export GIT_REPO_URL
 
   # Generate BUILD_VERSION
+  HELM_BUILD_VERSION: |
+    helm_version="1.0.${GITHUB_RUN_ID}"
+    export BUILD_VERSION="${HELM_BUILD_VERSION:-$helm_version}"
+    echo "Exported HELM_BUILD_VERSION=\"$HELM_BUILD_VERSION\""
+
+  # Generate BUILD_VERSION
   BUILD_VERSION: |
     timestamp_version=$(date +"%Y%m%d.%H%M%S" | sed 's/^0//').0
     export BUILD_VERSION="${BUILD_VERSION:-$timestamp_version}"
