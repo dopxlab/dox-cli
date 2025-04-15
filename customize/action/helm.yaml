@@ -31,10 +31,10 @@ template:
     APPLICATION_HEALTH_READINESS_DELAY: "${APPLICATION_HEALTH_READINESS_DELAY:-40}"
     AUTOSCALING_ENABLED: "${AUTOSCALING_ENABLED:-true}"
 
-    RESOURCE_REQUESTS_CPU: "${RESOURCE_REQUESTS_CPU:-200m}"
-    RESOURCE_REQUESTS_MEMORY: "${RESOURCE_REQUESTS_MEMORY:-512Mi}"
-    RESOURCE_LIMITS_CPU: "${RESOURCE_LIMITS_CPU:-500m}"
-    RESOURCE_LIMITS_MEMORY: "${RESOURCE_LIMITS_MEMORY:-1Gi}"
+    RESOURCE_REQUESTS_CPU: "${RESOURCE_REQUESTS_CPU:-500m}"        # 0.5 CPU request - this is a safe minimum for moderate workloads
+    RESOURCE_REQUESTS_MEMORY: "${RESOURCE_REQUESTS_MEMORY:-1Gi}"   # 1Gi memory request - reasonable for a typical Spring Boot application
+    RESOURCE_LIMITS_CPU: "${RESOURCE_LIMITS_CPU:-2}"               # 2 CPUs limit - allows for bursts in CPU usage during high load
+    RESOURCE_LIMITS_MEMORY: "${RESOURCE_LIMITS_MEMORY:-2Gi}"      # 2Gi memory limit - appropriate for applications with moderate to high memory requirements
     
     INGRESS_HOST: "${INGRESS_HOST:-}"
     IMAGE_PULL_SECRET: "${IMAGE_PULL_SECRET:-}"
