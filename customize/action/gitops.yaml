@@ -1,0 +1,43 @@
+configure: |
+  dox configure docker
+  echo "$OCI_REG_PASSWORD" | docker login -u "$OCI_REG_USER" --password-stdin docker.io
+
+  dox export GIT_REPOSITORY_NAME
+  dox export BUILD_VERSION
+
+actions:
+  update-version: |
+    STAGE="${STAGE:-dev}"           # e.g., dev
+    APP_NAME="$GIT_REPOSITORY_NAME" # e.g., springboot-hello-world
+    VERSION="$BUILD_VERSION"        # e.g., 20250415.110246.0
+    ls
+    VALUES_FILE="gitops-argocd/dev/demo-application/values.yaml"
+
+    echo "Updating $VALUES_FILE for app=$APP_NAME, stage=$STAGE, version=$VERSION"
+
+    # Check if app exists
+    APP_EXISTS=$(yq e ".applications[] | select(.name == \"$APP_NAME\")" "$VALUES_FILE")
+
+    if [[ -n "$APP_EXISTS" ]]; then
+      echo "App exists, updating tag for stage '$STAGE'"
+      yq e ".applications[] |= (select(.name == \"$APP_NAME\") | .image.tag.$STAGE = \"$VERSION\")" -i "$VALUES_FILE"
+    else
+      echo "App doesn't exist, creating new entry and setting tags for all stages"
+      TAGS=$(yq e '.stages | map({key: .name, value: "'"$VERSION"'"}) | from_entries' "$VALUES_FILE")
+
+      NEW_APP=$(cat <<EOF
+    - name: $APP_NAME
+      image:
+        tag: $TAGS
+    EOF
+    )
+
+      yq e ".applications += $NEW_APP" -i "$VALUES_FILE"
+    fi
+  push: |    
+    cd gitops-argocd
+    git config user.name "GitOps Bot"
+    git config user.email "bot@example.com"
+    git add .
+    git commit -m "update image tag for ${{ github.event.repository.name }}"
+    git push
