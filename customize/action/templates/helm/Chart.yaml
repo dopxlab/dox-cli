@@ -25,5 +25,5 @@ appVersion: "##CHART_VERSION##"
 
 # The git commit information  will be displayed here
 maintainers: 
-  - name: "##MAINTAINER_NAME##"
+  - name: "dox-cli"
     email: "##MAINTAINER_EMAIL##"
