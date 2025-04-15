@@ -63,6 +63,9 @@ update_env_file() {
 # Step 1: Before execution
 function on_before_execution() {
     # Capture the environment before running the DOX command
+    if [[ -f "$DOX_ENV" ]]; then
+        source "$DOX_ENV"
+    fi
     capture_env "$BEFORE_FILE"
 }
 
