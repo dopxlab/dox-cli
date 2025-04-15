@@ -21,7 +21,7 @@ actions:
 
     echo "📁 Created temp folder: $TMP_DIR"
     echo "🔄 Cloning GitOps repo..."
-    git clone --depth 1 --branch "$BRANCH" "https://${GITOPS_PAT}@github.com/${GITOPS_REPO}.git" "$TMP_DIR"
+    git clone --depth 1 --branch "$BRANCH" "https://${GITOPS_PAT}@${GITOPS_REPO}" "$TMP_DIR"
 
     cd "$TMP_DIR"
 
