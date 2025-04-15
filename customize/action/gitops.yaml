@@ -11,7 +11,7 @@ actions:
     APP_NAME="$GIT_REPOSITORY_NAME" # e.g., springboot-hello-world
     VERSION="$BUILD_VERSION"        # e.g., 20250415.110246.0
     ls
-    VALUES_FILE="gitops-argocd/dev/demo-application/values.yaml"
+    VALUES_FILE="argo-apps/values.yaml"
 
     echo "Updating $VALUES_FILE for app=$APP_NAME, stage=$STAGE, version=$VERSION"
 
@@ -35,7 +35,6 @@ actions:
       yq e ".applications += $NEW_APP" -i "$VALUES_FILE"
     fi
   push: |    
-    cd gitops-argocd
     git config user.name "GitOps Bot"
     git config user.email "bot@example.com"
     git add .
