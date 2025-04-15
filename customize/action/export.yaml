@@ -16,7 +16,7 @@ actions:
 
   # Generate BUILD_VERSION
   HELM_BUILD_VERSION: |
-    helm_version="1.0.${GITHUB_RUN_ID}"
+    helm_version="1.0.0"
     export BUILD_VERSION="${HELM_BUILD_VERSION:-$helm_version}"
     echo "Exported HELM_BUILD_VERSION=\"$HELM_BUILD_VERSION\""
 
