@@ -32,7 +32,7 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .Values.service.name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -44,12 +44,10 @@ spec:
                 fieldPath: metadata.namespace
           - name: IMAGE_VERSION
             value: "{{ .Values.image.tag }}"
-          {{- include "helpers.include-envfrom" . | indent 10 }}
           ports:
             - name: defaulthttp
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-            {{- include "helpers.list-additional-container-ports" . | indent 12 }}
           livenessProbe:
             initialDelaySeconds: {{ .Values.healthCheck.liveness.delay }}
             failureThreshold: 5

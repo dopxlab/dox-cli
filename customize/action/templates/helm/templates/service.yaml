@@ -15,6 +15,5 @@ spec:
       port: {{ .Values.service.port }}
       targetPort: defaulthttp
       protocol: TCP   
-    {{- include "helpers.list-additional-service-ports" . | indent 4 }}
   selector:
     {{- include "helm-chart.selectorLabels" . | nindent 4 }}
