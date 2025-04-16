@@ -4,6 +4,26 @@ configure: |
 
   dox export GIT_REPOSITORY_NAME
   dox export BUILD_VERSION
+  dox export FROM_IMAGE
+
+from-images: # This not the part of template but it is used n export.yaml to automate the right image based on $JDK_VERSION version @Ref: /configure/jdk.yaml
+  "8": "eclipse-temurin:8-jre-alpine"
+  "9": "eclipse-temurin:11-jre-alpine"
+  "10": "eclipse-temurin:11-jre-alpine"
+  "11": "eclipse-temurin:11-jre-alpine"
+  "12": "eclipse-temurin:17-jre-alpine"
+  "13": "eclipse-temurin:17-jre-alpine"
+  "14": "eclipse-temurin:17-jre-alpine"
+  "15": "eclipse-temurin:17-jre-alpine"
+  "16": "eclipse-temurin:17-jre-alpine"
+  "17": "eclipse-temurin:17-jre-alpine"
+  "18": "eclipse-temurin:18-jre-alpine"
+  "19": "eclipse-temurin:19-jre-alpine"
+  "20": "eclipse-temurin:20-jre-alpine"
+  "21": "eclipse-temurin:21-jre-alpine"
+  "22": "eclipse-temurin:22-jre-alpine"
+  "23": "eclipse-temurin:23-jre-alpine"
+  "24": "eclipse-temurin:23-jre-alpine"
 
 template:
   folder: "${DOX_CUSTOM_DIR}/action/templates/docker" # ${template_folder} will be resolved path of the template folder 
