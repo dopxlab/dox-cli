@@ -21,3 +21,4 @@ configuration:
   post_configuration_script: |
     # Print the installed Maven version
     mvn -v
+    echo "JDK_VERSION is set to $JDK_VERSION"
