@@ -37,7 +37,14 @@ jobs:
         run: |
           dox --version  # Verify that DOX CLI is now available
 
-      # Step 3: DOX Action for helm build and push
+      # Step 3: DOX Action for dockerfile
+      - name: dox docker cat_dockerfile (for jdk 21)
+        run: |
+          export JDK_VERSION=21
+          dox configure maven
+          dox docker cat_dockerfile
+
+      # Step 4: DOX Action for helm build and push
       - name: dox helm template
         run: |
           dox helm template package push
