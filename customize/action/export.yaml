@@ -16,7 +16,8 @@ actions:
 
   FROM_IMAGE: | #Not a Global variable
     echo "JDK_VERSION is set to $JDK_VERSION"
-    base_image=$(yq eval ".base-images.\"$JDK_VERSION\"" "$DOX_CUSTOM_DIR/action/docker.yaml")
+    base_image=$(yq eval ".base-images.${JDK_VERSION}" "$DOX_CUSTOM_DIR/action/docker.yaml")
+    echo "base_image : $base_image"
     export FROM_IMAGE="${FROM_IMAGE:-$base_image}"
     echo "Exported FROM_IMAGE=\"$FROM_IMAGE\""
 

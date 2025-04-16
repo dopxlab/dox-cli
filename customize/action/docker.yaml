@@ -32,8 +32,8 @@ template:
 
 actions:
   cat_dockerfile: |
-    cat ${template_folder}/Dockerfile
-    
+    debug ${template_folder}/Dockerfile
+
   build: |
     cp ${template_folder}/Dockerfile ./
     cat Dockerfile
