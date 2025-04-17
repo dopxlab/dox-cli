@@ -39,9 +39,11 @@ function generate_env_files() {
             # Print the evaluated value
             #echo "Evaluated Value: $evaluated_value"
             if [ "$key" == "PATH" ]; then # If key is PATH, save it to ENV_PATH
-                append_if_not_exists $ENV_PATH "$evaluated_value:"
+                #append_if_not_exists $ENV_PATH "$evaluated_value:"
+                export PATH=$PATH:$evaluated_value
             else # For other keys, save them to the env.sh script
-                append_if_not_exists $ENV_EXPORT "export $key=\"$evaluated_value\";"
+                #append_if_not_exists $ENV_EXPORT "export $key=\"$evaluated_value\";"
+                export $key="$evaluated_value"
             fi
         done
     fi
