@@ -15,4 +15,4 @@ configuration:
   post_configuration_script: |
     # Print the installed  version
     helm version
-
+    whereis helm

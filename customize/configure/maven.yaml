@@ -22,3 +22,4 @@ configuration:
     # Print the installed Maven version
     mvn -v
     echo "JDK_VERSION is set to $JDK_VERSION"
+    whereis mvn

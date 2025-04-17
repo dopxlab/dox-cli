@@ -18,3 +18,4 @@ configuration:
   post_configuration_script: |
     # Print the installed version
     kubectl version
+    whereis kubectl

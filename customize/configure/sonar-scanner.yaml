@@ -17,3 +17,4 @@ configuration:
   post_configuration_script: |
     # Print the installed Sonar Scan version
     sonar-scanner --version
+    whereis sonar-scanner 

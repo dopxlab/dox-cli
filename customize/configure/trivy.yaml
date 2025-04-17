@@ -18,4 +18,5 @@ configuration:
   post_configuration_script: |
     # Print the installed version
     trivy --version
+    whereis trivy 
 

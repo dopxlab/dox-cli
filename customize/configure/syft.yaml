@@ -17,3 +17,4 @@ configuration:
   post_configuration_script: |
     # Print the installed Syft version
     syft version
+    whereis syft 

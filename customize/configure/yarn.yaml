@@ -16,3 +16,4 @@ configuration:
   post_configuration_script: |
     # Print the installed Yarn version
     yarn -v
+    whereis yarn 

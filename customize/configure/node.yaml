@@ -19,3 +19,4 @@ configuration:
   post_configuration_script: |
     # Print the installed Node version
     node -v
+    whereis node
