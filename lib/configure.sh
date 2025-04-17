@@ -181,7 +181,7 @@ function install_dependencies() {
         for dep in $cleaned_dependencies; do
             dep="${dep#-}"
             print "Installing dependency: $dep..."
-            configure "$dep"
+            dox configure "$dep"
         done
     fi
 }
@@ -322,6 +322,6 @@ else
     # Iterate over all the provided arguments and call configure for each
     for tool in "$@"; do
         echo "Configuring tool: $tool"
-        dox configure "$tool"
+        configure "$tool"
     done
 fi
