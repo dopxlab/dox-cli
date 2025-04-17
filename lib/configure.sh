@@ -322,6 +322,6 @@ else
     # Iterate over all the provided arguments and call configure for each
     for tool in "$@"; do
         echo "Configuring tool: $tool"
-        configure "$tool"
+        dox configure "$tool"
     done
 fi
