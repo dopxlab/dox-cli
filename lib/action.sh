@@ -108,9 +108,6 @@ function run_action_script() {
         # Make the temporary script executable
         chmod +x "$temp_script_file"
 
-        if [[ -f "$DOX_ENV" ]]; then
-            source "$DOX_ENV"
-        fi
         # Execute the temporary script
         source $temp_script_file  # Execute the script on the same shell (!IMPORTANT)
 
