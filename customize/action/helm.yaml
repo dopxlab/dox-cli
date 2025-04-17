@@ -1,6 +1,6 @@
 configure: |
   dox configure helm
-  helm registry login -u "$OCI_REG_USER" -p "$OCI_REG_PASSWORD" docker.io
+  helm registry login -u "$OCI_REG_USER" -p "$OCI_REG_PASSWORD" ${OCI_REG_HOST:-docker.io}
  
   dox export HELM_BUILD_VERSION
   dox export GIT_REPOSITORY_NAME 
