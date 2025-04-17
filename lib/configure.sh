@@ -263,10 +263,10 @@ function configure() {
     generate_env_files "$lib" "$lib_version" "$install_dir"
     
     if $run_post_installation; then
-        run_installation_script "$lib" "installation.post_installation_script"
+        run_installation_script "$lib" ".installation.post_installation_script"
     fi
 
-    run_installation_script "$lib" "configuration.post_configuration_script"
+    run_installation_script "$lib" ".configuration.post_configuration_script"
 
     echo ""
     echo -e "\033[0;32m$lib installation completed successfully.\033[0m"
