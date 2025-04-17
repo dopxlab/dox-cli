@@ -40,10 +40,8 @@ function generate_env_files() {
             #echo "Evaluated Value: $evaluated_value"
             if [ "$key" == "PATH" ]; then # If key is PATH, save it to ENV_PATH
                 append_if_not_exists $ENV_PATH "$evaluated_value:"
-                export PATH=$evaluated_value:$PATH
             else # For other keys, save them to the env.sh script
                 append_if_not_exists $ENV_EXPORT "export $key=\"$evaluated_value\";"
-                export $key="$evaluated_value"
             fi
         done
     fi
@@ -265,10 +263,10 @@ function configure() {
     generate_env_files "$lib" "$lib_version" "$install_dir"
     
     if $run_post_installation; then
-        run_installation_script "$lib" ".installation.post_installation_script"
+        run_installation_script "$lib" "installation.post_installation_script"
     fi
 
-    run_installation_script "$lib" ".configuration.post_configuration_script"
+    run_installation_script "$lib" "configuration.post_configuration_script"
 
     echo ""
     echo -e "\033[0;32m$lib installation completed successfully.\033[0m"
@@ -282,30 +280,41 @@ function run_installation_script(){
     check_file_exists $lib_config_file
 
     # Extract the script value using yq
-    script=$(yq eval "${script_path} // \"\"" "$lib_config_file")
+    script=$(yq eval ".${script_path} // \"\"" "$lib_config_file")
 
     # Check if the script is empty, if it's not, then run it
     if [[ -n "$script" ]]; then
-        # Print script and debug info
-        print "34" "40" "🚀[$lib] Running $script_path script"  # Yellow text on black background
-
-        # Create a temporary file for the script
-        temp_script_file=$(mktemp /tmp/temp_script.XXXXXX)
-
-        # Write the script to the temporary file
-        echo "$script" > "$temp_script_file"
-
-        # Make the temporary script executable
-        chmod +x "$temp_script_file"
-
-        # Execute the temporary script
-        source $temp_script_file  # Execute the script on the same shell (!IMPORTANT)
-
-        # Optionally, remove the temporary script file after execution
-        rm -f "$temp_script_file"
+        print "33" "40" "Running $script_path Script"  # Yellow text on black background
+        echo ""
+        echo -e "\033[1;36mOriginal script:\033[0m"  # Bold cyan for the label
+        echo -e "\033[0;36m$script\033[0m"  # Cyan color for the original script
+        echo ""
+        script_with_vars=$(replace_env_vars "$script") # Replacing script_with_vars=$(echo "$script" | envsubst)
+        echo -e "\033[1;32mSubstituted script:\033[0m"  # Bold green for the label
+        echo -e "\033[0;32m$script_with_vars\033[0m"  # Green color for the substituted script
+        echo ""
+        eval "$script_with_vars"
     else
-        debug "No script found $lib_config_file in $script_path for $lib. Skipping script execution."
+        info "No script found $lib_config_file in $script_path for $lib. Skipping script execution."
     fi
+}
+
+replace_env_vars() {
+  local input="$1"
+  local output="$input"
+
+  # Match all $VAR or ${VAR} patterns
+  while [[ "$output" =~ (\$\{?[A-Za-z_][A-Za-z0-9_]*\}?) ]]; do
+    var="${BASH_REMATCH[1]}"
+    # Remove optional ${} and get the variable name
+    clean_var=$(echo "$var" | sed -E 's/^\$\{?([A-Za-z_][A-Za-z0-9_]*)\}?$/\1/')
+    value="${!clean_var}"
+    # Escape slashes in value for safe replacement
+    safe_value=$(printf '%s\n' "$value" | sed 's/[&/\]/\\&/g')
+    output=$(echo "$output" | sed "s|\${*$clean_var}*|$safe_value|g")
+  done
+
+  echo "$output"
 }
 
 # Example installation of JDK and Maven
