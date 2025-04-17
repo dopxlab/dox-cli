@@ -181,7 +181,7 @@ function install_dependencies() {
         for dep in $cleaned_dependencies; do
             dep="${dep#-}"
             print "Installing dependency: $dep..."
-            dox configure "$dep"
+            configure "$dep"
         done
     fi
 }
