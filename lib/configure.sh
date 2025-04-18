@@ -292,13 +292,13 @@ function configure() {
         eval "$installation_script"
     fi
 
-    # Set environment variables for the library
-    generate_env_files "$lib" "$lib_version" "$install_dir"
-    
     if $run_post_installation; then
         run_installation_script "$lib" ".installation.post_installation_script"
     fi
 
+    # Set environment variables for the library
+    generate_env_files "$lib" "$lib_version" "$install_dir"
+    
     run_installation_script "$lib" ".configuration.post_configuration_script"
 
     echo ""
