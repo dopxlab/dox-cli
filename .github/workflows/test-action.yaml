@@ -74,13 +74,13 @@ jobs:
 
           echo "----------------------------------------"
           echo "dox_env"
-          cat $dox_env
+          cat dox_env
           echo "----------------------------------------"
           echo "env_export"
-          cat $env_export
+          cat env_export
           echo "----------------------------------------"
           echo "env_path"
-          cat $env_path
+          cat env_path
           echo "----------------------------------------"
 
           echo "MAVEN: Testing combination of Configuration + Action"
