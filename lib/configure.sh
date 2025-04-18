@@ -40,7 +40,7 @@ function generate_env_files() {
             # Print the evaluated value
             #echo "Evaluated Value: $evaluated_value"
             if [ "$key" == "PATH" ]; then # If key is PATH, save it to ENV_PATH
-                create_symlinks_to_bin "$evaluated_value:"
+                create_symlinks_to_bin "$evaluated_value"
                 #append_if_not_exists $ENV_PATH "$evaluated_value:"
                 #export PATH=$evaluated_value:$PATH
             else # For other keys, save them to the env.sh script
