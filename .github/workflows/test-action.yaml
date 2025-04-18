@@ -71,17 +71,23 @@ jobs:
         run: |
           export JDK_VERSION=23
           . dox configure maven # Same Shell Test
-
+          echo ""
           echo "----------------------------------------"
           echo "dox_env"
           cat dox_env
+          echo ""
           echo "----------------------------------------"
+          echo ""
           echo "env_export"
           cat env_export
+          echo ""
           echo "----------------------------------------"
+          echo ""
           echo "env_path"
           cat env_path
+          echo ""
           echo "----------------------------------------"
+          echo ""
 
           echo "MAVEN: Testing combination of Configuration + Action"
           mvn -v
