@@ -42,9 +42,13 @@ jobs:
         run: |
           export JDK_VERSION=21
           dox configure maven
-          echo "Testing combination of Configuration + Action"
+
+          echo "MAVEN: Testing combination of Configuration + Action"
           mvn -v
           whereis mvn
+          echo "JAVA 21: Testing combination of Configuration + Action"
+          java -version
+          whereis java
           dox docker cat_dockerfile
 
       # Step 4: DOX Action for helm build and push
