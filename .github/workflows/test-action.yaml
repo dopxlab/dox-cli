@@ -72,9 +72,20 @@ jobs:
           export JDK_VERSION=23
           . dox configure maven # Same Shell Test
 
+          echo "----------------------------------------"
+          echo "dox_env"
+          cat $dox_env
+          echo "----------------------------------------"
+          echo "env_export"
+          cat $env_export
+          echo "----------------------------------------"
+          echo "env_path"
+          cat $env_path
+          echo "----------------------------------------"
+
           echo "MAVEN: Testing combination of Configuration + Action"
           mvn -v
           whereis mvn
-          echo "JAVA 21: Testing combination of Configuration + Action"
+          echo "JAVA 23: Testing combination of Configuration + Action"
           java -version
           whereis java
