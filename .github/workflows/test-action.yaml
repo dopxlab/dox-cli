@@ -74,18 +74,17 @@ jobs:
           echo ""
           echo "----------------------------------------"
           echo "dox_env"
-          cat dox_env
-          echo ""
+          [ -f dox_env ] && cat dox_env || echo "❌ dox_env not found"
           echo "----------------------------------------"
           echo ""
+
           echo "env_export"
-          cat env_export
-          echo ""
+          [ -f env_export ] && cat env_export || echo "❌ env_export not found"
           echo "----------------------------------------"
           echo ""
+
           echo "env_path"
-          cat env_path
-          echo ""
+          [ -f env_path ] && cat env_path || echo "❌ env_path not found"
           echo "----------------------------------------"
           echo ""
 

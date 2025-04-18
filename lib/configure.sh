@@ -74,7 +74,7 @@ function create_symlinks_to_bin() {
         ln -sf "$file" "$bin_folder/$filename"
         echo "🔗 Linked $filename to $bin_folder"
       else
-        echo "⚠️ Skipping non-executable: $filename"
+        debug "⚠️ Skipping non-executable: $filename"
       fi
     fi
   done
