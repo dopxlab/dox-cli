@@ -64,4 +64,17 @@ jobs:
       # Step 6: DOX Action validating the installation path
       - name: dox maven test
         run: |
-          dox maven test          
+          dox maven test
+
+      # Step 7: DOX Action for dockerfile
+      - name: dox same shell test
+        run: |
+          export JDK_VERSION=23
+          . dox configure maven # Same Shell Test
+
+          echo "MAVEN: Testing combination of Configuration + Action"
+          mvn -v
+          whereis mvn
+          echo "JAVA 21: Testing combination of Configuration + Action"
+          java -version
+          whereis java
