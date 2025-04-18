@@ -4,7 +4,7 @@
 export DOX_DIR="${DOX_DIR:-$HOME/.dox}"
 export DOX_CUSTOM_DIR="${DOX_CUSTOM_DIR:-$DOX_DIR/customize}"
 export DOX_RESOURCES_DIR="${DOX_RESOURCES_DIR:-$HOME/dox_resources}"
-export DOX_USER_BIN"${DOX_USER_BIN:-$HOME/dox/bin/}"
+export DOX_USER_BIN="${DOX_USER_BIN:-/usr/local/bin/}"
 
 source ${DOX_DIR}/lib/shared/print.sh
 source ${DOX_CUSTOM_DIR}/download_files.sh
