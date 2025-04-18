@@ -1,159 +1,141 @@
 #!/usr/bin/env bash
 
-# Enable case-insensitive matching for the script
+# Enable case-insensitive matching
 shopt -s nocasematch
 
-source ${DOX_DIR}/lib/shared/print.sh
+source "${DOX_DIR}/lib/shared/print.sh"
 
-#Optional: As its already configured in dox
+# Optional defaults
 export DOX_DIR="${DOX_DIR:-$HOME/.dox}"
 export DOX_CUSTOM_DIR="${DOX_CUSTOM_DIR:-$DOX_DIR/customize}"
 export DOX_ENV="dox_env"
 
-# action yaml location
+# Action YAML location
 ACTION_FILE_PATH="${DOX_CUSTOM_DIR}/action"
 
-# Function to ensure a file exists, exit if not
+# Ensure file exists or exit
 function ensure_file_exists() {
     [ -f "$1" ] || { echo "Error: File $1 not found!" >&2; exit 1; }
 }
 
-# Function to get a value from a YAML file by key
+# Get YAML value by key using yq
 function get_yaml_value() {
     ensure_file_exists "$1"
     yq eval -r "$2" "$1"
 }
 
-# Function to escape slashes in a string
+# Escape slashes for sed compatibility
 function escape_slashes() {
     local input_string="$1"
-    local escaped_string=$(echo "$input_string" | sed 's/\//\\\//g')
+    local escaped_string
+    escaped_string=$(echo "$input_string" | sed 's/\//\\\//g')
     echo "$escaped_string"
 }
 
-# Function to evaluate and export variables from YAML
+# Generate dynamic sed utility script for variable replacement
 function generate_utility_script() {
-    config_file="$1"
-    # Check if the file exists and then source it
+    local config_file="$1"
+    local sed_utility_script="$2"
+
     if [[ -f "$DOX_ENV" ]]; then
         debug "DOX Env Variables: "
         debug "$(cat "$DOX_ENV")"
         source "$DOX_ENV"
     fi
+
     echo "📄 Extracting variables from $config_file... and generating utility script 🛠️"
 
-    # Declare an associative array to store variables
-    sed_utility_script="$2"
-    echo "#!/bin/bash" >"$sed_utility_script"
+    echo "#!/bin/bash" > "$sed_utility_script"
     echo "" >> "$sed_utility_script"
     echo "set -e  # Exit on error" >> "$sed_utility_script"
     echo "function replace_variables(){" >> "$sed_utility_script"
     echo "    input_file=\$1" >> "$sed_utility_script"
-    echo "    temp_file=$(mktemp)" >> "$sed_utility_script"
+    echo "    temp_file=\$(mktemp)" >> "$sed_utility_script"
     echo "    sed \\" >> "$sed_utility_script"
-    # Extract YAML key-value pairs
+
     yq eval '.template.variables | to_entries | .[] | "\(.key)=\(.value)"' "$config_file" | while read -r line; do
-        # Handle command substitution
         key=$(echo "$line" | cut -d'=' -f1)
         value=$(echo "$line" | cut -d'=' -f2-)
-
         value=$(escape_slashes "$value")
-
-        # Evaluate and export the key-value pair
         eval "export $key=\"$value\""
-
         echo "    -e \"s|##$key##|${!key}|g\" \\" >> "$sed_utility_script"
     done
+
     echo "    \$input_file > \$temp_file" >> "$sed_utility_script"
     echo "    mv \$temp_file \$input_file" >> "$sed_utility_script"
     echo "}" >> "$sed_utility_script"
 }
 
+# Replaces variables in template files
 function run_replace_variables(){
     local lib=$1
     local template_dir=$2
 
-    replace_utility_script="${lib}_replace_utility.sh"
-    generate_utility_script "$ACTION_FILE_PATH/$lib.yaml" $replace_utility_script
+    local replace_utility_script="${lib}_replace_utility.sh"
+    generate_utility_script "$ACTION_FILE_PATH/$lib.yaml" "$replace_utility_script"
 
-    source $replace_utility_script
+    source "$replace_utility_script"
+    debug "$(cat "$replace_utility_script")"
 
-    debug "$(cat $replace_utility_script)"
-
-    find "$template_dir" -type f | while read -r file; do
+    # ✅ FIXED: Avoid subshell using process substitution
+    while IFS= read -r file; do
         echo "Processing: $file"
-        replace_variables $file #Calling dynamically generatoed method on runtime
-    done
+        replace_variables "$file"
+    done < <(find "$template_dir" -type f)
 }
 
+# Run a script section from YAML
 function run_action_script() {
     local lib=$1
     local script_path=$2
     local lib_config_file="$ACTION_FILE_PATH/$lib.yaml"
 
-    # Extract the script value using yq
+    local script
     script=$(yq eval "${script_path} // \"\"" "$lib_config_file")
 
-    # Check if the script is empty, if it's not, then run it
     if [[ -n "$script" ]]; then
-        # Print script and debug info
-        print "34" "40" "🚀[$lib] Running $script_path script"  # Yellow text on black background
+        print "34" "40" "🚀[$lib] Running $script_path script"
 
-        # Create a temporary file for the script
+        local temp_script_file
         temp_script_file=$(mktemp /tmp/temp_script.XXXXXX)
-
-        # Write the script to the temporary file
         echo "$script" > "$temp_script_file"
-
-        # Make the temporary script executable
         chmod +x "$temp_script_file"
-
-        # Execute the temporary script
-        source $temp_script_file  # Execute the script on the same shell (!IMPORTANT)
-
-        # Optionally, remove the temporary script file after execution
+        source "$temp_script_file"
         rm -f "$temp_script_file"
     else
-        debug "No script found $lib_config_file in $script_path for $lib. Skipping script execution."
+        debug "No script found in $lib_config_file at $script_path. Skipping."
     fi
 }
 
-# Function to run a specific action
+# Configure tool, replace template variables
 function configure_action() {
-  local lib=$1
-  #info "🛠️ Configuring Tool: $lib"
+    local lib=$1
+    run_action_script "$lib" ".configure"
 
-  #Step 1: Configuration Run Configure script
-  run_action_script $lib ".configure"
-  #Step 2: Process Template # Reference template folder based on lib
-  local ref_template_folder=$(yq eval ".template.folder // \"\"" "$ACTION_FILE_PATH/$lib.yaml")
-  ref_template_folder=$(eval echo "$ref_template_folder")
-  
-    if [ -d "$ref_template_folder" ]; then
+    local ref_template_folder
+    ref_template_folder=$(yq eval ".template.folder // \"\"" "$ACTION_FILE_PATH/$lib.yaml")
+    ref_template_folder=$(eval echo "$ref_template_folder")
+
+    if [[ -d "$ref_template_folder" ]]; then
         echo "Template: $ref_template_folder exists"
-        # Create a real temporary folder and export the path as an environment variable
-        
-        # Creates a unique temporary directory and copy the files to template_folder
         export template_folder=$(mktemp -d)
-        
         echo "Temporary folder created at: $template_folder"
-        
+
         cp -r "$ref_template_folder/." "$template_folder"
         echo "Templates copied to: $template_folder"
 
-        #Generate SED Command
-        run_replace_variables $lib $template_folder
+        run_replace_variables "$lib" "$template_folder"
     fi
 }
 
+# Entry point
 lib=$1
 ensure_file_exists "$ACTION_FILE_PATH/$lib.yaml"
-configure_action $lib
+configure_action "$lib"
 
-# Loop through the actions (starting from $2 as the first argument is the tool name)
+# Run additional actions passed as arguments
 for action in "${@:2}"; do
-    #echo "🚀 Executing action: '$lib $action'"
-    run_action_script $lib ".actions.$action"
+    run_action_script "$lib" ".actions.$action"
 done
 
-echo  "✅ Actions completed for tool: $lib with actions: ${@:2}"
+echo "✅ Actions completed for tool: $lib with actions: ${*:2}"
