@@ -60,3 +60,8 @@ jobs:
       - name: dox argocd deploy
         run: |
           dox argocd deploy
+
+      # Step 6: DOX Action validating the installation path
+      - name: dox maven test
+        run: |
+          dox argocd test          

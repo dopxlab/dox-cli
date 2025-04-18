@@ -4,3 +4,13 @@ configure: |
 actions:
   build: |
     mvn clean install
+  test: |
+    echo ""
+    echo "MAVEN: Testing combination of Configuration + Action"
+    mvn -v
+    whereis mvn
+    echo "JAVA 21: Testing combination of Configuration + Action"
+    java -version
+    whereis java 
+    echo ""
+      
