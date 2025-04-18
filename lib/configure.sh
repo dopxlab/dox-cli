@@ -4,6 +4,7 @@
 export DOX_DIR="${DOX_DIR:-$HOME/.dox}"
 export DOX_CUSTOM_DIR="${DOX_CUSTOM_DIR:-$DOX_DIR/customize}"
 export DOX_RESOURCES_DIR="${DOX_RESOURCES_DIR:-$HOME/dox_resources}"
+export DOX_USER_BIN"${DOX_USER_BIN:-/usr/local/bin/}"
 
 source ${DOX_DIR}/lib/shared/print.sh
 source ${DOX_CUSTOM_DIR}/download_files.sh
@@ -39,16 +40,46 @@ function generate_env_files() {
             # Print the evaluated value
             #echo "Evaluated Value: $evaluated_value"
             if [ "$key" == "PATH" ]; then # If key is PATH, save it to ENV_PATH
-                append_if_not_exists $ENV_PATH "$evaluated_value:"
-                export PATH=$evaluated_value:$PATH
+                create_symlinks_to_bin "$evaluated_value:"
+                #append_if_not_exists $ENV_PATH "$evaluated_value:"
+                #export PATH=$evaluated_value:$PATH
             else # For other keys, save them to the env.sh script
                 append_if_not_exists $ENV_EXPORT "export $key=\"$evaluated_value\";"
-                export $key="$evaluated_value"
+                #export $key="$evaluated_value"
             fi
         done
     fi
     configure_env_variables # used for post_installation_scripts
 }
+
+function create_symlinks_to_bin() {
+  local source_folder="$1"
+  local bin_folder="${DOX_USER_BIN}"
+
+  if [ ! -d "$source_folder" ]; then
+    echo "❌ Source folder '$source_folder' does not exist."
+    return 1
+  fi
+
+  for file in "$source_folder"/*; do
+    if [ -f "$file" ]; then
+      filename=$(basename "$file")
+      
+      # Skip non-executable or irrelevant files
+      case "$filename" in
+        *.txt|*.md|README|LICENSE) continue ;;
+      esac
+
+      if [[ -x "$file" ]]; then
+        ln -sf "$file" "$bin_folder/$filename"
+        echo "🔗 Linked $filename to $bin_folder"
+      else
+        echo "⚠️ Skipping non-executable: $filename"
+      fi
+    fi
+  done
+}
+
 
 # Function to append a value to a file if it doesn't already exist
 function append_if_not_exists() {
