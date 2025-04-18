@@ -4,7 +4,7 @@
 export DOX_DIR="${DOX_DIR:-$HOME/.dox}"
 export DOX_CUSTOM_DIR="${DOX_CUSTOM_DIR:-$DOX_DIR/customize}"
 export DOX_RESOURCES_DIR="${DOX_RESOURCES_DIR:-$HOME/dox_resources}"
-export DOX_USER_BIN"${DOX_USER_BIN:-/usr/local/bin/}"
+export DOX_USER_BIN"${DOX_USER_BIN:-$HOME/dox/bin/}"
 
 source ${DOX_DIR}/lib/shared/print.sh
 source ${DOX_CUSTOM_DIR}/download_files.sh
@@ -108,7 +108,8 @@ function configure_env_variables() {
     # Check if the ENV_PATH file exists and update PATH
     if [ -f "$ENV_PATH" ]; then
         echo -e "ENV_PATH: \033[0;35m$(cat "$ENV_PATH")\033[0m"
-        export PATH="$(cat "$ENV_PATH")$PATH"  # Prepend the value from ENV_PATH to the PATH variable
+        #export PATH="$(cat "$ENV_PATH")$PATH"  # Prepend the value from ENV_PATH to the PATH variable
+        export PATH="${DOX_USER_BIN}:${PATH}"  # Loading dox user bin values to path.
     else
         echo "Warning: $ENV_PATH file not found...!"
     fi
