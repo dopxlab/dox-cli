@@ -5,12 +5,15 @@ export DOX_DIR="${DOX_DIR:-$HOME/.dox}"
 export DOX_CUSTOM_DIR="${DOX_CUSTOM_DIR:-$DOX_DIR/customize}"
 export DOX_RESOURCES_DIR="${DOX_RESOURCES_DIR:-$HOME/dox_resources}"
 export DOX_USER_BIN="${DOX_USER_BIN:-/usr/local/bin/}"
+export DOX_ENV="dox_env"
 
+source ${DOX_DIR}/lib/shared/env_handler.sh
 source ${DOX_DIR}/lib/shared/print.sh
 source ${DOX_CUSTOM_DIR}/download_files.sh
 
 # configuration yaml location
 CONFIGURE_FILE_PATH="${DOX_CUSTOM_DIR}/configure"
+
 ENV_PATH="env_path"
 ENV_EXPORT="env_export"
 
@@ -44,8 +47,10 @@ function generate_env_files() {
                 #append_if_not_exists $ENV_PATH "$evaluated_value:"
                 #export PATH=$evaluated_value:$PATH
             else # For other keys, save them to the env.sh script
-                append_if_not_exists $ENV_EXPORT "export $key=\"$evaluated_value\";"
+                #append_if_not_exists $ENV_EXPORT "export $key=\"$evaluated_value\";"
                 #export $key="$evaluated_value"
+                #echo "export $key=\"$evaluated_value\"" > DOX_ENV
+                update_dox_env $key $evaluated_value
             fi
         done
     fi
@@ -82,18 +87,18 @@ function create_symlinks_to_bin() {
 
 
 # Function to append a value to a file if it doesn't already exist
-function append_if_not_exists() {
-    local file_path=$1
-    local value_to_append=$2
+#function append_if_not_exists() {
+#    local file_path=$1
+#    local value_to_append=$2
     # Check if the value already exists in the file
-    if ! grep -q "^$value_to_append" "$file_path"; then
+#    if ! grep -q "^$value_to_append" "$file_path"; then
         # If not found, append the value_to_append to the file
-        echo -n "$value_to_append" >> "$file_path"
-        echo "Appended '$value_to_append' to $file_path"
-    else
-        echo "'$value_to_append' already exists in $file_path. Skipping append."
-    fi
-}
+#        echo -n "$value_to_append" >> "$file_path"
+#        echo "Appended '$value_to_append' to $file_path"
+#    else
+#        echo "'$value_to_append' already exists in $file_path. Skipping append."
+#    fi
+#}
 
 # Function to configure environment variables
 function configure_env_variables() {

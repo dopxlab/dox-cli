@@ -49,7 +49,7 @@ update_env_file() {
                 value="\"$value\""
             fi
             # If the variable doesn't exist, append it with the last known value from DOX_ENV
-            echo "$key=$value" >> "$temp_env_file"
+            echo "export $key=$value" >> "$temp_env_file"
         fi
     done < "$DOX_ENV"
 
@@ -87,3 +87,20 @@ function on_after_execution() {
     rm -f "$BEFORE_FILE" "$AFTER_FILE"
 }
 
+function update_dox_env() {
+  local key="$1"
+  local value="$2"
+  local file="${DOX_ENV}"  # Defaults to DOX_ENV if no file passed
+
+  # Create file if it doesn't exist
+  [ -f "$file" ] || touch "$file"
+
+  # Remove existing key (if exists)
+  grep -v "^export $key=" "$file" > "${file}.tmp"
+  
+  # Add updated key=value
+  echo "export $key=\"$value\"" >> "${file}.tmp"
+
+  # Replace original file
+  mv "${file}.tmp" "$file"
+}
