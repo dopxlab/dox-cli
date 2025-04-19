@@ -78,16 +78,6 @@ jobs:
           echo "----------------------------------------"
           echo ""
 
-          echo "env_export"
-          [ -f env_export ] && cat env_export || echo "❌ env_export not found"
-          echo "----------------------------------------"
-          echo ""
-
-          echo "env_path"
-          [ -f env_path ] && cat env_path || echo "❌ env_path not found"
-          echo "----------------------------------------"
-          echo ""
-
           echo "MAVEN: Testing combination of Configuration + Action"
           mvn -v
           whereis mvn

@@ -37,21 +37,6 @@ function validate_args() {
     return 0
 }
 
-function configure_env() {
-    # Check if the env_export file exists and source it
-    local env_export="env_export"
-    if [ -f "$env_export" ]; then
-        debug "Found $env_export, sourcing the environment variables from it."
-        source "$env_export"  # Source the env_export file directly to apply the environment variables
-    fi
-
-    local env_path="env_path"
-    # Check if the env_path file exists and update PATH
-    if [ -f "$env_path" ]; then
-        debug "Found $env_path, updating PATH."
-        export PATH="$(cat "$env_path")$PATH"  # Prepend the new path to the current PATH
-    fi
-}
 # Function to check if required tools are installed
 function check_tools() {
     local tools=("tar" "unzip" "curl" "yq")  # List of required tools
@@ -69,7 +54,6 @@ function check_tools() {
 check_tools
 
 on_before_execution #Handling env variables
-configure_env
 
 # Handle actions based on user input
 case "$action" in
