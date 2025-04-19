@@ -28,41 +28,37 @@ extract_added_vars() {
 
 # Function to remove duplicates and update the DOX_ENV file with the latest values
 update_env_file() {
+    # Create a temporary file to store the updated environment variables
     local temp_env_file=$(mktemp)
 
-    while IFS= read -r line; do
-        # Skip empty lines or lines without export
-        [[ -z "$line" || ! "$line" =~ ^export\  ]] && continue
-
-        # Remove 'export ' prefix and split into key=value
-        local line_no_export="${line#export }"
-        local key="${line_no_export%%=*}"
-        local value="${line_no_export#*=}"
-
-        # Evaluate latest value from the environment
+    # Iterate through the DOX_ENV file and update or append the variables
+    while IFS='=' read -r key value; do
+        # If the key is already in the current environment, use the latest value
         eval "current_value=\$$key"
 
         if [[ -n "$current_value" ]]; then
-            # Quote current_value if not numeric or already quoted
+            #IMPORTANT - to fix with spaced names "John Rambo" needs to be in double quotes
             if [[ ! "$current_value" =~ ^-?[0-9]+(\.[0-9]+)?$ && ! "$current_value" =~ ^\".*\"$ ]]; then
                 current_value="\"$current_value\""
             fi
-            echo "export $key=$current_value" >> "$temp_env_file"
+            # Update the variable with the latest value
+            echo "$key=$current_value" >> "$temp_env_file"
         else
-            # Quote value from file if necessary
+            #IMPORTANT - to fix with spaced names "John Rambo" needs to be in double quotes
             if [[ ! "$value" =~ ^-?[0-9]+(\.[0-9]+)?$ && ! "$value" =~ ^\".*\"$ ]]; then
                 value="\"$value\""
             fi
-            echo "export $key=$value" >> "$temp_env_file"
+            # If the variable doesn't exist, append it with the last known value from DOX_ENV
+            echo "$key=$value" >> "$temp_env_file"
         fi
     done < "$DOX_ENV"
 
-    # Sort and deduplicate by key (latest takes precedence)
-    tac "$temp_env_file" | awk '!seen[$2]++' | tac > "$DOX_ENV"
+    # Sort and remove duplicate entries
+    sort "$temp_env_file" | uniq > "$DOX_ENV"
 
+    # Clean up the temporary file
     rm -f "$temp_env_file"
 }
-
 
 # Step 1: Before execution
 function on_before_execution() {
@@ -103,7 +99,7 @@ function update_dox_env() {
   grep -v "^export $key=" "$file" > "${file}.tmp"
   
   # Add updated key=value
-  echo "export $key=\"$value\"" >> "${file}.tmp"
+  echo "$key=\"$value\"" >> "${file}.tmp"
 
   # Replace original file
   mv "${file}.tmp" "$file"
