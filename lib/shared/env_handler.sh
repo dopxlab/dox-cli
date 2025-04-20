@@ -7,9 +7,6 @@ AFTER_FILE="env_after.txt"
 
 # Export DOX_ENV variable (this will be part of the environment)
 export DOX_ENV="dox_env"
-#echo "Exported DOX_ENV=$DOX_ENV"
-#cat "$DOX_ENV"
-#echo "----"
 
 # Function to capture environment variables and save them to a file
 capture_env() {
@@ -90,13 +87,13 @@ function on_after_execution() {
 function update_dox_env() {
   local key="$1"
   local value="$2"
-  local file="${DOX_ENV}"  # Defaults to DOX_ENV if no file passed
+  local file="${DOX_ENV}"
 
   # Create file if it doesn't exist
   [ -f "$file" ] || touch "$file"
 
   # Remove existing key (if exists)
-  grep -v "^export $key=" "$file" > "${file}.tmp"
+  grep -v "^$key=" "$file" > "${file}.tmp"
   
   # Add updated key=value
   echo "$key=\"$value\"" >> "${file}.tmp"
