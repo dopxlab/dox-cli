@@ -1,0 +1,102 @@
+name: Build Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Optional: major, minor, patch'
+        required: false
+        type: choice
+        options: [major, minor, patch]
+  schedule:
+    - cron: '0 0 1 * *'  # Every month on the 1st at 00:00
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Fetch Tags
+        run: git fetch --tags
+
+      - name: Get Latest Tag
+        id: get_version
+        run: |
+          latest_tag=$(git describe --tags $(git rev-list --tags --max-count=1) 2>/dev/null || echo "v0.0.0")
+          echo "Latest tag: $latest_tag"
+          version=${latest_tag#v}
+          IFS='.' read -r major minor patch <<< "$version"
+          echo "major=$major" >> $GITHUB_OUTPUT
+          echo "minor=$minor" >> $GITHUB_OUTPUT
+          echo "patch=$patch" >> $GITHUB_OUTPUT
+          echo "tag=$latest_tag" >> $GITHUB_OUTPUT
+
+      - name: Analyze Commit Messages
+        id: detect_type
+        run: |
+          release_type="${{ github.event.inputs.release_type }}"
+
+          if [[ -z "$release_type" ]]; then
+            echo "No input. Analyzing commits since ${{ steps.get_version.outputs.tag }}"
+            log=$(git log ${{ steps.get_version.outputs.tag }}..HEAD --pretty=format:%s)
+
+            if echo "$log" | grep -E 'BREAKING CHANGE|!:' > /dev/null; then
+              release_type="major"
+            elif echo "$log" | grep -E '^feat' > /dev/null; then
+              release_type="minor"
+            elif echo "$log" | grep -E '^fix' > /dev/null; then
+              release_type="patch"
+            else
+              echo "No relevant commits. Defaulting to patch."
+              release_type="patch"
+            fi
+          fi
+
+          echo "release_type=$release_type" >> $GITHUB_OUTPUT
+
+      - name: Calculate New Version
+        id: version
+        run: |
+          major=${{ steps.get_version.outputs.major }}
+          minor=${{ steps.get_version.outputs.minor }}
+          patch=${{ steps.get_version.outputs.patch }}
+          type=${{ steps.detect_type.outputs.release_type }}
+
+          if [[ "$type" == "major" ]]; then
+            major=$((major + 1)); minor=0; patch=0
+          elif [[ "$type" == "minor" ]]; then
+            minor=$((minor + 1)); patch=0
+          else
+            patch=$((patch + 1))
+          fi
+
+          new_version="v$major.$minor.$patch"
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
+          echo "$new_version" > version.txt
+
+      - name: Create Tarball
+        run: tar -czf dox-cli.tar.gz bin/ lib/ customize/
+
+      - name: Upload dox-cli.tar.gz
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.new_version }}
+          name: dox-cli.tar.gz
+          files: dox-cli.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload install.sh
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.new_version }}
+          name: install.sh
+          files: install.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
