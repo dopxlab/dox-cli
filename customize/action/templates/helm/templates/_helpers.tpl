@@ -56,7 +56,6 @@ Selector labels
 */}}
 {{- define "helm-chart.selectorLabels" -}}
 app.kubernetes.io/name: {{ .Values.service.name }}
-app.kubernetes.io/instance: {{ .Values.service.name }}-{{ .Values.image.tag }}
 {{- end }}
 
 {{/*
