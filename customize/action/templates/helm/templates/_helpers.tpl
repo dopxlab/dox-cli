@@ -59,14 +59,6 @@ app.kubernetes.io/name: {{ .Values.service.name }}
 {{- end }}
 
 {{/*
-Create container exposed ports for deployment
-*/}}
-
-{{/*
-Create container exposed ports for service
-*/}}
-
-{{/*
 Create the name of the service account to use
 */}}
 {{- define "helm-chart.serviceAccountName" -}}
