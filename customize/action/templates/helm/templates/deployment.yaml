@@ -44,6 +44,17 @@ spec:
                 fieldPath: metadata.namespace
           - name: IMAGE_VERSION
             value: "{{ .Values.image.tag }}"
+          {{- if or .Values.app.configmap .Values.app.secret }}
+          envFrom:
+            {{- if .Values.app.configmap }}
+            - configMapRef:
+                name: {{ .Values.app.configmap }}
+            {{- end }}
+            {{- if .Values.app.secret }}
+            - secretRef:
+                name: {{ .Values.app.secret }}
+            {{- end }}
+          {{- end }}
           ports:
             - name: defaulthttp
               containerPort: {{ .Values.service.port }}
@@ -68,17 +79,17 @@ spec:
               port: {{ .Values.healthCheck.port }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- if .Values.existingPv.name }}
+          {{- if .Values.app.pvc }}
           volumeMounts:
             - name: existing-pv
               mountPath: /data
           {{- end }}
       volumes:
-          {{- if .Values.existingPv.name }}
+        {{- if .Values.app.pvc }}
         - name: existing-pv
           persistentVolumeClaim:
-            claimName: {{ .Values.existingPv.name }}
-        {{- end }}            
+            claimName: {{ .Values.app.pvc }}
+        {{- end }}        
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
