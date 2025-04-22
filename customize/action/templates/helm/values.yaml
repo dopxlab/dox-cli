@@ -81,8 +81,10 @@ tolerations: []
 
 affinity: {}
 
-existingPv:
-  name: ##PERSISTENT_VOLUME_CLAIM##
+app:
+  configmap: ##APP_CONFIG_MAP##
+  secret: ##APP_SECRET##
+  pvc: ##APP_PVC##
 
 # Custom values will be added below from the environment variables - Keep two line spaces
 
