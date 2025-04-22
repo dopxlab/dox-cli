@@ -1,6 +1,10 @@
 configure: |
-  dox export GIT_REPOSITORY_NAME
-  dox export BUILD_VERSION
+  echo -e "\n🌟 Configuration Summary 🌟"
+  printf "%-30s : %s\n" "PVC" "$APP_PVC"
+  printf "%-30s : %s\n" "ConfigMap" "$APP_CONFIG_MAP"
+  printf "%-30s : %s\n" "Secret" "$APP_SECRET"
+
+  dox export APP_GITOPS_VARIABLES
 
 actions:
   update-image-tag: |
@@ -10,6 +14,14 @@ actions:
     : "${GITOPS_REPO:?❌ GITOPS_REPO is required}"
     : "${GIT_REPOSITORY_NAME:?❌ GIT_REPOSITORY_NAME is required}"
     : "${BUILD_VERSION:?❌ BUILD_VERSION is required}"
+
+    echo -e "\n🌟 Configuration Summary 🌟"
+    printf "%-30s : %s\n" "GITOPS_REPO" "$GITOPS_REPO"
+    printf "%-30s : %s\n" "GIT_REPOSITORY_NAME" "$GIT_REPOSITORY_NAME"
+    printf "%-30s : %s\n" "BUILD_VERSION" "$BUILD_VERSION"
+    printf "%-30s : %s\n" "PVC" "$APP_PVC"
+    printf "%-30s : %s\n" "ConfigMap" "$APP_CONFIG_MAP"
+    printf "%-30s : %s\n" "Secret" "$APP_SECRET"
 
     # Config
     BRANCH="main"
@@ -36,26 +48,27 @@ actions:
     else
       echo "➕ App '$APP_NAME' not found. Creating entry and applying version '$VERSION' to all defined stages..."
 
-      # Create YAML content dynamically with all stages
       TMP_TAGS_FILE=$(mktemp)
       echo "tag:" > "$TMP_TAGS_FILE"
       for s in $(yq e '.stages[].name' "$VALUES_FILE"); do
         echo "  $s: \"$VERSION\"" >> "$TMP_TAGS_FILE"
       done
 
-      # Create the final application entry
       TMP_APP_FILE=$(mktemp)
       {
         echo "- name: $APP_NAME"
+        [[ -n "$APP_PVC" ]] && echo "  pvc: $APP_PVC"
+        [[ -n "$APP_CONFIG_MAP" ]] && echo "  configmap: $APP_CONFIG_MAP"
+        [[ -n "$APP_SECRET" ]] && echo "  secret: $APP_SECRET"
         echo "  image:"
-        cat "$TMP_TAGS_FILE" | sed 's/^/    /'
+        sed 's/^/    /' "$TMP_TAGS_FILE"
       } > "$TMP_APP_FILE"
 
-      # Merge into values.yaml
       yq e ".applications += load(\"$TMP_APP_FILE\")" -i "$VALUES_FILE"
 
       rm -f "$TMP_TAGS_FILE" "$TMP_APP_FILE"
     fi
+
 
     #------------------------ GIT PUSH ------------------------#
     echo "🚀 Committing and pushing changes..."
