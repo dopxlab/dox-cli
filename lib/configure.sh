@@ -273,6 +273,14 @@ function configure() {
     echo ""
 }
 
+function replace_install_dir_vars() {
+    local lib="$1"
+    local lib_version=$(yq eval -r ".configuration.default_version" "$CONFIGURE_FILE_PATH/$lib.yaml")
+    local install_dir="${DOX_RESOURCES_DIR}/${lib}/${lib_version}"
+    debug "Replacing \${install_dir} with ${install_dir}"
+    sed -i "s|\${install_dir}|$install_dir|g" "$2"
+}
+
 function run_installation_script(){
     local lib=$1
     local script_path=$2
@@ -292,6 +300,8 @@ function run_installation_script(){
 
         # Write the script to the temporary file
         echo "$script" > "$temp_script_file"
+
+        replace_install_dir_vars $lib $temp_script_file #Replacing all the string variables ${install_dir} with actual path
 
         # Make the temporary script executable
         chmod +x "$temp_script_file"
