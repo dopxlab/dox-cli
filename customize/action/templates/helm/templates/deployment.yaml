@@ -1,13 +1,18 @@
+{{- $isConfigMapMounted := and .Values.configmap.name .Values.configmap.mountPath }}
+{{- $isSecretMounted := and .Values.secret.name .Values.secret.mountPath }}
+{{- $isPVCMounted := and .Values.pvc.name .Values.pvc.mountPath }}
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-{{- if .Values.service.name }}
+  {{- if .Values.service.name }}
   name: {{ .Values.service.name }}
-{{- else }}
+  {{- else }}
   name: {{ include "helm-chart.fullname" . }}
-{{- end }}
+  {{- end }}
   labels:
     {{- include "helm-chart.labels" . | nindent 4 }}
+
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
@@ -23,42 +28,47 @@ spec:
       {{- end }}
       labels:
         {{- include "helm-chart.selectorLabels" . | nindent 8 }}
-    spec:    
+
+    spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-         {{- toYaml . | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
+
       serviceAccountName: {{ include "helm-chart.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+
       containers:
         - name: {{ .Values.service.name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+
           env:
-          - name: POD_NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
-          - name: IMAGE_VERSION
-            value: "{{ .Values.image.tag }}"
-          {{- if or .Values.app.configmap .Values.app.secret }}
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: IMAGE_VERSION
+              value: "{{ .Values.image.tag }}"
+
           envFrom:
-            {{- if .Values.app.configmap }}
+            {{- if and (not $isConfigMapMounted) .Values.configmap.name }}
             - configMapRef:
-                name: {{ .Values.app.configmap }}
+                name: {{ .Values.configmap.name }}
             {{- end }}
-            {{- if .Values.app.secret }}
+            {{- if and (not $isSecretMounted) .Values.secret.name }}
             - secretRef:
-                name: {{ .Values.app.secret }}
+                name: {{ .Values.secret.name }}
             {{- end }}
-          {{- end }}
+
           ports:
             - name: defaulthttp
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+
           livenessProbe:
             initialDelaySeconds: {{ .Values.healthCheck.liveness.delay }}
             failureThreshold: 5
@@ -68,6 +78,7 @@ spec:
             httpGet:
               path: {{ .Values.healthCheck.liveness.path }}
               port: {{ .Values.healthCheck.port }}
+
           readinessProbe:
             initialDelaySeconds: {{ .Values.healthCheck.readiness.delay }}
             failureThreshold: 5
@@ -77,27 +88,53 @@ spec:
             httpGet:
               path: {{ .Values.healthCheck.readiness.path }}
               port: {{ .Values.healthCheck.port }}
+
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- if .Values.app.pvc }}
+
           volumeMounts:
-            - name: existing-pv
-              mountPath: /data
-          {{- end }}
+            {{- if $isPVCMounted }}
+            - name: pvc-volume
+              mountPath: {{ .Values.pvc.mountPath }}
+            {{- end }}
+            {{- if $isConfigMapMounted }}
+            - name: config-volume
+              mountPath: {{ .Values.configmap.mountPath }}
+            {{- end }}
+            {{- if $isSecretMounted }}
+            - name: secret-volume
+              mountPath: {{ .Values.secret.mountPath }}
+            {{- end }}
+
       volumes:
-        {{- if .Values.app.pvc }}
-        - name: existing-pv
+        {{- if $isPVCMounted }}
+        - name: pvc-volume
           persistentVolumeClaim:
-            claimName: {{ .Values.app.pvc }}
-        {{- end }}        
+            claimName: {{ .Values.pvc.name }}
+        {{- end }}
+
+        {{- if $isConfigMapMounted }}
+        - name: config-volume
+          configMap:
+            name: {{ .Values.configmap.name }}
+        {{- end }}
+
+        {{- if $isSecretMounted }}
+        - name: secret-volume
+          secret:
+            secretName: {{ .Values.secret.name }}
+        {{- end }}
+
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
       {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
       {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}

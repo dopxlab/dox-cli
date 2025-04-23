@@ -8,23 +8,23 @@ configure: |
 
 actions:
   update-image-tag: |
-    #------------------------ SETUP ------------------------#
-    # Required environment variables
-    : "${GITOPS_PAT:?❌ GITOPS_PAT is required}"
-    : "${GITOPS_REPO:?❌ GITOPS_REPO is required}"
-    : "${GIT_REPOSITORY_NAME:?❌ GIT_REPOSITORY_NAME is required}"
-    : "${BUILD_VERSION:?❌ BUILD_VERSION is required}"
+    #!/bin/bash
 
-    echo -e "\n🌟 Configuration Summary 🌟"
-    printf "%-30s : %s\n" "GITOPS_REPO" "$GITOPS_REPO"
-    printf "%-30s : %s\n" "GIT_REPOSITORY_NAME" "$GIT_REPOSITORY_NAME"
-    printf "%-30s : %s\n" "BUILD_VERSION" "$BUILD_VERSION"
-    printf "%-30s : %s\n" "PVC" "$APP_PVC"
-    printf "%-30s : %s\n" "ConfigMap" "$APP_CONFIG_MAP"
-    printf "%-30s : %s\n" "Secret" "$APP_SECRET"
+    set -euo pipefail
 
-    # Config
-    BRANCH="main"
+    echo "______"
+    echo "gitops-argocd-values.yaml"
+    cat "${template_folder}/gitops-argocd-values.yaml"
+    echo "______"
+
+    CLEANED_FILE="${template_folder}/cleaned-gitops-argocd-values.yaml"
+
+    # Clean null or empty values from the original values file
+    yq e 'walk(if type == "object" then with_entries(select(.value != null and .value != "")) else . end)' \
+      "${template_folder}/gitops-argocd-values.yaml" > "${CLEANED_FILE}"
+
+    # Configuration
+    BRANCH=$(git ls-remote --symref "https://${GITOPS_PAT}@${GITOPS_REPO}" HEAD | awk -F'/' '/^ref:/ {print $NF}')
     TMP_DIR=$(mktemp -d -t gitops-XXXXXXXXXX)
     VALUES_FILE="argo-apps/values.yaml"
     STAGE="${STAGE:-dev}"
@@ -38,37 +38,26 @@ actions:
     cd "$TMP_DIR"
 
     #------------------------ PROCESSING ------------------------#
-    echo "📄 Updating $VALUES_FILE for app=$APP_NAME, stage=$STAGE, version=$VERSION"
 
-    APP_EXISTS=$(yq e ".applications[] | select(.name == \"$APP_NAME\") | .name" "$VALUES_FILE")
+    # Extract the specific application block from cleaned file
+    APPLICATION_DATA=$(yq e '.applications[] | select(.name == "'"$APPLICATION_NAME"'")' "$CLEANED_FILE")
 
-    if [[ "$APP_EXISTS" == "$APP_NAME" ]]; then
-      echo "✅ App '$APP_NAME' exists, updating stage '$STAGE' tag..."
-      yq e ".applications[] |= (select(.name == \"$APP_NAME\") | .image.tag.$STAGE = \"$VERSION\")" -i "$VALUES_FILE"
+    # Check if the application exists in the current values file
+    EXISTING_APP=$(yq e '.applications[] | select(.name == "'"$APPLICATION_NAME"'")' "$VALUES_FILE")
+
+    if [[ -n "$EXISTING_APP" ]]; then
+      echo "🔄 Application '$APPLICATION_NAME' found, updating it..."
+      yq e "
+        .applications |= (
+          map(if .name == \"$APPLICATION_NAME\" then $APPLICATION_DATA else . end)
+        )
+      " -i "$VALUES_FILE"
     else
-      echo "➕ App '$APP_NAME' not found. Creating entry and applying version '$VERSION' to all defined stages..."
-
-      TMP_TAGS_FILE=$(mktemp)
-      echo "tag:" > "$TMP_TAGS_FILE"
-      for s in $(yq e '.stages[].name' "$VALUES_FILE"); do
-        echo "  $s: \"$VERSION\"" >> "$TMP_TAGS_FILE"
-      done
-
-      TMP_APP_FILE=$(mktemp)
-      {
-        echo "- name: $APP_NAME"
-        [[ -n "$APP_PVC" ]] && echo "  pvc: $APP_PVC"
-        [[ -n "$APP_CONFIG_MAP" ]] && echo "  configmap: $APP_CONFIG_MAP"
-        [[ -n "$APP_SECRET" ]] && echo "  secret: $APP_SECRET"
-        echo "  image:"
-        sed 's/^/    /' "$TMP_TAGS_FILE"
-      } > "$TMP_APP_FILE"
-
-      yq e ".applications += load(\"$TMP_APP_FILE\")" -i "$VALUES_FILE"
-
-      rm -f "$TMP_TAGS_FILE" "$TMP_APP_FILE"
+      echo "➕ Application '$APPLICATION_NAME' not found, adding it..."
+      yq e ".applications += [$APPLICATION_DATA]" -i "$VALUES_FILE"
     fi
 
+    echo "✅ Application '$APPLICATION_NAME' has been updated or added in $VALUES_FILE."
 
     #------------------------ GIT PUSH ------------------------#
     echo "🚀 Committing and pushing changes..."

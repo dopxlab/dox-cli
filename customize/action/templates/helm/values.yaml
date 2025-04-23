@@ -81,10 +81,15 @@ tolerations: []
 
 affinity: {}
 
-app:
-  configmap: ##APP_CONFIG_MAP##
-  secret: ##APP_SECRET##
-  pvc: ##APP_PVC##
+configmap:
+  name: "##CONFIG_MAP_NAME##"
+  mountPath: "##CONFIG_MAP_MOUNT_PATH##"
+secret:
+  name: "##SECRET_NAME##"
+  mountPath: "##SECRET_MOUNT_PATH##"
+pvc:
+  name: "##PVC_NAME##"
+  mountPath: "##PVC_MOUNT_PATH##"
 
 # Custom values will be added below from the environment variables - Keep two line spaces
 

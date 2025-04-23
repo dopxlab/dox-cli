@@ -1,0 +1,13 @@
+- name: "##APPLICATION_NAME##"
+  configmap:
+    name: "##CONFIG_MAP_NAME##"
+    mountPath: "##CONFIG_MAP_MOUNT_PATH##"
+  secret:
+    name: "##SECRET_NAME##"
+    mountPath: "##SECRET_MOUNT_PATH##"
+  pvc:
+    name: "##PVC_NAME##"
+    mountPath: "##PVC_MOUNT_PATH##"
+  image:
+    tag:
+      dev: "##BUILD_VERSION##"
