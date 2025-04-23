@@ -17,7 +17,7 @@ CONFIGURE_FILE_PATH="${DOX_CUSTOM_DIR}/configure"
 print_envs DOX_RESOURCES_DIR CONFIGURE_FILE_PATH DOX_DIR DOX_CUSTOM_DIR
 
 # Function to set environment variables for a given library
-function generate_env_files() {
+function configure_env_variables() {
     local lib=$1
     local version=$2
     local install_dir=$3
@@ -259,12 +259,12 @@ function configure() {
         eval "$installation_script"
     fi
 
+    # Set environment variables for the library
+    configure_env_variables "$lib" "$lib_version" "$install_dir"
+
     if $run_post_installation; then
         run_installation_script "$lib" ".installation.post_installation_script"
     fi
-
-    # Set environment variables for the library
-    generate_env_files "$lib" "$lib_version" "$install_dir"
     
     run_installation_script "$lib" ".configuration.post_configuration_script"
 
