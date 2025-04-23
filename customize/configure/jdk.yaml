@@ -24,6 +24,7 @@ installation:
   post_installation_script: |
     #!/bin/bash
     echo "install custom certificates"
+    echo "JDK installed in ${install_dir}"
 
 
 configuration:
