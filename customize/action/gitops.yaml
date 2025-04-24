@@ -30,7 +30,6 @@ actions:
     #---------------------GIT CLONE--------------------------#
 
     # Configuration
-    BRANCH=$(git ls-remote --symref "https://${GITOPS_PAT}@${GITOPS_REPO}" HEAD | awk -F'/' '/^ref:/ {print $NF}')
     TMP_DIR=$(mktemp -d -t gitops-XXXXXXXXXX)
     VALUES_FILE="argo-apps/values.yaml"
     STAGE="${STAGE:-dev}"
@@ -39,7 +38,7 @@ actions:
 
     echo "📁 Created temp folder: $TMP_DIR"
     echo "🔄 Cloning GitOps repo..."
-    git clone --depth 1 --branch "$BRANCH" "https://${GITOPS_PAT}@${GITOPS_REPO}" "$TMP_DIR"
+    git clone --depth 1 "https://${GITOPS_PAT}@${GITOPS_REPO}" "$TMP_DIR"
 
     cd "$TMP_DIR"
     
@@ -91,6 +90,6 @@ actions:
       echo "ℹ️ No changes detected. Skipping commit."
     else
       git commit -m "🔄 Update image tag for $APP_NAME: $VERSION ($STAGE)"
-      git push origin "$BRANCH"
-      echo "✅ Changes pushed to branch '$BRANCH'"
+      git push
+      echo "✅ Changes pushed into the gitops repository
     fi
