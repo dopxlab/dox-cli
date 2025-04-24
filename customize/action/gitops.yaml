@@ -63,10 +63,6 @@ actions:
         clean' |
     yq -P > "${CLEANED_FILE}"
 
-    echo "______"
-    echo "${CLEANED_FILE}"
-    cat "${CLEANED_FILE}"
-    echo "______"
     #------------------------ PROCESSING ------------------------#
     # Iterate through each application in CLEANED_FILE
     for app_name in $(yq eval '.applications[].name' $CLEANED_FILE); do
@@ -93,7 +89,7 @@ actions:
     #------------------------ GIT PUSH ------------------------#
     echo "🚀 Committing and pushing changes..."
     git config user.name "GitOps Bot"
-    git config user.email "bot@example.com"
+    git config user.email "devops@dox-cli.com"
     git add "$VALUES_FILE"
 
     if git diff --cached --quiet; then
