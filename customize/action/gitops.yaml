@@ -4,7 +4,7 @@ configure: |
 template:
   folder: "${DOX_CUSTOM_DIR}/action/templates/gitops" # ${template_folder} will be resolved path of the template folder 
   variables:
-    BUILD_VERSION: "${HELM_BUILD_VERSION:}"
+    BUILD_VERSION: "${BUILD_VERSION:}"
     APPLICATION_NAME: "${APPLICATION_NAME:-$GIT_REPOSITORY_NAME}"
 
     CONFIG_MAP_NAME: "${CONFIG_MAP_NAME:-}"
@@ -15,7 +15,7 @@ template:
 
     PVC_NAME: "${PVC_NAME:-}"
     PVC_MOUNT_PATH: "${PVC_MOUNT_PATH:-}"
-    
+
 actions:
   update-image-tag: |
     #!/bin/bash
