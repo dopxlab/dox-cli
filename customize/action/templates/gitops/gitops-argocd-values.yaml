@@ -10,5 +10,4 @@ applications:
       name: "##PVC_NAME##"
       mountPath: "##PVC_MOUNT_PATH##"
     image:
-      tag:
-        dev: "##BUILD_VERSION##"
+      tag: "##BUILD_VERSION##"
