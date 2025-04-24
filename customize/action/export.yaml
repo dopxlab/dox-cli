@@ -14,6 +14,17 @@ actions:
     dox export GIT_PIPELINE_URL
     dox export GIT_REPO_URL
 
+  APP_GITOPS_VARIABLES: | 
+
+    export CONFIG_MAP_NAME="${CONFIG_MAP_NAME:-}"
+    export CONFIG_MAP_MOUNT_PATH="${CONFIG_MAP_MOUNT_PATH:-}"
+    
+    export SECRET_NAME="${SECRET_NAME:-}"
+    export SECRET_MOUNT_PATH="${SECRET_MOUNT_PATH:-}"
+    
+    export PVC_NAME="${PVC_NAME:-}"
+    export PVC_MOUNT_PATH="${PVC_MOUNT_PATH:-}"
+    
   FROM_IMAGE: | #Not a Global variable
     echo "JDK_VERSION is set to $JDK_VERSION"
     base_image=$(yq eval ".from-images.${JDK_VERSION}" "$DOX_CUSTOM_DIR/action/docker.yaml")

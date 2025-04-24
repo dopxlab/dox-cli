@@ -1,11 +1,21 @@
 configure: |
-  echo -e "\n🌟 Configuration Summary 🌟"
-  printf "%-30s : %s\n" "PVC" "$APP_PVC"
-  printf "%-30s : %s\n" "ConfigMap" "$APP_CONFIG_MAP"
-  printf "%-30s : %s\n" "Secret" "$APP_SECRET"
-
   dox export APP_GITOPS_VARIABLES
 
+template:
+  folder: "${DOX_CUSTOM_DIR}/action/templates/gitops" # ${template_folder} will be resolved path of the template folder 
+  variables:
+    BUILD_VERSION: "${HELM_BUILD_VERSION:}"
+    APPLICATION_NAME: "${APPLICATION_NAME:-$GIT_REPOSITORY_NAME}"
+
+    CONFIG_MAP_NAME: "${CONFIG_MAP_NAME:-}"
+    CONFIG_MAP_MOUNT_PATH: "${CONFIG_MAP_MOUNT_PATH:-}"
+
+    SECRET_NAME: "${SECRET_NAME:-}"
+    SECRET_MOUNT_PATH: "${SECRET_MOUNT_PATH:-}"
+
+    PVC_NAME: "${PVC_NAME:-}"
+    PVC_MOUNT_PATH: "${PVC_MOUNT_PATH:-}"
+    
 actions:
   update-image-tag: |
     #!/bin/bash
@@ -17,11 +27,7 @@ actions:
     cat "${template_folder}/gitops-argocd-values.yaml"
     echo "______"
 
-    CLEANED_FILE="${template_folder}/cleaned-gitops-argocd-values.yaml"
-
-    # Clean null or empty values from the original values file
-    yq e 'walk(if type == "object" then with_entries(select(.value != null and .value != "")) else . end)' \
-      "${template_folder}/gitops-argocd-values.yaml" > "${CLEANED_FILE}"
+    #---------------------GIT CLONE--------------------------#
 
     # Configuration
     BRANCH=$(git ls-remote --symref "https://${GITOPS_PAT}@${GITOPS_REPO}" HEAD | awk -F'/' '/^ref:/ {print $NF}')
@@ -36,27 +42,43 @@ actions:
     git clone --depth 1 --branch "$BRANCH" "https://${GITOPS_PAT}@${GITOPS_REPO}" "$TMP_DIR"
 
     cd "$TMP_DIR"
+    
+    #---------------------CLEANING YAML--------------------------#
+    CLEANED_FILE="${template_folder}/cleaned-gitops-argocd-values.yaml"
+
+    # Clean null or empty values from the original values file
+    yq -o=json eval '.' "${template_folder}/gitops-argocd-values.yaml" |
+    jq 'def clean:
+          walk(
+            if type == "object"
+            then with_entries(select(.value != "" and .value != null))
+            else .
+            end
+          );
+        clean' |
+    yq -P > "${CLEANED_FILE}"
 
     #------------------------ PROCESSING ------------------------#
-
-    # Extract the specific application block from cleaned file
-    APPLICATION_DATA=$(yq e '.applications[] | select(.name == "'"$APPLICATION_NAME"'")' "$CLEANED_FILE")
-
-    # Check if the application exists in the current values file
-    EXISTING_APP=$(yq e '.applications[] | select(.name == "'"$APPLICATION_NAME"'")' "$VALUES_FILE")
-
-    if [[ -n "$EXISTING_APP" ]]; then
-      echo "🔄 Application '$APPLICATION_NAME' found, updating it..."
-      yq e "
-        .applications |= (
-          map(if .name == \"$APPLICATION_NAME\" then $APPLICATION_DATA else . end)
-        )
-      " -i "$VALUES_FILE"
-    else
-      echo "➕ Application '$APPLICATION_NAME' not found, adding it..."
-      yq e ".applications += [$APPLICATION_DATA]" -i "$VALUES_FILE"
-    fi
-
+    # Iterate through each application in CLEANED_FILE
+    for app_name in $(yq eval '.applications[].name' $CLEANED_FILE); do
+      # Check if the application already exists in VALUES_FILE
+      if yq eval ".applications[] | select(.name == \"$app_name\")" $VALUES_FILE > /dev/null; then
+        # If it exists, remove the old application and add the new one
+        echo "Replacing application $app_name in $VALUES_FILE"
+        yq eval -i "
+          .applications |= map(select(.name != \"$app_name\"))
+        " $VALUES_FILE
+        yq eval -i "
+          .applications += (load(\"$CLEANED_FILE\") | .applications[] | select(.name == \"$app_name\"))
+        " $VALUES_FILE
+      else
+        # If it doesn't exist, append the application from CLEANED_FILE to VALUES_FILE
+        echo "Adding new application $app_name to $VALUES_FILE"
+        yq eval -i "
+          .applications += (load(\"$CLEANED_FILE\") | .applications[] | select(.name == \"$app_name\"))
+        " $VALUES_FILE
+      fi
+    done
     echo "✅ Application '$APPLICATION_NAME' has been updated or added in $VALUES_FILE."
 
     #------------------------ GIT PUSH ------------------------#
