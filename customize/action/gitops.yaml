@@ -45,12 +45,18 @@ actions:
     #---------------------CLEANING YAML--------------------------#
     CLEANED_FILE="${template_folder}/cleaned-gitops-argocd-values.yaml"
 
-    # Clean null or empty values from the original values file
+    # Clean null, empty string, and empty objects from the original values file
     yq -o=json eval '.' "${template_folder}/gitops-argocd-values.yaml" |
     jq 'def clean:
           walk(
             if type == "object"
-            then with_entries(select(.value != "" and .value != null))
+            then with_entries(
+              select(
+                .value != null and
+                .value != "" and
+                (if (.value | type == "object") then (.value | length > 0) else true end)
+              )
+            )
             else .
             end
           );
