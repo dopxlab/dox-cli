@@ -31,8 +31,8 @@ actions:
 
     # Configuration
     TMP_DIR=$(mktemp -d -t gitops-XXXXXXXXXX)
-    VALUES_FILE="argo-apps/values.yaml"
-    STAGE="${STAGE:-dev}"
+    STAGE="${DEPLOYMENT_STAGE:-dev}"
+    VALUES_FILE="argo-apps/values-${STAGE}.yaml"
     APP_NAME="$GIT_REPOSITORY_NAME"
     VERSION="$BUILD_VERSION"
 
@@ -63,6 +63,10 @@ actions:
         clean' |
     yq -P > "${CLEANED_FILE}"
 
+    echo "______"
+    echo "${CLEANED_FILE}"
+    cat "${CLEANED_FILE}"
+    echo "______"
     #------------------------ PROCESSING ------------------------#
     # Iterate through each application in CLEANED_FILE
     for app_name in $(yq eval '.applications[].name' $CLEANED_FILE); do

@@ -18,6 +18,7 @@ actions:
 
     export CONFIG_MAP_NAME="${CONFIG_MAP_NAME:-}"
     export CONFIG_MAP_MOUNT_PATH="${CONFIG_MAP_MOUNT_PATH:-}"
+    export DEPLOYMENT_STAGE="${DEPLOYMENT_STAGE:-dev}"
     
     export SECRET_NAME="${SECRET_NAME:-}"
     export SECRET_MOUNT_PATH="${SECRET_MOUNT_PATH:-}"
