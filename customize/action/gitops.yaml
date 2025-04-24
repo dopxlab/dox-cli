@@ -91,5 +91,5 @@ actions:
     else
       git commit -m "🔄 Update image tag for $APP_NAME: $VERSION ($STAGE)"
       git push
-      echo "✅ Changes pushed into the gitops repository
+      echo "✅ Changes pushed into the gitops repository"
     fi
