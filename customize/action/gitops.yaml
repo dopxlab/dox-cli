@@ -78,7 +78,7 @@ actions:
         " $VALUES_FILE
       fi
     done
-    echo "✅ Application '$APPLICATION_NAME' has been updated or added in $VALUES_FILE."
+    echo "✅ Application has been updated or added in $VALUES_FILE."
 
     #------------------------ GIT PUSH ------------------------#
     echo "🚀 Committing and pushing changes..."
