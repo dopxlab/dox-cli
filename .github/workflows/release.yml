@@ -1,4 +1,4 @@
-name: Scheduled Helm Chart Release
+name: Scheduled DOX CLI Release
 
 on:
   workflow_dispatch:
