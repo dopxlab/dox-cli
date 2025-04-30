@@ -1,4 +1,4 @@
-name: Scheduled Build Release
+name: Scheduled Helm Chart Release
 
 on:
   workflow_dispatch:
