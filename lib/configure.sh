@@ -229,7 +229,7 @@ function configure() {
     fi
 
     # Using yq to evaluate the keys and set to empty string if they don't exist ( installation.download.123 or installation.download.123.)
-    local installation_url=$(yq eval ".installation.download.$lib_version // .installation.download.$lib_version.$(uname -m) // \"\"" "$lib_config_file")
+    local installation_url=$(yq eval ".installation.download.\"$lib_version\".\"$(uname -m)\" // .installation.download.\"$lib_version\" // \"\"" "$lib_config_file")
     local installation_script=$(yq eval ".installation.script.\"$lib_version\" // \"\"" "$lib_config_file")
 
     # Check if either installation_url or installation_script has a value
