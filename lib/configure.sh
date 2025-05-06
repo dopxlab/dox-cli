@@ -230,13 +230,16 @@ function configure() {
         return 1
     fi
 
-    # Using yq to evaluate the keys and set to empty string if they don't exist
-    local installation_url=$(yq eval ".installation.download.\"$lib_version\" // \"\"" "$lib_config_file")
+    # Using yq to evaluate the keys and set to empty string if they don't exist ( installation.download.123 or installation.download.123.)
+    local installation_url=$(yq eval ".installation.download.$lib_version // .installation.download.$lib_version.$(uname -m) // \"\"" "$lib_config_file")
     local installation_script=$(yq eval ".installation.script.\"$lib_version\" // \"\"" "$lib_config_file")
 
     # Check if either installation_url or installation_script has a value
     if [ -z "$installation_url" ] && [ -z "$installation_script" ]; then
         error "Error: Neither installation download URL nor install script found for $lib_version. Exiting."
+        debug ".installation.download.$lib_version.$(uname -m) - verify " 
+        debug ".installation.script.$lib_version - verify " 
+        debug "x86_64: Intel/AMD 64-bit (Ubuntu, macOS, Windows); armv7l: ARM 32-bit (Raspberry Pi 2, older Android); aarch64: ARM 64-bit (Raspberry Pi 3/4, Apple M1, ARM Servers); ppc64le: PowerPC 64-bit (IBM Power Systems)"
         exit 1
     fi
     
