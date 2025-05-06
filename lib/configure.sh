@@ -85,8 +85,6 @@ function download_and_extract() {
     local install_dir=$2
     local temp_file=$(mktemp)
 
-    echo -e "Downloading library from \033[0;36m$lib_url\033[0m"
-
     # Create target directory
     mkdir -p "$install_dir"
 
