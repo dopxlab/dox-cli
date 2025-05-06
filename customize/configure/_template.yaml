@@ -7,7 +7,8 @@ installation:
   
   # Uncomment to use the download option:
   # download:
-  #   version_archive: "/path/to/version_archive.tar.gz"
+  #   version_archive:
+  #     <architecture>  "/path/to/version_archive.tar.gz" # for ubuntu you could provide "x86_64" as architecture check - $(uname -m)
   
   # Uncomment to use the install option:
   script:
