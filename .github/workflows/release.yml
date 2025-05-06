@@ -7,7 +7,7 @@ on:
         description: 'Optional: major, minor, patch'
         required: false
         type: choice
-        options: [major, minor, patch]
+        options: [patch, minor, major]
   schedule:
     - cron: '0 0 1 * *'  # Every month on the 1st at 00:00
 
@@ -83,20 +83,16 @@ jobs:
       - name: Create Tarball
         run: tar -czf dox-cli.tar.gz bin/ lib/ customize/
 
-      - name: Upload dox-cli.tar.gz
+      - name: Upload release assets
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.version.outputs.new_version }}
-          name: dox-cli.tar.gz
-          files: dox-cli.tar.gz
+          name: |
+            dox-cli.tar.gz
+            install.sh
+          files: |
+            dox-cli.tar.gz
+            install.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload install.sh
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ steps.version.outputs.new_version }}
-          name: install.sh
-          files: install.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
