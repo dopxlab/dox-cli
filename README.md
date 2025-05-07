@@ -55,6 +55,7 @@ Custom configuration templates you could provide here
 Just run the installation script:
 
 ```bash
+#For a specific release use the export else latest will be installed > ex. export DOX_CLI_VERSION=v2.0.0
 curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh && bash install.sh
 cp $HOME/.dox/bin/* /usr/local/bin/
 ```
