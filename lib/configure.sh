@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 #Optional: As its already configured in dox
 export DOX_DIR="${DOX_DIR:-$HOME/.dox}"
