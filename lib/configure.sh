@@ -16,6 +16,12 @@ CONFIGURE_FILE_PATH="${DOX_CUSTOM_DIR}/configure"
 
 print_envs DOX_RESOURCES_DIR CONFIGURE_FILE_PATH DOX_DIR DOX_CUSTOM_DIR
 
+declare -A arch_map=(
+    [x86_64]="Intel/AMD 64-bit (Ubuntu, macOS, Windows)"
+    [armv7l]="ARM 32-bit (Raspberry Pi 2, older Android)"
+    [aarch64]="ARM 64-bit (Raspberry Pi 3/4, Apple M1, ARM Servers)"
+    [ppc64le]="PowerPC 64-bit (IBM Power Systems)"
+)
 # Function to set environment variables for a given library
 function configure_env_variables() {
     local lib=$1
@@ -235,7 +241,7 @@ function configure() {
 
     if [[ -z "$installation_url" ]]; then # to avoid the complexity keeping single architecture config also 
         debug "'.installation.download.$lib_version.$architecture' don't exist checking for a fallback url '.installation.download.$lib_version'" 
-        debug "x86_64: Intel/AMD 64-bit (Ubuntu, macOS, Windows); armv7l: ARM 32-bit (Raspberry Pi 2, older Android); aarch64: ARM 64-bit (Raspberry Pi 3/4, Apple M1, ARM Servers); ppc64le: PowerPC 64-bit (IBM Power Systems)"
+        debug "$architecture: ${arch_map[$architecture]}"
         installation_url=$(yq eval ".installation.download.\"$lib_version\" // \"\"" "$lib_config_file")
     fi
 
@@ -316,7 +322,10 @@ function run_installation_script(){
 
         # Execute the temporary script
         source $temp_script_file  # Execute the script on the same shell (!IMPORTANT)
-
+        if [[ $? -ne 0 ]]; then
+            echo "❌ [$lib] [$script_path] Script execution failed."
+            exit 1
+        fi
         # Optionally, remove the temporary script file after execution
         rm -f "$temp_script_file"
     else
