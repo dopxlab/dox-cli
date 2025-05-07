@@ -31,7 +31,7 @@ fi
 export DOX_DIR="$HOME/.dox"
 rm -rf "$DOX_DIR" && mkdir -p "$DOX_DIR"
 
-DOX_CLI_VERSION=$(curl -s https://api.github.com/repos/dopxlab/dox-cli/releases/latest | jq -r '.tag_name')
+DOX_CLI_VERSION=${DOX_CLI_VERSION:-$(curl -s https://api.github.com/repos/dopxlab/dox-cli/releases/latest | jq -r '.tag_name')}
 
 # Define the URL for the latest release tarball and the install directory
 DOX_RELEASE_URL="https://github.com/dopxlab/dox-cli/releases/download/$DOX_CLI_VERSION/dox-cli.tar.gz"
