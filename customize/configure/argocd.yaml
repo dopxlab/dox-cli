@@ -18,9 +18,12 @@ installation:
   post_installation_script: |
     #!/bin/bash
     echo "Configuring argocd cli"
-    mv "${DOX_RESOURCES_DIR}/argocd/${ARGOCD_VERSION}/"* "${DOX_RESOURCES_DIR}/argocd/${ARGOCD_VERSION}/argocd"
-    ls -lrt ${DOX_RESOURCES_DIR}/argocd/${ARGOCD_VERSION} 
-    chmod +x "${DOX_RESOURCES_DIR}/argocd/${ARGOCD_VERSION}/argocd"
+    source_folder=${DOX_RESOURCES_DIR}/argocd/${ARGOCD_VERSION}
+
+    mv "$source_folder/"* "$source_folder/argocd"
+    chmod +x "$source_folder/argocd"
+   
+    create_symlinks_to_bin $source_folder
 
 configuration:
   # Default versioning using an environment variable or fallback to version 
