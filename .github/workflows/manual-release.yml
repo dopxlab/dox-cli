@@ -1,4 +1,4 @@
-name: DOX CLI Release
+name: DOX CLI - Manual Release
 
 on:
   workflow_dispatch:

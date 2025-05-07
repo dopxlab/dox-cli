@@ -1,4 +1,4 @@
-name: Build
+name: DOX CLI - Build
 
 on:
   push:

@@ -1,10 +1,10 @@
-name: DOX CLI - Configure Test
+name: DOX CLI - Configuration Test
 
 on:
   workflow_run:
-    workflows: ["Build"]
+    workflows: ["DOX CLI - Build"]
     types:
-      - completed  # Trigger after the "Build Release" workflow is completed
+      - completed  # Trigger after the "DOX CLI - Build" workflow is completed
 env:
   DEBUG_MODE: ${{ vars.DEBUG_MODE }}
 

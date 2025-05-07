@@ -1,8 +1,8 @@
-name: DOX CLI - Action Test
+name: DOX CLI - Actions Test
 
 on:
   workflow_run:
-    workflows: ["Build"]  # Trigger this workflow after "Build" is completed
+    workflows: ["DOX CLI - Build"]  # Trigger this workflow after "DOX CLI - Build" is completed
     types:
       - completed  # Trigger after the workflow completes
       

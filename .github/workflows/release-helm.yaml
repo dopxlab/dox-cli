@@ -2,7 +2,7 @@ name: DOX CLI - Helm Release
 
 on:
   workflow_run:
-    workflows: ["DOX CLI Release"]  # Trigger this workflow after "DOX CLI Release" is completed
+    workflows: ["DOX CLI - Manual Release"]  # Trigger this workflow after "DOX CLI - Manual Release" is completed
     types:
       - completed  # Trigger after the workflow completes
     
