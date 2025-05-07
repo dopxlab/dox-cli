@@ -1,8 +1,11 @@
 name: DOX CLI - Helm Release
 
 on:
-  workflow_dispatch:
-      
+  workflow_run:
+    workflows: ["DOX CLI Release"]  # Trigger this workflow after "DOX CLI Release" is completed
+    types:
+      - completed  # Trigger after the workflow completes
+    
 env:
   DEBUG_MODE: ${{ vars.DEBUG_MODE }}
   OCI_REG_USER: ${{ vars.OCI_REG_USER }}
