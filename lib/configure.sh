@@ -14,7 +14,7 @@ source ${DOX_CUSTOM_DIR}/download_files.sh
 # configuration yaml location
 CONFIGURE_FILE_PATH="${DOX_CUSTOM_DIR}/configure"
 
-print_envs DOX_RESOURCES_DIR CONFIGURE_FILE_PATH DOX_DIR DOX_CUSTOM_DIR
+print_envs DOX_CLI_VERSION DOX_DIR DOX_CUSTOM_DIR DOX_RESOURCES_DIR  
 
 declare -A arch_map=(
     [x86_64]="Intel/AMD 64-bit (Ubuntu, macOS, Windows)"
