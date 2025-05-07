@@ -13,7 +13,7 @@ installation:
      arm64: "https://download.docker.com/linux/static/stable/aarch64/docker-26.1.4.tgz"
      
 configuration:
-  default_version: "${DOCKER_CLI_VERSION:-28.1.1"
+  default_version: "${DOCKER_CLI_VERSION:-28.1.1}"
 
   # Environment variable mappings for the installation paths
   environments:
