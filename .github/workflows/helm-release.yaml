@@ -1,0 +1,29 @@
+name: DOX CLI - Helm Release
+
+on:
+  workflow_dispatch:
+      
+env:
+  DEBUG_MODE: ${{ vars.DEBUG_MODE }}
+  OCI_REG_USER: ${{ vars.OCI_REG_USER }}
+  OCI_REG_PASSWORD: ${{ secrets.OCI_REG_PASSWORD }}
+  HELM_OCI_URL: ${{ vars.HELM_OCI_URL }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      # Step 1: Download and run the installation script
+      - name: Install DOX CLI
+        run: |
+          curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh && bash install.sh
+          cp $HOME/.dox/bin/* /usr/local/bin/
+          dox --version  # Verify that DOX CLI is now available
+
+      # Step 3: DOX Action for helm build and push
+      - name: dox-cli helm release
+        run: |
+          dox helm template package push

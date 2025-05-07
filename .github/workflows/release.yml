@@ -1,4 +1,4 @@
-name: Scheduled DOX CLI Release
+name: DOX CLI Release
 
 on:
   workflow_dispatch:
