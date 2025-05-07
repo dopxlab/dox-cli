@@ -54,7 +54,7 @@ jobs:
       # Step 4: DOX Action for helm build and push
       - name: dox helm template
         run: |
-          dox helm template package push
+          dox helm template package
 
       # Step 5: DOX Action for argocd deploy
       - name: dox argocd deploy
