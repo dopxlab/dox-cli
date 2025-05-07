@@ -1,4 +1,4 @@
-name: Install and Test DOX CLI - Configure
+name: DOX CLI - Configure Test
 
 on:
   workflow_run:
