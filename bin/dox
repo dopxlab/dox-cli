@@ -11,7 +11,7 @@ echo -e "\n▶️ DOX CLI running... Action: $action; Arguments: ${action_values
 
 
 # Directory paths for DOX (combined in one line for better readability)
-export DOX_CLI_VERSION="v0.1.0"
+export DOX_CLI_VERSION=$(cat "$DOX_DIR/version.txt" 2>/dev/null || echo "v0.1.0")
 
 export DOX_DIR="${DOX_DIR:-$HOME/.dox}"
 export DOX_CUSTOM_DIR="${DOX_CUSTOM_DIR:-$DOX_DIR/customize}"

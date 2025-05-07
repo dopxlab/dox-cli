@@ -19,6 +19,7 @@ installation:
     #!/bin/bash
     echo "Configuring argocd cli"
     mv "${DOX_RESOURCES_DIR}/argocd/${ARGOCD_VERSION}/"* "${DOX_RESOURCES_DIR}/argocd/${ARGOCD_VERSION}/argocd"
+    ls -lrt ${DOX_RESOURCES_DIR}/argocd/${ARGOCD_VERSION} 
     chmod +x "${DOX_RESOURCES_DIR}/argocd/${ARGOCD_VERSION}/argocd"
 
 configuration:
