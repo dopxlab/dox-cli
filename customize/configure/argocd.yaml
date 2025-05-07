@@ -2,18 +2,18 @@
 installation:
   download:
     # Define version download paths # https://github.com/argoproj/argo-cd/blob/master/docs/cli_installation.md
-    "3.0.0":
-      "x86_64": "https://github.com/argoproj/argo-cd/releases/download/v3.0.0/argocd-linux-amd64"
-      "arm64":  "https://github.com/argoproj/argo-cd/releases/download/v3.0.0/argocd-linux-arm64"
-    "2.14.9":
-      "x86_64": "https://github.com/argoproj/argo-cd/releases/download/v2.14.9/argocd-linux-amd64"
-      "arm64":  "https://github.com/argoproj/argo-cd/releases/download/v2.14.9/argocd-linux-arm64"
-    "2.13.6": 
-      "x86_64": "https://github.com/argoproj/argo-cd/releases/download/v2.13.6/argocd-linux-amd64"
-      "arm64":  "https://github.com/argoproj/argo-cd/releases/download/v2.13.6/argocd-linux-arm64"
-    "2.12.11": 
-      "x86_64": "https://github.com/argoproj/argo-cd/releases/download/v2.12.11/argocd-linux-amd64"
-      "arm64":  "https://github.com/argoproj/argo-cd/releases/download/v2.12.11/argocd-linux-arm64"
+    3.0.0:
+      x86_64: "https://github.com/argoproj/argo-cd/releases/download/v3.0.0/argocd-linux-amd64"
+      arm64:  "https://github.com/argoproj/argo-cd/releases/download/v3.0.0/argocd-linux-arm64"
+    2.14.9:
+      x86_64: "https://github.com/argoproj/argo-cd/releases/download/v2.14.9/argocd-linux-amd64"
+      arm64:  "https://github.com/argoproj/argo-cd/releases/download/v2.14.9/argocd-linux-arm64"
+    2.13.6: 
+      x86_64: "https://github.com/argoproj/argo-cd/releases/download/v2.13.6/argocd-linux-amd64"
+      arm64:  "https://github.com/argoproj/argo-cd/releases/download/v2.13.6/argocd-linux-arm64"
+    2.12.11: 
+      x86_64: "https://github.com/argoproj/argo-cd/releases/download/v2.12.11/argocd-linux-amd64"
+      arm64:  "https://github.com/argoproj/argo-cd/releases/download/v2.12.11/argocd-linux-arm64"
   
   post_installation_script: |
     #!/bin/bash
