@@ -89,7 +89,8 @@ dox configure <tool>
 
 This uses the configuration template from the `customize/configure/<tool>.yaml`.
 
-#### 📦 Configuration Template Format
+<details>
+  <summary>📦 Configuration Template Format</summary>
 
 ```yaml
 installation:
@@ -116,6 +117,7 @@ configuration:
   post_configuration_script: |
     echo "Printing installed version..."
 ```
+</details>
 
  [Read More About Configuration Template](./docs/configuration.md)
 
@@ -271,7 +273,8 @@ dox <tool> <action>
 
 This uses the action template from `customize/action/<tool>.yaml`.
 
-#### 🧩 Action Template Format
+<details>
+  <summary>🧩 Action Template Format</summary>
 
 ```yaml
 configure: |
@@ -289,8 +292,8 @@ actions:
     # Users can define any action name (e.g., 'build', 'deploy', etc.) 
   # Example: "build": "npm run build"
 
-
 ```
+</details>
 
 ### 🧠 Template Engine Module
 
@@ -298,7 +301,16 @@ The action module uses a dynamic template engine:
 
 - All files in the `template.folder` will have `##VARIABLE_KEY##` replaced with the respective env variable.
 - Example:  
-  A Dockerfile can include `##BUILD_VERSION##` and will be auto-filled before execution.
+  A [Dockerfile](./customize/action/templates/docker/Dockerfile) can include `##FROM_IMAGE##` and this will be auto-filled before execution. The [variables](./customize/action/docker.yaml) you can provide in `template.variables` path. 
+
+```yaml
+template:
+  folder: "<optional: template_folder>" 
+  variables:
+    <template-variable-name>: "<optional: template-variable-value>" 
+    # Example: "CUSTOM_VAR": "value"
+```
+
 - This makes the system extremely **modular** and **reusable**.
 
 > The final resolved template is stored at `${template_folder}`.
@@ -629,7 +641,7 @@ metrics:
 ### ✅ `helm-template.yaml`
 
 ```yaml
-name: Setup Node
+name: Maven Build
 on: [push]
 
 jobs:
@@ -643,15 +655,12 @@ jobs:
           curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh && bash install.sh
           cp $HOME/.dox/bin/* /usr/local/bin/
 
-      # Step 2: Add the new path for DOX to the $PATH and verify the installation
-      - name: Verify DOX CLI installation
-        run: |
           dox --version  # Verify that DOX CLI is now available
 
-      # Step 3: DOX Action 1
-      - name: dox helm template
+      # Step 2: DOX Action 1
+      - name: DOX Maven Build
         run: |
-          dox helm template
+          dox maven build
 
 ```
 
