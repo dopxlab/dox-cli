@@ -638,7 +638,7 @@ metrics:
 
 ## 📦 Example Use Case: GitHub Actions CI/CD
 
-### ✅ `helm-template.yaml`
+### ✅ `maven-build.yaml`
 
 ```yaml
 name: Maven Build
