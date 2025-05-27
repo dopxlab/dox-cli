@@ -234,6 +234,12 @@ function configure() {
         return 1
     fi
     local architecture=$(uname -m)
+
+    # Normalize to "arm64" if it's aarch64
+    if [[ "$architecture" == "aarch64" ]]; then
+        architecture="arm64"
+    fi   
+    
     info "Identified architecture is : $architecture"
     
     # Using yq to evaluate the keys and set to empty string if they don't exist (ex: installation.download.123 or installation.download.123.x86_64)
@@ -278,6 +284,7 @@ function configure() {
 
     if $run_post_installation; then
         run_installation_script "$lib" ".installation.post_installation_script"
+        create_symlinks_to_bin $source_folder # after chmod +x or renaming it has to be linked again to the bin folder
     fi
     
     run_installation_script "$lib" ".configuration.post_configuration_script"

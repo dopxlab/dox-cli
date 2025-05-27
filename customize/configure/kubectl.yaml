@@ -6,6 +6,11 @@ installation:
     "1.31.7": "https://cdn.dl.k8s.io/release/v1.31.7/bin/darwin/arm64/kubectl"
     "1.30.11": "https://cdn.dl.k8s.io/release/v1.30.11/bin/darwin/arm64/kubectl"
     "1.29.15": "https://cdn.dl.k8s.io/release/v1.29.15/bin/darwin/arm64/kubectl"
+  post_installation_script: |
+    #!/bin/bash
+    echo "Configuring kubectl"
+    chmod +x "${DOX_RESOURCES_DIR}/kubectl/${KUBECTL_VERSION}/kubectl"
+
 configuration:
   # Default versioning using an environment variable or fallback to version 
   default_version: "${KUBECTL_VERSION:-1.32.3}"
