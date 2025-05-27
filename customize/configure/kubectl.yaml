@@ -9,8 +9,10 @@ installation:
   post_installation_script: |
     #!/bin/bash
     echo "Configuring kubectl"
-    chmod +x "${DOX_RESOURCES_DIR}/kubectl/${KUBECTL_VERSION}/kubectl"
-
+    source_folder=${DOX_RESOURCES_DIR}/kubectl/${KUBECTL_VERSION}
+    chmod +x "$source_folder/kubectl"
+    create_symlinks_to_bin $source_folder
+    
 configuration:
   # Default versioning using an environment variable or fallback to version 
   default_version: "${KUBECTL_VERSION:-1.32.3}"

@@ -261,9 +261,9 @@ function configure() {
     fi
     
     local run_post_installation=false
+    local install_dir="${DOX_RESOURCES_DIR}/${lib}/${lib_version}"
 
     if [ -n "$installation_url" ]; then # If installation_url exists give more priority to this
-        local install_dir="${DOX_RESOURCES_DIR}/${lib}/${lib_version}"
         if [ ! -d "$install_dir" ] || [ -z "$(ls -A "$install_dir")" ]; then # If the directory does not exist or is empty
             rm -rf "$install_dir" #Handling empty condition
             echo -e "Download URL: \033[0;36m$installation_url\033[0m"
@@ -284,7 +284,6 @@ function configure() {
 
     if $run_post_installation; then
         run_installation_script "$lib" ".installation.post_installation_script"
-        create_symlinks_to_bin $source_folder # after chmod +x or renaming it has to be linked again to the bin folder
     fi
     
     run_installation_script "$lib" ".configuration.post_configuration_script"
