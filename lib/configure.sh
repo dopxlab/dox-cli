@@ -288,8 +288,7 @@ function configure() {
     
     run_installation_script "$lib" ".configuration.post_configuration_script"
 
-    echo ""
-    echo -e "\033[0;32m$lib installation completed successfully.\033[0m"
+    info "$lib installation completed successfully."
     echo ""
 }
 
@@ -349,7 +348,7 @@ if [ $# -eq 0 ]; then
 else  
     # Iterate over all the provided arguments and call configure for each
     for tool in "$@"; do
-        echo "Configuring tool: $tool"
+        info "Configuring tool: $tool"
         configure "$tool"
     done
 fi
