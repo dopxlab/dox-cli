@@ -37,17 +37,17 @@ print() {
 # Usage: print_envs VAR1 VAR2 VAR3 ...
 print_envs() {
     local border="--------------------------------------------------"
-    info "$border"  # Cyan on black
+    print "33" "40" "$border"  # Cyan on black
     for var in "$@"; do
         local value="${!var}"
         if [ -z "$value" ]; then
             value="<Not Set>"
-            info "$(printf '%-25s : %s' "$var" "$value")"  # Red for unset
+            print "33" "40" "$(printf '%-25s : %s' "$var" "$value")"  # Red for unset
         else
-            info "$(printf '%-25s : %s' "$var" "$value")"  # Green for set
+            print "33" "40" "$(printf '%-25s : %s' "$var" "$value")"  # Green for set
         fi
     done
-    info "$border"
+    print "33" "40" "$border"
 }
 
 # Function to print a warning message in yellow text on black background
@@ -74,9 +74,9 @@ error() {
 print_step() {
     local step_name="$1"
     echo ""
-    print "36" "40" "----------------------------------------------------"  # Cyan text on black background
+    print "33" "40" "----------------------------------------------------"  # Cyan text on black background
     print "33" "40" "Starting: $step_name"  # Yellow text on black background
-    print "36" "40" "----------------------------------------------------"  # Cyan text on black background
+    print "33" "40" "----------------------------------------------------"  # Cyan text on black background
     echo ""
 }
 
