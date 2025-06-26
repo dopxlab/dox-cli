@@ -1,0 +1,21 @@
+# Installation and Configuration
+installation:
+  download:
+    # Define version download paths # https://github.com/derailed/k9s/releases
+    1.33.0:
+     x86_64: "https://github.com/derailed/k9s/releases/download/v0.50.6/k9s_Linux_amd64.tar.gz"
+     arm64: "https://github.com/derailed/k9s/releases/download/v0.50.6/k9s_Linux_arm64.tar.gz"
+    
+configuration:
+  # Default versioning using an environment variable or fallback to version 
+  default_version: "${K9S_VERSION:-1.33.0}"
+
+  # Environment variable mappings for the installation paths
+  environments:
+    PATH: "${install_dir}"
+
+  # Print the installed version of the package
+  post_configuration_script: |
+    # Print the installed version
+    k9s version
+    whereis k9s

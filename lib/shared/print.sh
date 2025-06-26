@@ -10,11 +10,11 @@ print() {
     if [ $# -eq 1 ]; then
         local text="$1"
         local fg_color="32"  # Default to green text (32)
-        local bg_color="40"  # Default black background (40)
+        local bg_color=""  # No background color (transparent) for black background (40)
     elif [ $# -eq 2 ]; then
         # If two arguments are passed, treat the first one as foreground color and the second as background color
         local fg_color="$1"
-        local bg_color="40"  # Default background is black (40)
+        local bg_color=""  # No background color (transparent) for black background (40)
         local text="$2"
     elif [ $# -eq 3 ]; then
         # If three arguments are passed, treat them as foreground color, background color, and text
@@ -47,33 +47,33 @@ print_envs() {
     print "36" "40" "$border"
 }
 
-# Function to print a warning message in yellow text on black background
+# Function to print a warning message in yellow text (Replace "" with 40 for black background)
 # Usage: warn <text>
 info() {
-    print "34" "40" "$1"  # Blue text (34) on black background (40)
+    print "34" "" "$1"  # Blue text (34) 
 }
 
-# Function to print a warning message in yellow text on black background
+# Function to print a warning message in yellow text (Replace "" with 40 for black background)
 # Usage: warn <text>
 warn() {
-    print "33" "40" "$1"  # Yellow text (33) on black background (40)
+    print "33" "" "$1"  # Yellow text (33) 
 }
 
-# Function to print an error message in red text on black background
+# Function to print an error message in red text (Replace "" with 40 for black background)
 # Usage: error <text>
 error() {
-    print "31" "40" "$1"  # Red text (31) on black background (40)
+    print "31" "" "$1"  # Red text (31)
 }
 
 # Function to print a step message with a separator
 # Usage: print_step <step_name>
-# Prints a step message with cyan separators and yellow "Starting:" text.
+# Prints a step message with cyan separators and yellow "Starting:" text. (Replace "" with 40 for black background)
 print_step() {
     local step_name="$1"
     echo ""
-    print "36" "40" "----------------------------------------------------"  # Cyan text on black background
-    print "33" "40" "Starting: $step_name"  # Yellow text on black background
-    print "36" "40" "----------------------------------------------------"  # Cyan text on black background
+    print "36" "" "----------------------------------------------------"  # Cyan text 
+    print "33" "" "Starting: $step_name"  # Yellow text
+    print "36" "" "----------------------------------------------------"  # Cyan text
     echo ""
 }
 
