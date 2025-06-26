@@ -10,11 +10,11 @@ print() {
     if [ $# -eq 1 ]; then
         local text="$1"
         local fg_color="32"  # Default to green text (32)
-        local bg_color=""  # No background color (transparent) for black background (40)
+        local bg_color=""  # No background color (transparent) - for black background (40)
     elif [ $# -eq 2 ]; then
         # If two arguments are passed, treat the first one as foreground color and the second as background color
         local fg_color="$1"
-        local bg_color=""  # No background color (transparent) for black background (40)
+        local bg_color=""  # No background color (transparent) - for black background (40)
         local text="$2"
     elif [ $# -eq 3 ]; then
         # If three arguments are passed, treat them as foreground color, background color, and text
@@ -27,7 +27,11 @@ print() {
     fi
 
     # Print the text with specified colors
-    echo -e "\033[${fg_color};${bg_color}m${text}\033[0m"
+    if [ -n "$bg_color" ]; then
+        echo -e "\033[${fg_color};${bg_color}m${text}\033[0m"
+    else
+        echo -e "\033[0;${fg_color}m${text}\033[0m"
+    fi
 }
 
 # Function to print environment variables in a simple stylish format
