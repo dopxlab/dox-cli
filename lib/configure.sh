@@ -313,7 +313,7 @@ function run_installation_script(){
     # Check if the script is empty, if it's not, then run it
     if [[ -n "$script" ]]; then
         # Print script and debug info
-        print "34" "40" "🚀[$lib] Running $script_path script"  # Yellow text on black background
+        info "🚀[$lib] Running $script_path script"  # Yellow text on black background
 
         # Create a temporary file for the script
         temp_script_file=$(mktemp /tmp/temp_script.XXXXXX)

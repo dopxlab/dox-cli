@@ -94,7 +94,7 @@ function run_action_script() {
     script=$(yq eval "${script_path} // \"\"" "$lib_config_file")
 
     if [[ -n "$script" ]]; then
-        print "34" "40" "🚀[$lib] Running $script_path script"
+        info "🚀[$lib] Running $script_path script"
 
         local temp_script_file
         temp_script_file=$(mktemp /tmp/temp_script.XXXXXX)
