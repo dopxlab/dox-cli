@@ -1,6 +1,7 @@
 configure: |
   dox configure maven-gv
-  
+  export JAVA_HOME="/home/runner/dox_resources/jdk-gv/21"
+  export GRAALVM_HOME="/home/runner/dox_resources/jdk-gv/21"
 actions:
   build: |
     mvn -Pnative package -DskipTests -Dspring.aot.enabled=true
