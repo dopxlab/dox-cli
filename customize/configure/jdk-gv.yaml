@@ -19,6 +19,7 @@ configuration:
   # Environment variable mappings for installation paths
   environments:
     JAVA_HOME: "${install_dir}"
+    GRAALVM_HOME: "${install_dir}"
     PATH: "${install_dir}/bin"
 
   # Print the installed version of the package
