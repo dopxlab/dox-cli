@@ -5,14 +5,10 @@ configure: |
   dox export GIT_REPOSITORY_NAME
   dox export BUILD_VERSION
 
-template:
-  folder: "${DOX_CUSTOM_DIR}/action/templates/docker-gv" # ${template_folder} will be resolved path of the template folder 
-
 actions:
-  cat_dockerfile: |
-    debug ${template_folder}/Dockerfile
-
   build: |
+    cp ${DOX_CUSTOM_DIR}/action/templates/docker-gv/Dockerfile ./
+
     BINARY_NAME=$(find target -maxdepth 1 -type f -perm -111 ! -name "*.jar" -exec basename {} \;)
 
     if [ -z "$BINARY_NAME" ]; then
