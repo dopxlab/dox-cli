@@ -1,0 +1,22 @@
+configure: |
+  dox configure maven-gv
+  
+actions:
+  build: |
+    mvn -Pnative package -DskipTests -Dspring.aot.enabled=true
+  test: |
+    echo ""
+    echo "MAVEN: Testing combination of Configuration + Action"
+    mvn -v
+    whereis mvn
+    echo "JAVA: Testing combination of Configuration + Action"
+    java -version
+    whereis java 
+    echo " JAVA_HOME & GRAALVM_HOME"
+    echo ""
+    echo "JAVA_HOME: $JAVA_HOME"
+    echo ""
+    echo "GRAALVM_HOME: $GRAALVM_HOME"
+
+
+      
