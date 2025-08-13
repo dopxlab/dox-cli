@@ -18,8 +18,6 @@ actions:
 
     echo "✅ Native binary is: $BINARY_NAME"
 
-    mv "./target/$BINARY_NAME" "./target/graalvm_app"
-
-    docker build -t ${DOCKER_IMAGE_PUSH_PREFIX}/${GIT_REPOSITORY_NAME}:${BUILD_VERSION} .
+    docker build -t devstackhub/${GIT_REPOSITORY_NAME}:${BUILD_VERSION} .
   push: |
-    docker push ${DOCKER_IMAGE_PUSH_PREFIX}/${GIT_REPOSITORY_NAME}:${BUILD_VERSION}
+    docker push devstackhub/${GIT_REPOSITORY_NAME}:${BUILD_VERSION}
