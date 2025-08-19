@@ -1,5 +1,7 @@
 applications:
   - name: "##APPLICATION_NAME##"
+    serviceAccount:
+      name: "##SERVICE_ACCOUNT_NAME##"
     configmap:
       name: "##CONFIG_MAP_NAME##"
       mountPath: "##CONFIG_MAP_MOUNT_PATH##"

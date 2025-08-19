@@ -16,6 +16,8 @@ template:
     PVC_NAME: "${PVC_NAME:-}"
     PVC_MOUNT_PATH: "${PVC_MOUNT_PATH:-}"
 
+    SERVICE_ACCOUNT_NAME: "${SERVICE_ACCOUNT_NAME:-default}"
+
 actions:
   update-image-tag: |
     #!/bin/bash

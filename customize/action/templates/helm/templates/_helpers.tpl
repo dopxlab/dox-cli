@@ -63,9 +63,6 @@ app.kubernetes.io/instance: {{ .Values.service.name }}-instance
 Create the name of the service account to use
 */}}
 {{- define "helm-chart.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "helm-chart.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
+{{- default (include "helm-chart.fullname" .) (default "default" .Values.serviceAccount.name) }}
 {{- end }}
-{{- end }}
+
