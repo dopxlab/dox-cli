@@ -53,6 +53,8 @@ spec:
                   fieldPath: metadata.namespace
             - name: IMAGE_VERSION
               value: "{{ .Values.image.tag }}"
+            - name: DEPLOYMENT_STAGE
+              value: "{{ .Values.deployment.stage }}"
 
           envFrom:
             {{- if and (not $isConfigMapMounted) .Values.configmap.name }}

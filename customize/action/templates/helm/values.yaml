@@ -1,3 +1,6 @@
+deployment:
+  stage: "##DEPLOYMENT_STAGE##"
+  
 replicaCount: 1
 
 image:
