@@ -1,16 +1,15 @@
-applications:
-  - name: "##APPLICATION_NAME##"
-    imagePullSecretName: "##IMAGE_PULL_SECRET_NAME##"
-    serviceAccount:
-      name: "##SERVICE_ACCOUNT_NAME##"
-    configmap:
-      name: "##CONFIG_MAP_NAME##"
-      mountPath: "##CONFIG_MAP_MOUNT_PATH##"
-    secret:
-      name: "##SECRET_NAME##"
-      mountPath: "##SECRET_MOUNT_PATH##"
-    pvc:
-      name: "##PVC_NAME##"
-      mountPath: "##PVC_MOUNT_PATH##"
-    image:
-      tag: "##BUILD_VERSION##"
+name: "##APPLICATION_NAME##"
+imagePullSecretName: "##IMAGE_PULL_SECRET_NAME##"
+serviceAccount:
+  name: "##SERVICE_ACCOUNT_NAME##"
+configmap:
+  name: "##CONFIG_MAP_NAME##"
+  mountPath: "##CONFIG_MAP_MOUNT_PATH##"
+secret:
+  name: "##SECRET_NAME##"
+  mountPath: "##SECRET_MOUNT_PATH##"
+pvc:
+  name: "##PVC_NAME##"
+  mountPath: "##PVC_MOUNT_PATH##"
+image:
+  tag: "##BUILD_VERSION##"
