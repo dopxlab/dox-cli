@@ -30,9 +30,9 @@ spec:
         {{- include "helm-chart.selectorLabels" . | nindent 8 }}
 
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.imagePullSecretName }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
+        - name: {{ .Values.imagePullSecretName | quote }}
       {{- end }}
 
       serviceAccountName: {{ include "helm-chart.serviceAccountName" . }}

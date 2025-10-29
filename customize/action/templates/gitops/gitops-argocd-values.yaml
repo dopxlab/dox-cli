@@ -1,5 +1,6 @@
 applications:
   - name: "##APPLICATION_NAME##"
+    imagePullSecretName: "##IMAGE_PULL_SECRET_NAME##"
     serviceAccount:
       name: "##SERVICE_ACCOUNT_NAME##"
     configmap:

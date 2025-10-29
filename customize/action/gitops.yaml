@@ -18,86 +18,140 @@ template:
 
     SERVICE_ACCOUNT_NAME: "${SERVICE_ACCOUNT_NAME:-default}"
 
+    IMAGE_PULL_SECRET_NAME: "${IMAGE_PULL_SECRET_NAME:-}" 
+
 actions:
   update-image-tag: |
     #!/bin/bash
+    # Script to merge YAML files and update main configuration
+    # Usage: ./merge_yaml.sh
+    # Environment variables required:
+    # - STAGE: Target environment (dev, staging, prod, etc.)
+    # - GITOPS_PAT: Personal Access Token for GitOps repository
+    # - GITOPS_REPO: GitOps repository URL (e.g., github.com/user/repo.git)
+    set -e
 
-    set -euo pipefail
+    # Parameters
+    APP_NAME="springboot-hello-world"
+    STAGE="${STAGE:-dev}"  # Default to 'dev' if STAGE is not set
+    GITOPS_PAT="${GITOPS_PAT}"  # GitOps Personal Access Token
+    GITOPS_REPO="${GITOPS_REPO}"  # GitOps repository URL (without https://)
+    TMP_DIR="/tmp/gitops-$(date +%s)"  # Temporary directory for git clone
 
-    echo "______"
-    echo "gitops-argocd-values.yaml"
-    cat "${template_folder}/gitops-argocd-values.yaml"
-    echo "______"
-
-    #---------------------GIT CLONE--------------------------#
-
-    # Configuration
-    TMP_DIR=$(mktemp -d -t gitops-XXXXXXXXXX)
-    STAGE="${DEPLOYMENT_STAGE:-dev}"
-    VALUES_FILE="argo-apps/values-${STAGE}.yaml"
-    APP_NAME="$GIT_REPOSITORY_NAME"
-    VERSION="$BUILD_VERSION"
-
-    echo "📁 Created temp folder: $TMP_DIR"
-    echo "🔄 Cloning GitOps repo..."
+    # Clone the GitOps repository
+    echo "Cloning GitOps repository..."
     git clone --depth 1 "https://${GITOPS_PAT}@${GITOPS_REPO}" "$TMP_DIR"
 
-    cd "$TMP_DIR"
-    
-    #---------------------CLEANING YAML--------------------------#
-    CLEANED_FILE="${template_folder}/cleaned-gitops-argocd-values.yaml"
+    # Update paths to use the cloned repository
+    MAIN_YAML="$TMP_DIR/argo-apps/values-${STAGE}.yaml"
+    GITOPS_VALUES="${template_folder}/gitops-argocd-values.yaml"
+    VALUES_YAML="$(pwd)/values.yaml"
 
-    # Clean null, empty string, and empty objects from the original values file
-    yq -o=json eval '.' "${template_folder}/gitops-argocd-values.yaml" |
+    # Temporary files
+    TEMP_MERGED="/tmp/merged_temp.yaml"
+    TEMP_CLEANED="/tmp/cleaned_temp.yaml"
+    TEMP_MAIN="/tmp/main_temp.yaml"
+
+    echo "Merging YAML files for application: $APP_NAME in $STAGE environment"
+
+    # Verify required files exist
+    if [[ ! -f "$GITOPS_VALUES" ]]; then
+      echo "❌ Error: GitOps values file not found: $GITOPS_VALUES"
+      exit 1
+    fi
+
+    if [[ ! -f "$MAIN_YAML" ]]; then
+      echo "❌ Error: Main YAML file not found: $MAIN_YAML"
+      exit 1
+    fi
+
+    # Check if VALUES_YAML exists
+    if [[ -f "$VALUES_YAML" ]]; then
+      echo "Found values.yaml file - will merge with GitOps values"
+      USE_VALUES_YAML=true
+    else
+      echo "No values.yaml file found - using only GitOps values"
+      USE_VALUES_YAML=false
+    fi
+
+    # Step 1: Merge files (conditionally)
+    if [[ "$USE_VALUES_YAML" == "true" ]]; then
+      # Merge both files
+      yq eval-all 'select(fileIndex == 0) * select(fileIndex == 1)' "$GITOPS_VALUES" "$VALUES_YAML" > "$TEMP_MERGED"
+      echo "Step 1: Merged $GITOPS_VALUES and $VALUES_YAML"
+    else
+      # Use only GitOps values
+      cp "$GITOPS_VALUES" "$TEMP_MERGED"
+      echo "Step 1: Using only $GITOPS_VALUES (no values.yaml found)"
+    fi
+
+    # Step 2: Clean null, empty string, and empty objects using jq (improved cleaning)
+    yq -o=json eval '.' "$TEMP_MERGED" |
     jq 'def clean:
           walk(
-            if type == "object"
-            then with_entries(
-              select(
-                .value != null and
-                .value != "" and
-                (if (.value | type == "object") then (.value | length > 0) else true end)
-              )
-            )
+            if type == "object" then
+              with_entries(
+                select(
+                  .value != null and
+                  .value != "" and
+                  .value != [] and
+                  (if (.value | type == "object") then (.value | keys | length > 0) else true end) and
+                  (if (.value | type == "array") then (.value | length > 0) else true end)
+                )
+              ) |
+              # Remove the object itself if it becomes empty after filtering
+              if keys | length == 0 then empty else . end
+            elif type == "array" then
+              map(select(. != null and . != "" and . != [])) |
+              if length == 0 then empty else . end
             else .
             end
           );
-        clean' |
-    yq -P > "${CLEANED_FILE}"
+        clean | clean | clean' |
+    yq -P > "$TEMP_CLEANED"
+    echo "Step 2: Cleaned empty and null values from merged file"
 
-    #------------------------ PROCESSING ------------------------#
-    # Iterate through each application in CLEANED_FILE
-    for app_name in $(yq eval '.applications[].name' $CLEANED_FILE); do
-      # Check if the application already exists in VALUES_FILE
-      if yq eval ".applications[] | select(.name == \"$app_name\")" $VALUES_FILE > /dev/null; then
-        # If it exists, remove the old application and add the new one
-        echo "Replacing application $app_name in $VALUES_FILE"
-        yq eval -i "
-          .applications |= map(select(.name != \"$app_name\"))
-        " $VALUES_FILE
-        yq eval -i "
-          .applications += (load(\"$CLEANED_FILE\") | .applications[] | select(.name == \"$app_name\"))
-        " $VALUES_FILE
-      else
-        # If it doesn't exist, append the application from CLEANED_FILE to VALUES_FILE
-        echo "Adding new application $app_name to $VALUES_FILE"
-        yq eval -i "
-          .applications += (load(\"$CLEANED_FILE\") | .applications[] | select(.name == \"$app_name\"))
-        " $VALUES_FILE
-      fi
-    done
-    echo "✅ Application has been updated or added in $VALUES_FILE."
-
-    #------------------------ GIT PUSH ------------------------#
-    echo "🚀 Committing and pushing changes..."
-    git config user.name "GitOps Bot"
-    git config user.email "devops@dox-cli.com"
-    git add "$VALUES_FILE"
-
-    if git diff --cached --quiet; then
-      echo "ℹ️ No changes detected. Skipping commit."
+    # Step 3: Add or replace application configuration
+    # Check if application exists and handle accordingly
+    if yq eval ".applications[] | select(.name == \"$APP_NAME\") | .name" "$MAIN_YAML" | grep -q "$APP_NAME"; then
+      # Application exists - replace it
+      yq eval "
+        (.applications[] | select(.name == \"$APP_NAME\")) = (
+          load(\"$TEMP_CLEANED\") | .name = \"$APP_NAME\"
+        )
+      " "$MAIN_YAML" > "$TEMP_MAIN"
+      echo "Step 3: Replaced existing application $APP_NAME with cleaned configuration"
     else
-      git commit -m "🔄 Update image tag for $APP_NAME: $VERSION ($STAGE)"
-      git push
-      echo "✅ Changes pushed into the gitops repository"
+      # Application doesn't exist - add it
+      yq eval "
+        .applications += [load(\"$TEMP_CLEANED\") | .name = \"$APP_NAME\"]
+      " "$MAIN_YAML" > "$TEMP_MAIN"
+      echo "Step 3: Added new application $APP_NAME with cleaned configuration"
     fi
+
+    # Replace the original main file
+    mv "$TEMP_MAIN" "$MAIN_YAML"
+
+    # Step 4: Commit and push changes
+    cd "$TMP_DIR"
+    git config user.email "ci@example.com"
+    git config user.name "CI Bot"
+    git add "argo-apps/values-${STAGE}.yaml"
+    git commit -m "Update $APP_NAME configuration for $STAGE environment"
+    git push origin main
+
+    echo "✅ Successfully committed and pushed changes to GitOps repository"
+
+    # Step 5: Cleanup
+    cd - > /dev/null
+    rm -rf "$TMP_DIR"
+    rm -f "$TEMP_MERGED" "$TEMP_CLEANED"
+
+    echo "✅ Successfully merged, cleaned, and updated values-${STAGE}.yaml"
+    echo "Updated configuration for application: $APP_NAME in $STAGE environment"
+
+    # Display the result
+    echo ""
+    echo "Updated main YAML content:"
+    echo "=========================="
+    cat "$MAIN_YAML"

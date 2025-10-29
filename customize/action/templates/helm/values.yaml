@@ -9,6 +9,8 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "##IMAGE_TAG##"
 
+imagePullSecretName: ##IMAGE_PULL_SECRET_NAME##
+
 healthCheck:
   port: ##APPLICATION_HEALTH_PORT##
   liveness:
@@ -17,8 +19,6 @@ healthCheck:
   readiness:
     path: ##APPLICATION_HEALTH_READINESS_PATH##
     delay: ##APPLICATION_HEALTH_READINESS_DELAY##
-
-imagePullSecrets: []
 
 fullnameOverride: ""
 

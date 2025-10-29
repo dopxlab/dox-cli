@@ -57,6 +57,7 @@ template:
 
     ENVIORNMENT_STAGE: "unknown"
     CUSTOM_PROJECT_VARIABLES: "${CUSTOM_PROJECT_VARIABLES:-}"
+    IMAGE_PULL_SECRET_NAME: "${IMAGE_PULL_SECRET_NAME:-}"
 
 actions:
   template: |
