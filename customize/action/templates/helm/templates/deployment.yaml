@@ -30,7 +30,7 @@ spec:
         {{- include "helm-chart.selectorLabels" . | nindent 8 }}
 
     spec:
-      {{- with .Values.imagePullSecretName }}
+      {{- if .Values.imagePullSecretName }}
       imagePullSecrets:
         - name: {{ .Values.imagePullSecretName | quote }}
       {{- end }}
