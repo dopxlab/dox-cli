@@ -25,7 +25,11 @@ actions:
     
     export PVC_NAME="${PVC_NAME:-}"
     export PVC_MOUNT_PATH="${PVC_MOUNT_PATH:-}"
-    
+
+    repo_name=$(basename "$(git config --get remote.origin.url)" .git)
+    export GIT_REPOSITORY_NAME="$repo_name"
+    export APPLICATION_NAME="${APPLICATION_NAME:-$GIT_REPOSITORY_NAME}"
+
   FROM_IMAGE: | #Not a Global variable
     echo "JDK_VERSION is set to $JDK_VERSION"
     base_image=$(yq eval ".from-images.${JDK_VERSION}" "$DOX_CUSTOM_DIR/action/docker.yaml")
