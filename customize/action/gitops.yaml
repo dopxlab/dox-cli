@@ -32,7 +32,7 @@ actions:
     set -e
 
     # Parameters
-    APP_NAME="springboot-hello-world"
+    APP_NAME="${APPLICATION_NAME:-demo-app}"  # Can be overridden by environment variable
     STAGE="${STAGE:-dev}"  # Default to 'dev' if STAGE is not set
     GITOPS_PAT="${GITOPS_PAT}"  # GitOps Personal Access Token
     GITOPS_REPO="${GITOPS_REPO}"  # GitOps repository URL (without https://)
@@ -63,6 +63,14 @@ actions:
     if [[ ! -f "$MAIN_YAML" ]]; then
       echo "❌ Error: Main YAML file not found: $MAIN_YAML"
       exit 1
+    fi
+
+    # Check if application exists, if not add it to applications array
+    if ! yq eval ".applications[] | select(.name == \"$APP_NAME\") | .name" "$MAIN_YAML" | grep -q "$APP_NAME"; then
+      echo "Application $APP_NAME does not exist - adding new entry"
+      yq eval ".applications += [{\"name\": \"$APP_NAME\"}]" "$MAIN_YAML" > "$TEMP_MAIN"
+      mv "$TEMP_MAIN" "$MAIN_YAML"
+      echo "Added new application: $APP_NAME"
     fi
 
     # Check if VALUES_YAML exists
@@ -111,26 +119,33 @@ actions:
     yq -P > "$TEMP_CLEANED"
     echo "Step 2: Cleaned empty and null values from merged file"
 
-    # Step 3: Add or replace application configuration
+    # Step 3: Add name to cleaned config
+    yq eval ".name = \"$APP_NAME\"" "$TEMP_CLEANED" > "$TEMP_CLEANED.tmp"
+    mv "$TEMP_CLEANED.tmp" "$TEMP_CLEANED"
+
+    # Step 4: Add or replace application configuration
     # Check if application exists and handle accordingly
     if yq eval ".applications[] | select(.name == \"$APP_NAME\") | .name" "$MAIN_YAML" | grep -q "$APP_NAME"; then
-      # Application exists - replace it
+      # Application exists - merge it (use *= instead of =)
       yq eval "
-        (.applications[] | select(.name == \"$APP_NAME\")) = (
-          load(\"$TEMP_CLEANED\") | .name = \"$APP_NAME\"
-        )
+        (.applications[] | select(.name == \"$APP_NAME\")) *= load(\"$TEMP_CLEANED\")
       " "$MAIN_YAML" > "$TEMP_MAIN"
-      echo "Step 3: Replaced existing application $APP_NAME with cleaned configuration"
+      echo "Step 4: Merged configuration into existing application $APP_NAME"
     else
       # Application doesn't exist - add it
       yq eval "
-        .applications += [load(\"$TEMP_CLEANED\") | .name = \"$APP_NAME\"]
+        .applications += [load(\"$TEMP_CLEANED\")]
       " "$MAIN_YAML" > "$TEMP_MAIN"
-      echo "Step 3: Added new application $APP_NAME with cleaned configuration"
+      echo "Step 4: Added new application $APP_NAME with cleaned configuration"
     fi
 
     # Replace the original main file
     mv "$TEMP_MAIN" "$MAIN_YAML"
+    # Display the result
+    echo ""
+    echo "Updated main YAML content:"
+    echo "=========================="
+    cat "$MAIN_YAML"
 
     # Step 4: Commit and push changes
     cd "$TMP_DIR"
@@ -149,9 +164,3 @@ actions:
 
     echo "✅ Successfully merged, cleaned, and updated values-${STAGE}.yaml"
     echo "Updated configuration for application: $APP_NAME in $STAGE environment"
-
-    # Display the result
-    echo ""
-    echo "Updated main YAML content:"
-    echo "=========================="
-    cat "$MAIN_YAML"
