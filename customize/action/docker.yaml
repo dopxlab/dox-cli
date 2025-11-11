@@ -35,7 +35,10 @@ actions:
     debug ${template_folder}/Dockerfile
 
   build: |
-    cp ${template_folder}/Dockerfile ./
+    if [ ! -f Dockerfile ]; then
+      cp "${template_folder}/Dockerfile" ./
+    fi
+
     cat Dockerfile
 
     docker build -t ${DOCKER_IMAGE_PUSH_PREFIX}/${GIT_REPOSITORY_NAME}:${BUILD_VERSION} .
