@@ -217,7 +217,10 @@ function configure() {
     # Retrieve the default version of the library from the JSON
     local lib_version=$(yq eval -r ".configuration.default_version" "$lib_config_file")
     
-    variable_name=$(echo "$lib_version" | perl -nle 'print $1 if /\${([^:]+):/')
+    variable_name=""
+    if [[ $lib_version =~ \$\{([^:}]+) ]]; then
+        variable_name="${BASH_REMATCH[1]}" # Output: JDK_VERSION
+    fi
     echo -e "You can override the version by providing a value for the variable \033[0;35m$variable_name\033[0m"
     echo -e "Evaluating library version: \033[0;33m$lib_version\033[0m"
 
