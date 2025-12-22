@@ -67,6 +67,15 @@ function create_symlinks_to_bin() {
     return 1
   fi
 
+  # Ensure bin folder exists
+  if [ ! -d "$bin_folder" ]; then
+    echo "📂 Creating bin folder: $bin_folder"
+    mkdir -p "$bin_folder" || {
+      echo "❌ Failed to create bin folder: $bin_folder"
+      exit 1
+    }
+  fi
+
   for file in "$source_folder"/*; do
     if [ -f "$file" ]; then
       filename=$(basename "$file")
