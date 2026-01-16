@@ -44,3 +44,23 @@ actions:
     docker build -t ${DOCKER_IMAGE_PUSH_PREFIX}/${GIT_REPOSITORY_NAME}:${BUILD_VERSION} .
   push: |
     docker push ${DOCKER_IMAGE_PUSH_PREFIX}/${GIT_REPOSITORY_NAME}:${BUILD_VERSION}
+
+  buildx_push: |
+    if [ ! -f Dockerfile ]; then
+      cp "${template_folder}/Dockerfile" ./
+    fi
+    
+    DOCKER_PLATFORMS="${DOCKER_PLATFORMS:-linux/amd64,linux/arm64}"
+    echo "Building for platforms: ${DOCKER_PLATFORMS}"
+
+    cat Dockerfile
+
+    # Setup QEMU for multi-arch emulation
+    docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+    # Create and use buildx builder
+    docker buildx create --name dox-multiarch --driver docker-container --use 2>/dev/null || docker buildx use dox-multiarch
+    docker buildx inspect --bootstrap
+
+    # Build for multiple architectures
+    docker buildx build --platform ${DOCKER_PLATFORMS} --tag ${DOCKER_IMAGE_PUSH_PREFIX}/${GIT_REPOSITORY_NAME}:${BUILD_VERSION} --push .
