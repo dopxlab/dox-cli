@@ -4,11 +4,12 @@
 export DOX_DIR="${DOX_DIR:-$HOME/.dox}"
 export DOX_CUSTOM_DIR="${DOX_CUSTOM_DIR:-$DOX_DIR/customize}"
 export DOX_RESOURCES_DIR="${DOX_RESOURCES_DIR:-$HOME/dox_resources}"
-export DOX_USER_BIN="${DOX_USER_BIN:-/usr/local/bin/}"
+export DOX_USER_BIN="${DOX_USER_BIN:-${DOX_DIR}/bin}"
 export DOX_ENV="dox_env"
 
 source ${DOX_DIR}/lib/shared/env_handler.sh
 source ${DOX_DIR}/lib/shared/print.sh
+source ${DOX_DIR}/lib/shared/url_resolver.sh
 source ${DOX_CUSTOM_DIR}/download_files.sh
 
 # configuration yaml location
@@ -16,12 +17,16 @@ CONFIGURE_FILE_PATH="${DOX_CUSTOM_DIR}/configure"
 
 print_envs DOX_CLI_VERSION DOX_DIR DOX_CUSTOM_DIR DOX_RESOURCES_DIR  
 
-declare -A arch_map=(
-    [x86_64]="Intel/AMD 64-bit (Ubuntu, macOS, Windows)"
-    [armv7l]="ARM 32-bit (Raspberry Pi 2, older Android)"
-    [aarch64]="ARM 64-bit (Raspberry Pi 3/4, Apple M1, ARM Servers)"
-    [ppc64le]="PowerPC 64-bit (IBM Power Systems)"
-)
+# Replace lines 19-24 with:
+function get_arch_description() {
+    case "$1" in
+        x86_64) echo "Intel/AMD 64-bit (Ubuntu, macOS, Windows)" ;;
+        armv7l) echo "ARM 32-bit (Raspberry Pi 2, older Android)" ;;
+        aarch64) echo "ARM 64-bit (Raspberry Pi 3/4, Apple M1, ARM Servers)" ;;
+        ppc64le) echo "PowerPC 64-bit (IBM Power Systems)" ;;
+        *) echo "Unknown architecture" ;;
+    esac
+}
 # Function to set environment variables for a given library
 function configure_env_variables() {
     local lib=$1
@@ -56,6 +61,7 @@ function configure_env_variables() {
     if [[ -f "$DOX_ENV" ]]; then
         source "$DOX_ENV"
     fi
+    
 }
 
 function create_symlinks_to_bin() {
@@ -153,11 +159,19 @@ function move_contents_and_remove_subfolder() {
     if [ -d "$subdir" ]; then
         # Check if there are no files in the target directory
         if [ -z "$(find "$target_dir" -maxdepth 1 -type f)" ]; then
-            # Move contents of the subdirectory to the target directory
-            mv "$subdir"/* "$target_dir"
+            # Rename subdirectory to a temporary name to avoid conflicts
+            temp_name="_temp_extract_$$"  # Use process ID to make it unique
+            temp_dir="$target_dir/$temp_name"
             
-            # Remove the now-empty subdirectory
-            rmdir "$subdir"
+            mv "$subdir" "$temp_dir"
+            
+            # Move contents of the temporary directory to the target directory
+            for item in "$temp_dir"/*; do
+                mv "$item" "$target_dir/"
+            done
+            
+            # Remove the now-empty temporary subdirectory
+            rmdir "$temp_dir" 2>/dev/null || debug "Could not remove temporary subdirectory (may not be empty)"
             
             echo "Moved contents of the subdirectory and removed the empty subdirectory."
         else
@@ -169,7 +183,13 @@ function move_contents_and_remove_subfolder() {
     # List the contents of the target directory with detailed and colorized output
     echo ""
     echo "$target_dir"
-    ls -l --color=auto "$target_dir"
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS doesn't support --color=auto, use -G instead
+        ls -lG "$target_dir"
+    else
+        # Linux
+        ls -l --color=auto "$target_dir"
+    fi
     echo ""
 }
 
@@ -226,42 +246,26 @@ function configure() {
     # Retrieve the default version of the library from the JSON
     local lib_version=$(yq eval -r ".configuration.default_version" "$lib_config_file")
     
+    echo ""
+    echo ""
+    echo ""
+    echo "Default version (raw): $lib_version"
+    echo ""
+    echo ""
+    echo ""
+
     variable_name=""
     if [[ $lib_version =~ \$\{([^:}]+) ]]; then
         variable_name="${BASH_REMATCH[1]}" # Output: JDK_VERSION
     fi
-    echo -e "You can override the version by providing a value for the variable \033[0;35m$variable_name\033[0m"
-    echo -e "Evaluating library version: \033[0;33m$lib_version\033[0m"
-
-    # Evaluate shell variable expansion for the default version
-    lib_version=$(eval echo "$lib_version")
-    #Exporting variable name 
-    export "$variable_name"="$lib_version"
-
-    echo -e "Resolved $lib version: \033[0;33m$lib_version\033[0m"
-
-    # Check if the version is empty
-    if [ -z "$lib_version" ]; then
-        error "Error: No version specified for $lib"
-        return 1
-    fi
-    local architecture=$(uname -m)
-
-    # Normalize to "arm64" if it's aarch64
-    if [[ "$architecture" == "aarch64" ]]; then
-        architecture="arm64"
-    fi   
     
-    info "Identified architecture is : $architecture"
-    
-    # Using yq to evaluate the keys and set to empty string if they don't exist (ex: installation.download.123 or installation.download.123.x86_64)
-    local installation_url=$(yq eval ".installation.download.\"$lib_version\".\"$architecture\" // \"\"" "$lib_config_file")
+    lib_version=$(eval echo "$lib_version")  # <-- This resolves ${DOCKER_CLI_VERSION:-28.1.1} to actual value
+    info "Using version: $(tput setaf 5)$lib_version$(tput sgr0). (You can override this version using the variable $(tput setaf 5)$variable_name$(tput sgr0))"
 
-    if [[ -z "$installation_url" ]]; then # to avoid the complexity keeping single architecture config also 
-        debug "'.installation.download.$lib_version.$architecture' don't exist checking for a fallback url '.installation.download.$lib_version'" 
-        debug "$architecture: ${arch_map[$architecture]}"
-        installation_url=$(yq eval ".installation.download.\"$lib_version\" // \"\"" "$lib_config_file")
-    fi
+    echo ""
+    local installation_url=$(get_installation_url "$lib_version" "$lib_config_file")
+    info "Determined installation URL: $installation_url"
+    echo ""
 
     local installation_script=$(yq eval ".installation.script.\"$lib_version\" // \"\"" "$lib_config_file")
 
@@ -280,6 +284,7 @@ function configure() {
             rm -rf "$install_dir" #Handling empty condition
             echo -e "Download URL: \033[0;36m$installation_url\033[0m"
             echo -e "Installation Directory: \033[0;36m$install_dir\033[0m"
+            echo ""
             info "$lib version $lib_version is not installed. Installing..."
             download_and_extract "$installation_url" "$install_dir"
             run_post_installation=true
@@ -306,10 +311,22 @@ function configure() {
 
 function replace_install_dir_vars() {
     local lib="$1"
+    local script_file="$2"
     local lib_version=$(yq eval -r ".configuration.default_version" "$CONFIGURE_FILE_PATH/$lib.yaml")
-    local install_dir="${DOX_RESOURCES_DIR}/${lib}/${lib_version}"
+    
+    export lib_version=$(eval echo "$lib_version")
+
+    # Export the variable for envsubst
+    export install_dir="${DOX_RESOURCES_DIR}/${lib}/${lib_version}"
+    
     debug "Replacing \${install_dir} with ${install_dir}"
-    sed -i "s|\${install_dir}|$install_dir|g" "$2"
+    
+    # Use envsubst to replace variables
+    envsubst < "$script_file" > "${script_file}.tmp"
+    mv "${script_file}.tmp" "$script_file"
+    
+    # Clean up the exported variable
+    unset install_dir
 }
 
 function run_installation_script(){

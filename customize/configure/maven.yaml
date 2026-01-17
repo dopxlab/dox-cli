@@ -5,12 +5,11 @@ installation:
     - jdk
   download:
     # Define Maven version download paths
-    "3.8.9": "https://dlcdn.apache.org/maven/maven-3/3.8.9/binaries/apache-maven-3.8.9-bin.tar.gz"
-    "3.9.11": "https://dlcdn.apache.org/maven/maven-3/3.9.11/binaries/apache-maven-3.9.11-bin.tar.gz"
+    "3.9.12": "https://dlcdn.apache.org/maven/maven-3/3.9.12/binaries/apache-maven-3.9.12-bin.tar.gz"
 
 configuration:
   # Default Maven versioning using an environment variable or fallback to version 3.9.8
-  default_version: "${MAVEN_VERSION:-3.9.11}"
+  default_version: "${MAVEN_VERSION:-3.9.12}"
 
   # Environment variable mappings for Maven installation paths
   environments:
