@@ -10,6 +10,7 @@ export DOX_ENV="dox_env"
 source ${DOX_DIR}/lib/shared/env_handler.sh
 source ${DOX_DIR}/lib/shared/print.sh
 source ${DOX_DIR}/lib/shared/url_resolver.sh
+source ${DOX_DIR}/lib/shared/version_handler.sh
 source ${DOX_CUSTOM_DIR}/download_files.sh
 
 # configuration yaml location
@@ -17,7 +18,6 @@ CONFIGURE_FILE_PATH="${DOX_CUSTOM_DIR}/configure"
 
 print_envs DOX_CLI_VERSION DOX_DIR DOX_CUSTOM_DIR DOX_RESOURCES_DIR  
 
-# Replace lines 19-24 with:
 function get_arch_description() {
     case "$1" in
         x86_64) echo "Intel/AMD 64-bit (Ubuntu, macOS, Windows)" ;;
@@ -27,131 +27,113 @@ function get_arch_description() {
         *) echo "Unknown architecture" ;;
     esac
 }
-# Function to set environment variables for a given library
+
 function configure_env_variables() {
     local lib=$1
     local version=$2
     local install_dir=$3
 
-    info "Setting environment variables for $lib version $version..."
-
-    # Check if the 'envs' section exists in the JSON for this library
+    # Check if the 'envs' section exists in the YAML for this library
     local envs=$(yq eval ".configuration.environments // []" "$CONFIGURE_FILE_PATH/$lib.yaml")
 
     # If 'envs' exists, process and set the environment variables
-    if [ "$envs" == "[]" ]; then
-        echo "No environments found or the key is missing/empty for for $lib."
-    else
-        #echo "Environmet Variables : $envs" 
-        # Iterate over each element in the 'envs' array
+    if [ "$envs" != "[]" ]; then
         echo "$envs" | yq eval '. | to_entries | .[] | "\(.key)=\(.value)"' - | while IFS="=" read -r key value; do
-            # Print the $key and $value for debugging
-            # Evaluate and export the environment variable:
             local evaluated_value=$(eval echo "$value")
-            # Print the evaluated value
-            #echo "Evaluated Value: $evaluated_value"
-            if [ "$key" == "PATH" ]; then # 
+            if [ "$key" == "PATH" ]; then
                 create_symlinks_to_bin "$evaluated_value"
-            else # For other keys, save them to the env.sh script
+            else
                 update_dox_env $key $evaluated_value
             fi
         done
     fi
-    # used for post_installation_scripts
+    
+    # Source environment for post_installation_scripts
     if [[ -f "$DOX_ENV" ]]; then
         source "$DOX_ENV"
     fi
-    
 }
 
 function create_symlinks_to_bin() {
-  local source_folder="$1"
-  local bin_folder="${DOX_USER_BIN}"
+    local source_folder="$1"
+    local bin_folder="${DOX_USER_BIN}"
 
-  if [ ! -d "$source_folder" ]; then
-    echo "❌ Source folder '$source_folder' does not exist."
-    return 1
-  fi
-
-  # Ensure bin folder exists
-  if [ ! -d "$bin_folder" ]; then
-    echo "📂 Creating bin folder: $bin_folder"
-    mkdir -p "$bin_folder" || {
-      echo "❌ Failed to create bin folder: $bin_folder"
-      exit 1
-    }
-  fi
-
-  for file in "$source_folder"/*; do
-    if [ -f "$file" ]; then
-      filename=$(basename "$file")
-      
-      # Skip non-executable or irrelevant files
-      case "$filename" in
-        *.txt|*.md|README|LICENSE) continue ;;
-      esac
-
-      if [[ -x "$file" ]]; then
-        ln -sf "$file" "$bin_folder/$filename"
-        echo "🔗 Linked $filename to $bin_folder"
-      else
-        debug "⚠️ Skipping non-executable: $filename"
-      fi
+    if [ ! -d "$source_folder" ]; then
+        error "Source folder '$source_folder' does not exist."
+        return 1
     fi
-  done
+
+    # Ensure bin folder exists
+    if [ ! -d "$bin_folder" ]; then
+        mkdir -p "$bin_folder" || {
+            error "Failed to create bin folder: $bin_folder"
+            exit 1
+        }
+    fi
+
+    for file in "$source_folder"/*; do
+        if [ -f "$file" ]; then
+            filename=$(basename "$file")
+            
+            # Skip non-executable or irrelevant files
+            case "$filename" in
+                *.txt|*.md|README|LICENSE) continue ;;
+            esac
+
+            if [[ -x "$file" ]]; then
+                ln -sf "$file" "$bin_folder/$filename"
+                info "✓ Linked $filename"
+            fi
+        fi
+    done
 }
 
 function download_and_extract() {
     local lib_url=$1
     local install_dir=$2
     local temp_file=$(mktemp)
+    local filename=$(basename "$lib_url")
 
     # Create target directory
     mkdir -p "$install_dir"
 
     # Download the file
-    echo -e "\033[0;32mDownloading to temp file $temp_file\033[0m"
+    info "⬇ Downloading $filename..."
     download_tool_to_configure "$lib_url" "$temp_file"
 
-    echo -e "\033[0;32mDownload completed. Extracting to $install_dir\033[0m"
-
-    # Get the file name and extension
-    local filename=$(basename "$lib_url")
+    # Get the extension
     local extension="${filename##*.}"
 
     # Check if the file has an extension
     if [[ "$filename" == "$extension" ]]; then
-        # No extension, assume it's a regular file and copy ( Example kubectl )
-        mv "$temp_file" "$install_dir/$filename" && echo "Moving $filename to: $install_dir"
+        # No extension, assume it's a regular file and copy
+        mv "$temp_file" "$install_dir/$filename"
+        info "✓ Download complete"
     else
-        # File has an extension, determine its type and extract accordingly
+        # File has an extension, extract accordingly
         case "$extension" in
             gz|tgz)
-                tar -xzf "$temp_file" -C "$install_dir" && echo "Extracting tar.gz or tgz"
+                tar -xzf "$temp_file" -C "$install_dir" 2>/dev/null
                 ;;
             zip)
-                unzip "$temp_file" -d "$install_dir" && echo "Unzipping zip"
+                unzip -q "$temp_file" -d "$install_dir" 2>/dev/null
                 ;;
             xz)
-                tar -xJf "$temp_file" -C "$install_dir" && echo "Extracting tar.xz"
+                tar -xJf "$temp_file" -C "$install_dir" 2>/dev/null
                 ;;
             *)
-                error "Unsupported file extension: $extension" && return 1
+                error "Unsupported file extension: $extension"
+                return 1
                 ;;
         esac
+        info "✓ Extraction complete"
     fi
 
-    info "Extraction successful. Library installed to $install_dir"
     move_contents_and_remove_subfolder "$install_dir"
-
-    echo "Downloaded and extracted the library to $install_dir."
 }
 
-
-
-# Define the move_contents_and_remove_subfolder function
 function move_contents_and_remove_subfolder() {
-    target_dir="$1"  # Get target directory as argument
+    target_dir="$1"
     
     # Check if there is only one subdirectory and no files in the target directory
     subdir=$(find "$target_dir" -mindepth 1 -maxdepth 1 -type d)
@@ -160,7 +142,7 @@ function move_contents_and_remove_subfolder() {
         # Check if there are no files in the target directory
         if [ -z "$(find "$target_dir" -maxdepth 1 -type f)" ]; then
             # Rename subdirectory to a temporary name to avoid conflicts
-            temp_name="_temp_extract_$$"  # Use process ID to make it unique
+            temp_name="_temp_extract_$$"
             temp_dir="$target_dir/$temp_name"
             
             mv "$subdir" "$temp_dir"
@@ -171,30 +153,11 @@ function move_contents_and_remove_subfolder() {
             done
             
             # Remove the now-empty temporary subdirectory
-            rmdir "$temp_dir" 2>/dev/null || debug "Could not remove temporary subdirectory (may not be empty)"
-            
-            echo "Moved contents of the subdirectory and removed the empty subdirectory."
-        else
-            echo "There are files in the target directory, skipping the move."
+            rmdir "$temp_dir" 2>/dev/null
         fi
-    else
-        echo "No subdirectory found, skipping the move."
     fi
-    # List the contents of the target directory with detailed and colorized output
-    echo ""
-    echo "$target_dir"
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS doesn't support --color=auto, use -G instead
-        ls -lG "$target_dir"
-    else
-        # Linux
-        ls -l --color=auto "$target_dir"
-    fi
-    echo ""
 }
 
-
-# Generic function to install dependencies for a given library
 function install_dependencies() {
     local lib=$1
     local lib_config_file="$CONFIGURE_FILE_PATH/$lib.yaml"
@@ -203,15 +166,12 @@ function install_dependencies() {
     # Get the dependencies for the library (if they exist)
     local dependencies=$(yq eval ".installation.dependencies // []" "$lib_config_file")
 
-    # If there are no dependencies, return
-    if [ "$dependencies" == "null" ] || [ "$dependencies" == "[]" ]; then
-         print "Dependency check completed, NO dependencies found for $lib."
-    else
-        # Iterate through dependencies and install each
+    # If there are dependencies, install them
+    if [ "$dependencies" != "null" ] && [ "$dependencies" != "[]" ]; then
         cleaned_dependencies=$(echo $dependencies | tr -d '[]" ')
         for dep in $cleaned_dependencies; do
             dep="${dep#-}"
-            print "Installing dependency: $dep..."
+            info "Installing dependency: $dep"
             configure "$dep"
         done
     fi
@@ -219,15 +179,13 @@ function install_dependencies() {
 
 function check_file_exists() {
     local file_path=$1
-    # Check if the file exists
     if [ ! -f "$file_path" ]; then
-        error "Error: File $file_path not found!"
+        error "Configuration file not found: $file_path"
         return 1
     fi
     return 0
 }
 
-# Generic function to install any library based on the library name
 function configure() {
     local lib=$1
 
@@ -235,64 +193,35 @@ function configure() {
     install_dependencies "$lib"   
     
     print_step "Configuring $lib"
-    info  "Installing $lib..."
 
     lib_config_file="$CONFIGURE_FILE_PATH/$lib.yaml"
-    
     check_file_exists $lib_config_file
 
-    echo -e "Configuration file: \033[0;36m$lib_config_file\033[0m"
+    # Retrieve the default version of the library (already evaluated)
+    local lib_version=$(get_default_version "$lib")
 
-    # Retrieve the default version of the library from the JSON
-    local lib_version=$(yq eval -r ".configuration.default_version" "$lib_config_file")
-    
-    echo ""
-    echo ""
-    echo ""
-    echo "Default version (raw): $lib_version"
-    echo ""
-    echo ""
-    echo ""
-
-    variable_name=""
-    if [[ $lib_version =~ \$\{([^:}]+) ]]; then
-        variable_name="${BASH_REMATCH[1]}" # Output: JDK_VERSION
-    fi
-    
-    lib_version=$(eval echo "$lib_version")  # <-- This resolves ${DOCKER_CLI_VERSION:-28.1.1} to actual value
-    info "Using version: $(tput setaf 5)$lib_version$(tput sgr0). (You can override this version using the variable $(tput setaf 5)$variable_name$(tput sgr0))"
-
-    echo ""
     local installation_url=$(get_installation_url "$lib_version" "$lib_config_file")
-    info "Determined installation URL: $installation_url"
-    echo ""
-
     local installation_script=$(yq eval ".installation.script.\"$lib_version\" // \"\"" "$lib_config_file")
 
     # Check if either installation_url or installation_script has a value
     if [ -z "$installation_url" ] && [ -z "$installation_script" ]; then
-        error "Error: Neither installation download URL nor install script found for $lib_version. Exiting."
-        debug ".installation.script.$lib_version - verify " 
+        error "No installation method found for $lib version $lib_version"
         exit 1
     fi
     
     local run_post_installation=false
     local install_dir="${DOX_RESOURCES_DIR}/${lib}/${lib_version}"
 
-    if [ -n "$installation_url" ]; then # If installation_url exists give more priority to this
-        if [ ! -d "$install_dir" ] || [ -z "$(ls -A "$install_dir")" ]; then # If the directory does not exist or is empty
-            rm -rf "$install_dir" #Handling empty condition
-            echo -e "Download URL: \033[0;36m$installation_url\033[0m"
-            echo -e "Installation Directory: \033[0;36m$install_dir\033[0m"
-            echo ""
-            info "$lib version $lib_version is not installed. Installing..."
+    if [ -n "$installation_url" ]; then
+        if [ ! -d "$install_dir" ] || [ -z "$(ls -A "$install_dir")" ]; then
+            rm -rf "$install_dir"
+            #info "✓ Found default URL: $installation_url" >&2
             download_and_extract "$installation_url" "$install_dir"
             run_post_installation=true
-        else # If the directory exists and is not empty
-           echo "$lib version $lib_version already installed at $install_dir"
+        else
+            info "✓ Already installed: $lib $lib_version"
         fi
     else
-        echo "Installation Script: $installation_script"
         eval "$installation_script"
     fi
 
@@ -305,21 +234,16 @@ function configure() {
     
     run_installation_script "$lib" ".configuration.post_configuration_script"
 
-    info "$lib installation completed successfully."
     echo ""
 }
 
 function replace_install_dir_vars() {
     local lib="$1"
     local script_file="$2"
-    local lib_version=$(yq eval -r ".configuration.default_version" "$CONFIGURE_FILE_PATH/$lib.yaml")
+    local lib_version=$(get_default_version "$lib")
     
     export lib_version=$(eval echo "$lib_version")
-
-    # Export the variable for envsubst
     export install_dir="${DOX_RESOURCES_DIR}/${lib}/${lib_version}"
-    
-    debug "Replacing \${install_dir} with ${install_dir}"
     
     # Use envsubst to replace variables
     envsubst < "$script_file" > "${script_file}.tmp"
@@ -340,44 +264,35 @@ function run_installation_script(){
 
     # Check if the script is empty, if it's not, then run it
     if [[ -n "$script" ]]; then
-        # Print script and debug info
-        info "🚀[$lib] Running $script_path script"  # Yellow text on black background
-
         # Create a temporary file for the script
         temp_script_file=$(mktemp /tmp/temp_script.XXXXXX)
 
         # Write the script to the temporary file
         echo "$script" > "$temp_script_file"
 
-        replace_install_dir_vars $lib $temp_script_file #Replacing all the string variables ${install_dir} with actual path
+        replace_install_dir_vars $lib $temp_script_file
 
         # Make the temporary script executable
         chmod +x "$temp_script_file"
 
         # Execute the temporary script
-        source $temp_script_file  # Execute the script on the same shell (!IMPORTANT)
+        source $temp_script_file
         if [[ $? -ne 0 ]]; then
-            echo "❌ [$lib] [$script_path] Script execution failed."
+            error "Script execution failed: $script_path"
             exit 1
         fi
-        # Optionally, remove the temporary script file after execution
+        
+        # Remove the temporary script file
         rm -f "$temp_script_file"
-    else
-        debug "No script found $lib_config_file in $script_path for $lib. Skipping script execution."
     fi
 }
 
-# Example installation of JDK and Maven
-#configure jdk
-
 # Check if at least one argument is provided
 if [ $# -eq 0 ]; then
-    # No argument provided, print a message
     warn "No argument provided. Example: configure jdk"
 else  
     # Iterate over all the provided arguments and call configure for each
     for tool in "$@"; do
-        info "Configuring tool: $tool"
         configure "$tool"
     done
 fi

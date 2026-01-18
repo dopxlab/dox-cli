@@ -77,20 +77,23 @@ function get_installation_url_from_template() {
         return 1
     fi
     
-    info "Found template: $template" >&2
+    debug "Template: $template" >&2
     
     # Apply OS mapping
     local mapped_os=$(apply_os_mapping "$os_type" "$lib_config_file")
-    info "OS mapping: $os_type -> $mapped_os" >&2
     
     # Apply architecture mapping
     local mapped_arch=$(apply_arch_mapping "$architecture" "$lib_config_file")
-    info "Architecture mapping: $architecture -> $mapped_arch" >&2
+    
+    # Show mapping if changed
+    if [[ "$mapped_os" != "$os_type" ]] || [[ "$mapped_arch" != "$architecture" ]]; then
+        debug "Mapped: $os_type/$architecture → $mapped_os/$mapped_arch" >&2
+    fi
     
     # Generate URL from template
     local installation_url=$(generate_url_from_template "$template" "$lib_version" "$mapped_os" "$mapped_arch")
     
-    info "Generated URL from template: $installation_url" >&2
+    info "✓ Generated URL: $installation_url" >&2
     echo "$installation_url"
     return 0
 }
@@ -111,18 +114,17 @@ function get_installation_url_from_url() {
     local installation_url=$(yq eval ".installation.download.\"$lib_version\".\"$platform_key\" // \"\"" "$lib_config_file")
 
     if [[ -n "$installation_url" ]]; then
-        info "Found platform-specific URL: $platform_key" >&2
+        info "✓ Found URL for: $platform_key" >&2
         echo "$installation_url"
         return 0
     fi
 
     # Priority 2: Fallback to architecture-only (e.g., .installation.download.28.1.1.arm64)
     debug "'$platform_key' specific URL not found, checking for architecture-only configuration" >&2
-    debug "$architecture: $(get_arch_description "$architecture")" >&2
     installation_url=$(yq eval ".installation.download.\"$lib_version\".\"$architecture\" // \"\"" "$lib_config_file")
 
     if [[ -n "$installation_url" ]]; then
-        info "Found architecture-specific URL: $architecture" >&2
+        info "✓ Found URL for: $architecture" >&2
         echo "$installation_url"
         return 0
     fi
@@ -132,7 +134,6 @@ function get_installation_url_from_url() {
     installation_url=$(yq eval ".installation.download.\"$lib_version\" // \"\"" "$lib_config_file")
     
     if [[ -n "$installation_url" ]]; then
-        info "Found version-only URL" >&2
         echo "$installation_url"
         return 0
     fi
@@ -152,8 +153,7 @@ function get_installation_url() {
     local os_type=$(detect_os)
     local architecture=$(detect_architecture)
 
-    info "Identified OS: $os_type" >&2
-    info "Identified architecture: $architecture" >&2
+    info "✓ Detected: $os_type/$architecture" >&2
 
     local installation_url=""
     
@@ -166,7 +166,6 @@ function get_installation_url() {
     installation_url=$(get_installation_url_from_url "$lib_version" "$lib_config_file" "$os_type" "$architecture")
     
     if [[ -n "$installation_url" ]]; then
-        info "Using explicit URL definition" >&2
         echo "$installation_url"
         return 0
     fi
@@ -176,7 +175,6 @@ function get_installation_url() {
     installation_url=$(get_installation_url_from_template "$lib_version" "$lib_config_file" "$os_type" "$architecture")
     
     if [[ -n "$installation_url" ]]; then
-        info "Using template-generated URL" >&2
         echo "$installation_url"
         return 0
     fi
