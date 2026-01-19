@@ -1,0 +1,25 @@
+installation:
+  download:
+    template: "https://github.com/graalvm/graalvm-ce-builds/releases/download/{version}/graalvm-community-{version}_{os}-{arch}_bin.tar.gz"
+    mappings:
+      os:
+        linux: "linux"
+        mac: "macos"
+      arch:
+        x86_64: "x64"
+        amd64: "x64"
+        arm64: "aarch64"
+        aarch64: "aarch64"
+
+configuration:
+  default_version: "${JDK_VERSION_GVM:-$(curl -s https://api.github.com/repos/graalvm/graalvm-ce-builds/releases/latest | jq -r '.tag_name')}"
+
+  environments:
+    JAVA_HOME: "${install_dir}/Contents/Home"
+    GRAALVM_HOME: "${install_dir}/Contents/Home"
+    PATH: "${install_dir}/Contents/Home/bin"
+
+  post_configuration_script: |
+    info "✓ JAVA_HOME: ${install_dir}/Contents/Home"
+    info "✓ GRAALVM_HOME: ${install_dir}/Contents/Home"
+    info "✓ Java version: $(java -version 2>&1 | head -n 1)"

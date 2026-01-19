@@ -103,6 +103,16 @@ function download_and_extract() {
     info "⬇ Downloading $filename..."
     download_tool_to_configure "$lib_url" "$temp_file"
 
+    # Get file size and print it
+    local file_size=$(stat -f%z "$temp_file" 2>/dev/null || stat -c%s "$temp_file" 2>/dev/null)
+
+    # Check if downloaded file is empty
+    if [[ $file_size -lt 1024 ]]; then
+        error "✖ Empty file downloaded, please check the URL: $lib_url" >&2
+        rm -f "$temp_file"
+        exit 1
+    fi
+
     # Get the extension
     local extension="${filename##*.}"
 
@@ -125,11 +135,15 @@ function download_and_extract() {
                 ;;
             *)
                 error "Unsupported file extension: $extension"
+                rm -f "$temp_file"
                 return 1
                 ;;
         esac
         info "✓ Extraction complete"
     fi
+
+    # Clean up temp file if it still exists
+    rm -f "$temp_file"
 
     move_contents_and_remove_subfolder "$install_dir"
 }

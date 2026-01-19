@@ -1,14 +1,23 @@
 # Installation and Configuration
 installation:
   download:
-    # Define version download paths # https://github.com/derailed/k9s/releases
-    1.33.0:
-     x86_64: "https://github.com/derailed/k9s/releases/download/v0.50.6/k9s_Linux_amd64.tar.gz"
-     arm64: "https://github.com/derailed/k9s/releases/download/v0.50.6/k9s_Linux_arm64.tar.gz"
+    template: "https://github.com/derailed/k9s/releases/download/{version}/k9s_{os}_{arch}.tar.gz"
+    mappings:
+      os:
+        mac: "Darwin"
+        linux: "Linux"
+      arch:
+        x86_64: "amd64"
+        aarch64: "arm64"
+   
+   # Define version download paths # https://github.com/derailed/k9s/releases
+   # 1.33.0:
+   #  x86_64: "https://github.com/derailed/k9s/releases/download/v0.50.6/k9s_Linux_amd64.tar.gz"
+   #  arm64: "https://github.com/derailed/k9s/releases/download/v0.50.6/k9s_Linux_arm64.tar.gz"
     
 configuration:
   # Default versioning using an environment variable or fallback to version 
-  default_version: "${K9S_VERSION:-1.33.0}"
+  default_version: "${K9S_VERSION:-$(curl -s https://api.github.com/repos/derailed/k9s/releases/latest | jq -r '.tag_name')}"
 
   # Environment variable mappings for the installation paths
   environments:

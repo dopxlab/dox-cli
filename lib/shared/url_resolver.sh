@@ -89,10 +89,15 @@ function get_installation_url_from_template() {
     if [[ "$mapped_os" != "$os_type" ]] || [[ "$mapped_arch" != "$architecture" ]]; then
         debug "Mapped: $os_type/$architecture → $mapped_os/$mapped_arch" >&2
     fi
-    
+
     # Generate URL from template
     local installation_url=$(generate_url_from_template "$template" "$lib_version" "$mapped_os" "$mapped_arch")
-    
+    # Check if it's a direct URL or needs script execution
+    if [[ ! "$installation_url" =~ ^https?:// ]]; then
+        info "✓ Template result is not a URL, executing as script" >&2
+        installation_url=$(eval "$installation_url") >&2
+    fi
+
     info "✓ Generated URL: $installation_url" >&2
     echo "$installation_url"
     return 0
