@@ -24,13 +24,11 @@ configuration:
 
   post_configuration_script: |
     #!/bin/bash
-    echo "Configuring argocd cli"
-    source_folder=${DOX_RESOURCES_DIR}/argocd/${ARGOCD_VERSION}
+    echo "Configuring argocd cli : $install_dir"
 
-    if ! [ -d "$source_folder/argocd" ]; then
-      mv "$source_folder/"* "$source_folder/argocd"
-      chmod +x "$source_folder/argocd"
+    if [ -d "$install_dir" ] && compgen -G "$install_dir/*" > /dev/null; then
+      mv "$install_dir/"* "$install_dir/argocd"
+      chmod +x "$install_dir/argocd"
     fi
-
-    create_symlinks_to_bin $source_folder
+    create_symlinks_to_bin $install_dir
     argocd version --client

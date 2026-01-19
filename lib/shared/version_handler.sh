@@ -23,6 +23,46 @@
 VERSIONS_CACHE_FILE="${DOX_RESOURCES_DIR}/versions.yaml"
 
 # =============================================================================
+# FUNCTION: get_default_version_key
+# =============================================================================
+# Extracts the environment variable name from the version configuration
+# without evaluating the expression.
+#
+# Example:
+#   If config has: ${DOCKER_CLI_VERSION:-29.1.5}
+#   Returns: DOCKER_CLI_VERSION
+#
+# Returns empty string if no variable pattern is found.
+# =============================================================================
+function get_default_version_key() {
+    local lib=$1
+    local lib_config_file="$CONFIGURE_FILE_PATH/$lib.yaml"
+    
+    # Check if config file exists
+    if [ ! -f "$lib_config_file" ]; then
+        echo ""
+        return 1
+    fi
+    
+    # Read raw config (no evaluation)
+    local lib_version_raw=$(yq eval -r ".configuration.default_version" "$lib_config_file")
+    
+    if [ -z "$lib_version_raw" ] || [ "$lib_version_raw" == "null" ]; then
+        echo ""
+        return 1
+    fi
+    
+    # Extract variable name (e.g., DOCKER_CLI_VERSION from ${DOCKER_CLI_VERSION:-...})
+    local variable_name=""
+    if [[ $lib_version_raw =~ \$\{([^:}]+) ]]; then
+        variable_name="${BASH_REMATCH[1]}"
+    fi
+    
+    echo "$variable_name"
+    return 0
+}
+
+# =============================================================================
 # FUNCTION: get_default_version
 # =============================================================================
 function get_default_version() {
@@ -43,11 +83,8 @@ function get_default_version() {
         return 1
     fi
     
-    # Extract variable name (e.g., DOCKER_CLI_VERSION from ${DOCKER_CLI_VERSION:-...})
-    local variable_name=""
-    if [[ $lib_version_raw =~ \$\{([^:}]+) ]]; then
-        variable_name="${BASH_REMATCH[1]}"
-    fi
+    # Extract variable name using the dedicated function
+    local variable_name=$(get_default_version_key "$lib")
     
     # ==========================================================================
     # STEP 1: Check if environment variable already exists (SILENT)
@@ -86,8 +123,12 @@ function get_default_version() {
             yq eval -i ".${lib}.variable_name = \"${variable_name}\"" "$VERSIONS_CACHE_FILE" 2>/dev/null
         fi
         
-        # Show version info only once
-        info "Using $lib version: $evaluated_version" >&2
+        # Show version info with override hint
+        #if [ -n "$variable_name" ]; then
+        #    info "✓ Using $lib version: $evaluated_version (override: export $variable_name=<version>)" >&2
+        #else
+        #    info "✓ Using $lib version: $evaluated_version" >&2
+        #fi
         
         # STEP 2c: Return the value
         echo "$evaluated_version"

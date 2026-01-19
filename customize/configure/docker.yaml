@@ -5,7 +5,6 @@ installation:
     mappings:
       arch:
         arm64: "aarch64"
-        
 configuration:
   default_version: "${DOCKER_CLI_VERSION:-$(curl -s https://api.github.com/repos/moby/moby/releases/latest | jq -r '.tag_name' | sed 's/^docker-v//;s/^v//')}"
 
@@ -19,4 +18,4 @@ configuration:
     # Print the installed version
     docker --version
     whereis docker
-    tree ${DOX_RESOURCES_DIR}/docker/${DOCKER_CLI_VERSION}
+    #tree ${DOX_RESOURCES_DIR}/docker/${DOCKER_CLI_VERSION}

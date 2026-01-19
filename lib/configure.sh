@@ -58,6 +58,8 @@ function create_symlinks_to_bin() {
     local source_folder="$1"
     local bin_folder="${DOX_USER_BIN}"
 
+    info "✓ Creating System Links from : $source_folder to bin: $bin_folder" >&2
+
     if [ ! -d "$source_folder" ]; then
         error "Source folder '$source_folder' does not exist."
         return 1
@@ -189,6 +191,7 @@ function check_file_exists() {
 function configure() {
     local lib=$1
 
+
     # Install dependencies first if they're required by other libs
     install_dependencies "$lib"   
     
@@ -199,6 +202,10 @@ function configure() {
 
     # Retrieve the default version of the library (already evaluated)
     local lib_version=$(get_default_version "$lib")
+
+    local variable_name=$(get_default_version_key "$lib")
+    info "✓ Using $lib version: $lib_version (override: export $variable_name=<version>)" >&2
+
 
     local installation_url=$(get_installation_url "$lib_version" "$lib_config_file")
     local installation_script=$(yq eval ".installation.script.\"$lib_version\" // \"\"" "$lib_config_file")

@@ -44,16 +44,11 @@ configuration:
     fi
 
     echo "Installed Java/GraalVM version: ${install_dir}"
-    create_symlinks_to_bin $source_folder/bin
+    create_symlinks_to_bin $install_dir/bin
     
-    export PATH="${install_dir}/bin:$PATH"    
     export JAVA_HOME="${install_dir}"
     export GRAALVM_HOME="${install_dir}"
-    echo ""
-    echo ""
-    cat $PATH
-    echo ""
-    echo ""
+    export PATH="${install_dir}/bin:$PATH"
     java -version
     echo "Java binary path:"
     which java || whereis java
