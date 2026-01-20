@@ -14,8 +14,4 @@ configuration:
 
   # Print the installed version of the package
   post_configuration_script: |
-    echo "Docker CLI Version:"
-    # Print the installed version
-    docker --version
-    whereis docker
-    #tree ${DOX_RESOURCES_DIR}/docker/${DOCKER_CLI_VERSION}
+    info "✓ $(docker --version)"

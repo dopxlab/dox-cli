@@ -19,16 +19,13 @@ configuration:
   default_version: "${ARGOCD_VERSION:-$(curl -s https://api.github.com/repos/argoproj/argo-cd/releases/latest | jq -r '.tag_name')}"
 
   environments:
-    INSTALL_DIR: "${install_dir}"
     PATH: "${install_dir}"
 
   post_configuration_script: |
     #!/bin/bash
-    echo "Configuring argocd cli : $install_dir"
-
     if [ -d "$install_dir" ] && compgen -G "$install_dir/*" > /dev/null; then
       mv "$install_dir/"* "$install_dir/argocd"
       chmod +x "$install_dir/argocd"
     fi
     create_symlinks_to_bin $install_dir
-    argocd version --client
+    info "✓ $(argocd version --client)"

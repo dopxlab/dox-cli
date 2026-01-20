@@ -1,7 +1,6 @@
 installation:
   download:
     template: "https://github.com/aquasecurity/trivy/releases/download/v{version}/trivy_{version}_{os}-{arch}.tar.gz"
-    template: "https://github.com/aquasecurity/trivy/releases/download/v0.68.2/trivy_0.68.2_macOS-ARM64.tar.gz"
     mappings:
       os:
         mac: "macOS"

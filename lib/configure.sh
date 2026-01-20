@@ -28,6 +28,84 @@ function get_arch_description() {
     esac
 }
 
+function list_available_configurations() {
+    info "📋 Available configurations:"
+    echo ""
+    
+    if [ ! -d "$CONFIGURE_FILE_PATH" ]; then
+        error "Configuration directory not found: $CONFIGURE_FILE_PATH"
+        return 1
+    fi
+    
+    local count=0
+    printf "%-2s %-15s %-20s\n" "SL" "Tool" "Override"
+    printf "%-2s %-15s %-20s\n" "--" "----" "--------"
+    for config_file in "$CONFIGURE_FILE_PATH"/*.yaml; do
+        if [ -f "$config_file" ]; then
+            local filename=$(basename "$config_file" .yaml)
+            local variable_name=$(get_default_version_key "$filename")
+
+            # Skip files starting with underscore
+            if [[ ! "$filename" =~ ^_ ]]; then
+                ((count++))
+                printf "%-2s %-15s %-20s\n" "$count" "$filename" "$variable_name"
+            fi
+        fi
+    done
+    
+    if [ $count -eq 0 ]; then
+        warn "No configuration files found"
+    else
+        echo ""
+        info "Total: $count configuration(s) available"
+    fi
+}
+
+function configure_from_file() {
+    local config_file=$1
+    
+    if [ ! -f "$config_file" ]; then
+        error "Configuration file not found: $config_file"
+        exit 1
+    fi
+    
+    info "📄 Reading configuration from: $config_file"
+    echo ""
+    
+    # Read the YAML file and extract tool configurations
+    local tools=$(yq eval 'keys | .[]' "$config_file")
+    
+    if [ -z "$tools" ]; then
+        error "No tools found in configuration file"
+        exit 1
+    fi
+    
+    # Process each tool
+    while IFS= read -r tool; do
+        local version=$(yq eval ".$tool.version" "$config_file")
+        
+        local variable_name=$(get_default_version_key "$tool")
+
+        if [ -n "$version" ] && [ "$version" != "null" ] && [ -n "$variable_name" ] && [ "$variable_name" != "null" ]; then
+            info "Configuring $tool with $variable_name=$version"
+            
+            # Export the version variable temporarily for this configuration
+            export "$variable_name=$version"
+            
+            # Call configure for this tool
+            configure "$tool"
+            
+            # Unset the variable after configuration
+            unset "$variable_name"
+        else
+            info "✓ Installing default version for $tool (as no version or variable_name specified)"
+            configure "$tool"
+        fi
+    done <<< "$tools"
+    
+    info "✓ Configuration from file completed"
+}
+
 function configure_env_variables() {
     local lib=$1
     local version=$2
@@ -205,7 +283,6 @@ function check_file_exists() {
 function configure() {
     local lib=$1
 
-
     # Install dependencies first if they're required by other libs
     install_dependencies "$lib"   
     
@@ -217,15 +294,15 @@ function configure() {
     # Retrieve the default version of the library (already evaluated)
     local lib_version=$(get_default_version "$lib")
 
-    local variable_name=$(get_default_version_key "$lib")
-    info "✓ Using $lib version: $lib_version (override: export $variable_name=<version>)" >&2
-
-
     local installation_url=$(get_installation_url "$lib_version" "$lib_config_file")
+
+    # Read template separately
+    local installation_script_template=$(yq eval ".installation.script.template // \"\"" "$lib_config_file")
+
     local installation_script=$(yq eval ".installation.script.\"$lib_version\" // \"\"" "$lib_config_file")
 
     # Check if either installation_url or installation_script has a value
-    if [ -z "$installation_url" ] && [ -z "$installation_script" ]; then
+    if [ -z "$installation_url" ] && [ -z "$installation_script" ] && [ -z "$installation_script_template" ]; then
         error "No installation method found for $lib version $lib_version"
         exit 1
     fi
@@ -243,6 +320,10 @@ function configure() {
             info "✓ Already installed: $lib $lib_version"
         fi
     else
+        if [ -n "$installation_script_template" ]; then
+            installation_script=$(echo "$installation_script_template" | sed "s/{version}/$lib_version/g")
+        fi
+        info "✓ Using installation script: $installation_script"
         eval "$installation_script"
     fi
 
@@ -250,10 +331,10 @@ function configure() {
     configure_env_variables "$lib" "$lib_version" "$install_dir"
 
     if $run_post_installation; then
-        run_installation_script "$lib" ".installation.post_installation_script"
+        run_installation_script "$lib" ".installation.post_installation_script" $lib_version
     fi
     
-    run_installation_script "$lib" ".configuration.post_configuration_script"
+    run_installation_script "$lib" ".configuration.post_configuration_script" $lib_version
 
     echo ""
 }
@@ -261,8 +342,8 @@ function configure() {
 function replace_install_dir_vars() {
     local lib="$1"
     local script_file="$2"
-    local lib_version=$(get_default_version "$lib")
-    
+    local lib_version="$3"
+
     export lib_version=$(eval echo "$lib_version")
     export install_dir="${DOX_RESOURCES_DIR}/${lib}/${lib_version}"
     
@@ -277,6 +358,8 @@ function replace_install_dir_vars() {
 function run_installation_script(){
     local lib=$1
     local script_path=$2
+    local lib_version=$3
+
     local lib_config_file="$CONFIGURE_FILE_PATH/$lib.yaml"
     check_file_exists $lib_config_file
 
@@ -291,7 +374,7 @@ function run_installation_script(){
         # Write the script to the temporary file
         echo "$script" > "$temp_script_file"
 
-        replace_install_dir_vars $lib $temp_script_file
+        replace_install_dir_vars $lib $temp_script_file $lib_version
 
         # Make the temporary script executable
         chmod +x "$temp_script_file"
@@ -308,9 +391,21 @@ function run_installation_script(){
     fi
 }
 
-# Check if at least one argument is provided
+# Main execution logic
 if [ $# -eq 0 ]; then
-    warn "No argument provided. Example: configure jdk"
+    # No arguments: list available configurations
+    list_available_configurations
+elif [ "$1" == "list" ]; then
+    # Explicit list command
+    list_available_configurations
+elif [ "$1" == "-f" ]; then
+    # Configure from file
+    if [ $# -lt 2 ]; then
+        error "Error: -f option requires a file path"
+        echo "Usage: dox configure -f <config-file>"
+        exit 1
+    fi
+    configure_from_file "$2"
 else  
     # Iterate over all the provided arguments and call configure for each
     for tool in "$@"; do

@@ -25,6 +25,5 @@ configuration:
 
   # Print the installed version of the package
   post_configuration_script: |
-    # Print the installed version
-    k9s version
-    whereis k9s
+    info "✓ K9s Installation: ${install_dir}"
+    info "$(k9s version)"

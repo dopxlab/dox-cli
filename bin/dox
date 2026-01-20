@@ -1,14 +1,72 @@
 #!/usr/bin/env bash
 #set -euo pipefail
 
+# Function to display help
+# Function to display help
+function show_help() {
+    cat << EOF
+
+DOX CLI - Development Operations Toolkit
+
+USAGE
+  dox <action> [arguments]
+
+CORE COMMANDS
+  version, --version       Show DOX CLI version
+  help, --help            Show this help message
+  config, configure       Configure tools and dependencies
+  <tool> <action>         Run tool-specific actions
+
+CONFIGURE
+  dox config                      List all available tools
+  dox config list                 List all available tools
+  dox config <tool> [tool...]     Configure one or more tools
+  dox config -f <file>            Configure from YAML file
+
+TOOL ACTIONS
+  dox <tool> <action> [args]      Execute tool-specific actions
+  
+  Examples:
+    dox maven build               Configure Maven, then build
+    dox docker build push         Configure Docker, then build and push
+
+CONFIGURATION FILE
+  Simple YAML format:
+  
+  kustomize:                      # Use default version
+  kubectl:
+    version: v1.35.0              # Specific version
+  go:
+    version: 1.25.6
+
+ENVIRONMENT VARIABLES
+  DOX_DIR              Installation directory (default: ~/.dox)
+  DOX_CUSTOM_DIR       Configuration directory (default: ~/.dox/customize)
+  DOX_RESOURCES_DIR    Resources directory (default: ~/dox_resources)
+  <TOOL>_VERSION       Override tool version (e.g., KUBECTL_VERSION=v1.34.0)
+
+EXAMPLES
+  dox config                      List available tools
+  dox config kubectl helm         Configure multiple tools
+  dox config -f tools.yaml        Configure from file
+  dox maven build                 Configure Maven and build
+  KUBECTL_VERSION=v1.34.0 dox config kubectl
+
+MORE INFO
+  https://github.com/dopxlab/dox-cli
+
+EOF
+}
+
 # Main script execution
-action=$1
-shift  # Remove the first argument (action) from the list
+action=${1:-help}
+shift 2>/dev/null || true  # Remove the first argument (action) from the list
 action_values=("$@")  # Capture the remaining arguments (tool names)
 
-# Print the action and arguments
-echo -e "\n▶️ DOX CLI running... Action: $action; Arguments: ${action_values[@]}"
-
+# Print the action and arguments (skip for help/version)
+if [[ "$action" != "help" && "$action" != "--help" && "$action" != "version" && "$action" != "--version" ]]; then
+    echo -e "\n▶️ DOX CLI running... Action: $action; Arguments: ${action_values[@]:-none}"
+fi
 
 # Directory paths for DOX (combined in one line for better readability)
 export DOX_DIR="${DOX_DIR:-$HOME/.dox}"
@@ -60,14 +118,17 @@ case "$action" in
     echo "DOX CLI version: $DOX_CLI_VERSION"
     ;;
 
-  configure)
-    # For 'configure' action, at least 1 argument is required (min=1, max=unlimited) (Example dox configure helm)
-    validate_args 1 -1 ${#action_values[@]} || exit 1
+  help | --help)
+    show_help
+    ;;
+
+  configure | config)
+    # For 'configure' action, handle new options
     ${DOX_DIR}/lib/configure.sh "${action_values[@]}"
     ;;
   
   *)
-    # For any other action, call the action.sh script # For 'tool' action, at least 2 argument is required (Example: dox docker build push)
+    # For any other action, call the action.sh script
     validate_args 1 -1 ${#action_values[@]} || exit 1
     # Capture the environment before the action
     source ${DOX_DIR}/lib/action.sh "$action" "${action_values[@]}"

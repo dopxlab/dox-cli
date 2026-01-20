@@ -4,14 +4,13 @@ installation:
   dependencies:
     - node
   script:
-    "16.0.0": "npm install @angular/cli@16.0.0"
-    "17.0.0": "npm install @angular/cli@17.0.0"
+    template: "npm install @angular/cli@{version}"
 
 configuration:
   # Default versioning using an environment variable or fallback to a placeholder version
-  default_version: "${ANGULAR_VERSION:-16.0.0}"
+  default_version: "${ANGULAR_VERSION:-$(curl -s https://registry.npmjs.org/@angular/cli/latest | jq -r '.version')}"
 
   # Print the installed version of the package
   post_configuration_script: |
     # Print the installed Angular version
-    npx ng version
+    info "✓ $(npx ng version | grep 'Angular CLI')"

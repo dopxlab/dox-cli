@@ -29,6 +29,5 @@ configuration:
 
   # Print the installed version of the package
   post_configuration_script: |
-    # Print the installed Java version
-    java -version
-    whereis java
+    info "✓ JAVA_HOME: ${install_dir}"
+    info "✓ Java version: $(java -version 2>&1 | head -n 1)"
