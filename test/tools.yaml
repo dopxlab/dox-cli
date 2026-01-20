@@ -1,6 +1,5 @@
 angular:
 argocd:
-checkov:
 docker:
 go:
 gradle:
