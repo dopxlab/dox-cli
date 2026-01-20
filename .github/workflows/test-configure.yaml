@@ -5,6 +5,8 @@ on:
     workflows: ["DOX CLI - Build"]
     types:
       - completed  # Trigger after the "DOX CLI - Build" workflow is completed
+    branches:
+      - '**'         # all branches      
 env:
   DEBUG_MODE: ${{ vars.DEBUG_MODE }}
 
