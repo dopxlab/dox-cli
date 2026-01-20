@@ -26,4 +26,4 @@ jobs:
       # Step 3: Run DOX configure command to test functionality (Ensuring angular and manodeven are installed)
       - name: dox build
         run: |
-          dox config -f ./test/tools.yaml
+          dox config -f ${DOX_DIR}/test/tools.yaml
