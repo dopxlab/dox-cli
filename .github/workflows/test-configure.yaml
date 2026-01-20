@@ -12,6 +12,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      # Step 0: Checkout repo to access files
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       # Step 1: Download and run the installation script
       - name: Install DOX CLI
         run: |
@@ -23,7 +27,7 @@ jobs:
           cp $HOME/.dox/bin/* /usr/local/bin/
           dox --version  # Verify that DOX CLI is now available
 
-      # Step 3: Run DOX configure command to test functionality (Ensuring angular and manodeven are installed)
+      # Step 3: Run DOX configure command
       - name: dox build
         run: |
-          dox config -f ${DOX_CUSTOM_DIR}/test/tools.yaml
+          dox config -f test/tools.yaml
