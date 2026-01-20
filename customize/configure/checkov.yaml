@@ -1,0 +1,18 @@
+# Checkov Configuration ( checkov_darwin_arm64.zip dont' provide it might fail)
+installation:
+  download:
+    template: "https://github.com/bridgecrewio/checkov/releases/download/{version}/checkov_{os}_{arch}.zip"  
+    mappings:
+      os:
+        mac: "darwin"
+        linux: "linux"
+      arch:
+        x86_64: "X86_64"
+        aarch64: "arm64"
+
+configuration:
+  default_version: "${CHECKOV_VERSION:-$(curl -s https://github.com/bridgecrewio/checkov/releases/latest | jq -r '.tag_name')}"
+  environments:
+    PATH: "${install_dir}"
+  post_configuration_script: |
+    info "✓ Checkov version : $(checkov --version)"
