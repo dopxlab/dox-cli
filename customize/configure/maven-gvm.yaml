@@ -1,6 +1,6 @@
 installation:
   dependencies:
-    - jdk
+    - jdk-gvm
   download:
     template: "https://dlcdn.apache.org/maven/maven-3/{version}/binaries/apache-maven-{version}-bin.tar.gz"
     mappings:

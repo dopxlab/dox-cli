@@ -1,20 +1,28 @@
 # Installation and Configuration
 installation:
   download:
-    # Define version download paths
-    3.17.3:
-     x86_64: "https://get.helm.sh/helm-v3.17.3-linux-amd64.tar.gz"
-     arm64: "https://get.helm.sh/helm-v3.17.3-darwin-arm64.tar.gz"
+    # Template for automatic URL generation
+    template: "https://get.helm.sh/helm-{version}-{os}-{arch}.tar.gz"
+    # Helm-specific mappings
+    mappings:
+      os:
+        linux: "linux"
+        mac: "darwin"
+      arch:
+        x86_64: "amd64"
+        arm64: "arm64"
+    
+    # Optional: Keep explicit URLs for specific versions (overrides template)
+    # 3.17.3:
+    #   linux-x86_64: "https://get.helm.sh/helm-v3.17.3-linux-amd64.tar.gz"
+    #   mac-arm64: "https://get.helm.sh/helm-v3.17.3-darwin-arm64.tar.gz"
 
 configuration:
-  default_version: "${HELM_VERSION:-3.17.3}"
+  # Fetch latest version from GitHub or use environment variable
+  default_version: "${HELM_VERSION:-$(curl -s https://api.github.com/repos/helm/helm/releases/latest | jq -r '.tag_name')}"
 
-  # Environment variable mappings for the installation paths
   environments:
-    PATH: "${install_dir}"
+    PATH: "${install_dir}/"  # Helm extracts to os-arch folder
 
-  # Print the installed version of the package
   post_configuration_script: |
-    # Print the installed  version
-    helm version
-    whereis helm
+    info "✓ Helm version : $(helm version --short)"

@@ -1,20 +1,25 @@
-# Installation and Configuration
 installation:
   download:
-    # Define Sonar Scan version download path
-    "7.0.2.4839": "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-7.0.2.4839-linux-x64.zip"
-    
+    template: "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-{version}-{os}-{arch}.zip"
+
+    mappings:
+      os:
+        linux: "linux"
+        mac: "macosx"
+      arch:
+        x86_64: "x64"
+        amd64: "x64"
+        arm64: "aarch64"
+        aarch64: "aarch64"
+
 configuration:
-  # Default versioning using an environment variable or fallback to version 1.10.5
-  default_version: "${SONAR_SCANNER_VERSION:-7.0.2.4839}"
+  # Fetch latest version dynamically from GitHub releases
+  default_version: "${SONAR_SCANNER_VERSION:-$(curl -s https://api.github.com/repos/SonarSource/sonar-scanner-cli/releases/latest | jq -r '.tag_name' | sed 's/^v//')}"
 
-  # Environment variable mappings for installation paths
   environments:
+    SONAR_SCANNER_HOME: "${install_dir}"
     PATH: "${install_dir}/bin"
-    SONAR_USER_HOME: "/home/runner/.cache/sonar"
 
-  # Print the installed version of Sonar Scan after installation
   post_configuration_script: |
-    # Print the installed Sonar Scan version
-    sonar-scanner --version
-    whereis sonar-scanner 
+    info "✓ SONAR_SCANNER_HOME: ${install_dir}"
+    info "✓ SonarScanner version: $(sonar-scanner --version | head -n 1)"

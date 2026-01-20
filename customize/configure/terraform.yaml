@@ -1,19 +1,22 @@
-# Installation and Configuration
 installation:
   download:
-    # Define Terraform version download path
-    "1.10.5": "https://releases.hashicorp.com/terraform/1.10.5/terraform_1.10.5_linux_amd64.zip"
+    template: "https://releases.hashicorp.com/terraform/{version}/terraform_{version}_{os}_{arch}.zip"
+    mappings:
+      os:
+        linux: "linux"
+        mac: "darwin"
+      arch:
+        x86_64: "amd64"
+        aarch64: "arm64"
 
 configuration:
-  # Default versioning using an environment variable or fallback to version 1.10.5
-  default_version: "${TERRAFORM_VERSION:-1.10.5}"
+  # Get latest terraform version dynamically
+  default_version: "${TERRAFORM_VERSION:-$(curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | jq -r '.tag_name' | sed 's/^v//')}"
 
-  # Environment variable mappings for installation paths
   environments:
+    TERRAFORM_HOME: "${install_dir}"
     PATH: "${install_dir}"
 
-  # Print the installed version of Terraform after installation
   post_configuration_script: |
-    # Print the installed Terraform version
-    terraform -v
-    whereis terraform 
+    info "✓ TERRAFORM_HOME: ${install_dir}"
+    info "✓ Terraform version: $(terraform version | head -n 1)"

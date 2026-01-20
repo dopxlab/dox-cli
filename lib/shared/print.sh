@@ -1,91 +1,88 @@
 #!/bin/bash
 
 # Function to print text in a specified color (text and background color)
-# Usage: print <foreground_color> <background_color> <text>
-# If only one argument is passed, it prints the text in green (32) text and black (40) background by default.
-# If two arguments are passed, the first is treated as the foreground (text) color and the second as the background color.
-# If three arguments are passed, the first one is the foreground color, the second is the background color, and the third is the text.
+# Usage: print <text>
+#        print <foreground_color> <text>
+#        print <foreground_color> <background_color> <text>
 print() {
-    # Default colors if only one argument is passed
+    # Default colors
+    local fg_color="32"  # Default to green text
+    local bg_color="40"  # Default black background
+    local text=""
+
     if [ $# -eq 1 ]; then
-        local text="$1"
-        local fg_color="32"  # Default to green text (32)
-        local bg_color="40"  # Default black background (40)
+        # Only text provided, use defaults
+        text="$1"
     elif [ $# -eq 2 ]; then
-        # If two arguments are passed, treat the first one as foreground color and the second as background color
-        local fg_color="$1"
-        local bg_color="40"  # Default background is black (40)
-        local text="$2"
+        # Foreground color and text provided
+        fg_color="$1"
+        text="$2"
     elif [ $# -eq 3 ]; then
-        # If three arguments are passed, treat them as foreground color, background color, and text
-        local fg_color="$1"
-        local bg_color="$2"
-        local text="$3"
+        # Foreground color, background color, and text provided
+        fg_color="$1"
+        bg_color="$2"
+        text="$3"
     else
-        echo "Usage: print <foreground_color> <background_color> <text>"
+        echo "Usage: print [foreground_color] [background_color] <text>"
         return 1
     fi
 
-
-    # Print the text with specified colors DISABLING BACKGROUND COLOR
-    #echo -e "\033[${fg_color};${bg_color}m${text}\033[0m"
+    # Print the text with specified colors (bold text, no background color applied)
     echo -e "\033[1;${fg_color}m${text}\033[0m"
-
 }
 
 # Function to print environment variables in a simple stylish format
 # Usage: print_envs VAR1 VAR2 VAR3 ...
 print_envs() {
     local border="--------------------------------------------------"
-    print "33" "40" "$border"  # Cyan on black
+    print "33" "$border"  # Yellow text
     for var in "$@"; do
         local value="${!var}"
         if [ -z "$value" ]; then
             value="<Not Set>"
-            print "33" "40" "$(printf '%-25s : %s' "$var" "$value")"  # Red for unset
+            print "31" "$(printf '%-25s : %s' "$var" "$value")"  # Red for unset
         else
-            print "33" "40" "$(printf '%-25s : %s' "$var" "$value")"  # Green for set
+            print "33" "$(printf '%-25s : %s' "$var" "$value")"  # Yellow for set
         fi
     done
-    print "33" "40" "$border"
+    print "33" "$border"
 }
 
-# Function to print a warning message in yellow text on black background
-# Usage: warn <text>
+# Function to print an info message in blue text
+# Usage: info <text>
 info() {
-    print "34" "40" "$1"  # Blue text (34) on black background (40)
+    print "34" "$1"  # Blue text (34)
 }
 
-# Function to print a warning message in yellow text on black background
+# Function to print a warning message in yellow text
 # Usage: warn <text>
 warn() {
-    print "33" "40" "$1"  # Yellow text (33) on black background (40)
+    print "33" "$1"  # Yellow text (33)
 }
 
-# Function to print an error message in red text on black background
+# Function to print an error message in red text
 # Usage: error <text>
 error() {
-    print "31" "40" "$1"  # Red text (31) on black background (40)
+    print "31" "$1"  # Red text (31)
 }
 
 # Function to print a step message with a separator
 # Usage: print_step <step_name>
-# Prints a step message with cyan separators and yellow "Starting:" text.
 print_step() {
     local step_name="$1"
     echo ""
-    print "33" "40" "----------------------------------------------------"  # Cyan text on black background
-    print "33" "40" "Starting: $step_name"  # Yellow text on black background
-    print "33" "40" "----------------------------------------------------"  # Cyan text on black background
+    print "33" "----------------------------------------------------"
+    print "33" "Starting: $step_name"
+    print "33" "----------------------------------------------------"
     echo ""
 }
 
 # Debug function: prints only if DEBUG_MODE is true
 debug() {
     if [ -n "$DEBUG_MODE" ] && [ "$DEBUG_MODE" = "true" ]; then
-        # Print message line by line with dark background
+        # Print message line by line with yellow text
         while IFS= read -r line; do
-            printf "\033[93;40m  %s\033[0m\n" "$line"
+            printf "\033[93m  %s\033[0m\n" "$line"
         done <<< "$1"
     fi
 }
@@ -129,19 +126,22 @@ debug() {
 # Usage Examples:
 
 # 1. Print a text in green (default behavior with one argument)
-#print "This is a green text on black background"
+# print "This is a green text"
 
-# 2. Print a text in red text with yellow background (2 arguments)
-#print "31" "43" "This is red text on yellow background"
+# 2. Print a text in red text (2 arguments)
+# print "31" "This is red text"
 
 # 3. Print a custom color with a background (3 arguments, blue text on white background)
-#print "34" "47" "This is blue text on white background"
+# print "34" "47" "This is blue text on white background"
 
-# 4. Print a warning message in yellow text on black background (use "warn" as argument)
-#warn "This is a warning message in yellow text on black background"
+# 4. Print a warning message in yellow text
+# warn "This is a warning message"
 
-# 5. Print an error message in red text on black background (use "error" as argument)
-#error "This is an error message in red text on black background"
+# 5. Print an error message in red text
+# error "This is an error message"
 
-# 6. Using print_step to print a step message
-#print_step "Setup Configuration"
+# 6. Print an info message in blue text
+# info "This is an info message"
+
+# 7. Using print_step to print a step message
+# print_step "Setup Configuration"

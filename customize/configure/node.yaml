@@ -1,22 +1,17 @@
-# Installation and Configuration
 installation:
   download:
-    # Define Node.js version download paths
-    "16.20.2": "https://nodejs.org/dist/v16.20.2/node-v16.20.2-linux-x64.tar.xz"
-    "18.0.0": "https://nodejs.org/dist/v18.20.8/node-v18.20.8-linux-x64.tar.xz"
-    "20.0.0": "https://nodejs.org/dist/v20.19.0/node-v20.19.0-linux-x64.tar.xz"
-    "22.14.0": "https://nodejs.org/dist/v22.14.0/node-v22.14.0-linux-x64.tar.xz"
-
+    template: "https://nodejs.org/dist/{version}/node-{version}-{os}-{arch}.tar.gz"
+    mappings:
+      os:
+        mac: "darwin"
+        linux: "linux"
+      arch:
+        x86_64: "x64"
+        aarch64: "arm64"
 configuration:
-  # Default Node.js versioning using an environment variable or fallback to version 16.0.0
-  default_version: "${NODE_VERSION:-22.14.0}"
-
-  # Environment variable mappings for Node.js installation paths
+  default_version: "${NODE_VERSION:-$(curl -s https://nodejs.org/dist/index.json | jq -r '.[0].version')}"
   environments:
-    NODE_HOME: "${install_dir}"
     PATH: "${install_dir}/bin"
-  # Print the installed version of the package
   post_configuration_script: |
-    # Print the installed Node version
-    node -v
-    whereis node
+    info "✓ Node version : $(node -v)"
+    info "✓ NPM version : $(npm -v)"

@@ -1,0 +1,16 @@
+installation:
+  download:
+    template: "https://github.com/anchore/grype/releases/download/v{version}/grype_{version}_{os}_{arch}.tar.gz"
+    mappings:
+      os:
+        mac: "Darwin"
+        linux: "Linux"
+      arch:
+        x86_64: "amd64"
+        aarch64: "arm64"
+configuration:
+  default_version: "${GRYPE_VERSION:-$(curl -s https://api.github.com/repos/anchore/grype/releases/latest | jq -r '.tag_name' | sed 's/v//')}"
+  environments:
+    PATH: "${install_dir}"
+  post_configuration_script: |
+    info "✓ Grype version : $(grype version)"

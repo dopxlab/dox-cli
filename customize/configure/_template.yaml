@@ -5,30 +5,34 @@ installation:
     - dependency_1
     - dependency_2
   
-  # Uncomment to use the download option:
-  # download:
-  #   version_archive:
-  #     <architecture>  "/path/to/version_archive.tar.gz" # for ubuntu you could provide "x86_64" as architecture check - $(uname -m)
-  
-  # Uncomment to use the install option:
-  script:
-    # Define the specific package and version to install
-    package_version: "install something"
-
-  post_installation_script: |
-    # Add post-installation steps here if necessary
-    echo "Post-installation script executed"
-
+  # URL template for downloads (uses placeholders)
+  download:
+    template: "https://example.com/releases/{version}/tool-{version}-{os}-{arch}.tar.gz"
+    
+    # Architecture and OS mappings for URL generation
+    # These override the default values when generating URLs from template
+    mappings:
+      os:
+        mac: "darwin"      # mac -> darwin
+        linux: "linux"     # linux -> linux (no change)
+      arch:
+        x86_64: "x64"      # x86_64 -> x64
+        arm64: "aarch64"   # arm64 -> aarch64
+    
+    # OR define specific versions with explicit URLs (higher priority than template):
+    "1.2.3":
+      mac-arm64: "https://example.com/tool-1.2.3-mac-arm64.tar.gz"
+      mac-x86_64: "https://example.com/tool-1.2.3-mac-x86_64.tar.gz"
+      linux-arm64: "https://example.com/tool-1.2.3-linux-arm64.tar.gz"
+      linux-x86_64: "https://example.com/tool-1.2.3-linux-x86_64.tar.gz"
+      
 configuration:
-  # Default versioning using an environment variable or fallback to a placeholder version
-  default_version: "${LIBRARY_VERSION:-latest}"
+  # Default version - can be static, env var, or script
+  default_version: "${LIBRARY_VERSION:-1.2.3}"
+  
+  environments:
+    INSTALL_DIR: "${install_dir}"
+    PATH: "${install_dir}/bin"
 
-  # Environment variable mappings for installation paths
-  environments: # ${install_dir} will replace at runtime with the actual installation folder
-    INSTALL_DIR: "${install_dir}" # this will create export envs
-    PATH: "${install_dir}/bin" # PATH Is reserved key - for updating existing path 
-
-  # Print the installed version of the package
   post_configuration_script: |
-    # Command to print the installed version of the package
     echo "Printing installed version..."

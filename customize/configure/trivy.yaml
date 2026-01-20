@@ -1,22 +1,17 @@
-# Installation and Configuration
 installation:
   download:
-    # Define version download path # https://github.com/aquasecurity/trivy/releases/
-    "0.61.0": "https://github.com/aquasecurity/trivy/releases/download/v0.61.0/trivy_0.61.0_Linux-64bit.tar.gz"
-    "0.60.0": "https://github.com/aquasecurity/trivy/releases/download/v0.60.0/trivy_0.60.0_Linux-64bit.tar.gz"
-    "0.59.1": "https://github.com/aquasecurity/trivy/releases/download/v0.59.1/trivy_0.59.1_Linux-64bit.tar.gz"
-
+    template: "https://github.com/aquasecurity/trivy/releases/download/v{version}/trivy_{version}_{os}-{arch}.tar.gz"
+    mappings:
+      os:
+        mac: "macOS"
+        linux: "Linux"
+      arch:
+        x86_64: "64bit"
+        aarch64: "ARM64"
 configuration:
-  # Default versioning using an environment variable or fallback to version 1.10.5
-  default_version: "${TRIVY_VERSION:-0.61.0}"
-
-  # Environment variable mappings for installation paths
+  default_version: "${TRIVY_VERSION:-$(curl -s https://api.github.com/repos/aquasecurity/trivy/releases/latest | jq -r '.tag_name' | sed 's/v//')}"
   environments:
     PATH: "${install_dir}"
-
-  # Print the installed version after installation
   post_configuration_script: |
-    # Print the installed version
-    trivy --version
-    whereis trivy 
-
+    info "✓ Trivy Installation: ${install_dir}"
+    info "✓ Trivy Version: $(trivy --version | head -n 1)"

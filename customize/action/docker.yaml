@@ -29,7 +29,6 @@ template:
   folder: "${DOX_CUSTOM_DIR}/action/templates/docker" # ${template_folder} will be resolved path of the template folder 
   variables:
     FROM_IMAGE: "${FROM_IMAGE:-jre}"
-
 actions:
   cat_dockerfile: |
     debug ${template_folder}/Dockerfile

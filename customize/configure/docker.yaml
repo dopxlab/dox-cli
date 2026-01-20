@@ -1,27 +1,17 @@
 # Installation and Configuration
 installation:
   download:
-    # Define version download paths # https://download.docker.com/linux/static/stable/x86_64/
-    28.1.1:
-      x86_64: "https://download.docker.com/linux/static/stable/x86_64/docker-28.1.1.tgz"
-      arm64: "https://download.docker.com/linux/static/stable/aarch64/docker-28.1.1.tgz"
-    27.5.1: 
-      x86_64: "https://download.docker.com/linux/static/stable/x86_64/docker-27.5.1.tgz"
-      arm64: "https://download.docker.com/linux/static/stable/aarch64/docker-27.5.1.tgz"
-    26.1.4:
-     x86_64: "https://download.docker.com/linux/static/stable/x86_64/docker-26.1.4.tgz"
-     arm64: "https://download.docker.com/linux/static/stable/aarch64/docker-26.1.4.tgz"
-     
+    template: "https://download.docker.com/{os}/static/stable/{arch}/docker-{version}.tgz"   
+    mappings:
+      arch:
+        arm64: "aarch64"
 configuration:
-  default_version: "${DOCKER_CLI_VERSION:-28.1.1}"
+  default_version: "${DOCKER_CLI_VERSION:-$(curl -s https://api.github.com/repos/moby/moby/releases/latest | jq -r '.tag_name' | sed 's/^docker-v//;s/^v//')}"
 
   # Environment variable mappings for the installation paths
   environments:
-    PATH: "${install_dir}/docker"
+    PATH: "${install_dir}"
 
   # Print the installed version of the package
   post_configuration_script: |
-    # Print the installed version
-    docker --version
-    whereis docker
-    tree ${DOX_RESOURCES_DIR}/docker/${DOCKER_CLI_VERSION}
+    info "✓ $(docker --version)"

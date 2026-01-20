@@ -1,0 +1,9 @@
+installation:
+  download:
+    template: "https://services.gradle.org/distributions/gradle-{version}-bin.zip"
+configuration:
+  default_version: "${GRADLE_VERSION:-$(curl -s https://services.gradle.org/versions/current | jq -r '.version')}"
+  environments:
+    PATH: "${install_dir}/bin"
+  post_configuration_script: |
+    info "✓ Gradle version : $(gradle -v)"

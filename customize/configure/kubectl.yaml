@@ -1,28 +1,28 @@
-# Installation and Configuration
 installation:
   download:
-    # Define version download paths # https://github.com/kubernetes/kubernetes/releases
-    1.33.0:
-     x86_64: "https://dl.k8s.io/release/v1.33.0/bin/linux/amd64/kubectl"
-     arm64: "https://dl.k8s.io/release/v1.33.0/bin/linux/arm64/kubectl"
+    template: "https://dl.k8s.io/release/{version}/bin/{os}/{arch}/kubectl"
+    mappings:
+      os:
+        mac: "darwin"
+        linux: "linux"
+      arch:
+        x86_64: "amd64"
+        aarch64: "arm64"
 
-  post_installation_script: |
-    #!/bin/bash
-    echo "Configuring kubectl"
-    source_folder=${DOX_RESOURCES_DIR}/kubectl/${KUBECTL_VERSION}
-    chmod +x "$source_folder/kubectl"
-    create_symlinks_to_bin $source_folder
-    
 configuration:
-  # Default versioning using an environment variable or fallback to version 
-  default_version: "${KUBECTL_VERSION:-1.33.0}"
+  default_version: "${KUBECTL_VERSION:-$(curl -s https://api.github.com/repos/kubernetes/kubernetes/releases/latest | jq -r '.tag_name')}"
 
-  # Environment variable mappings for the installation paths
   environments:
     PATH: "${install_dir}"
 
-  # Print the installed version of the package
   post_configuration_script: |
-    # Print the installed version
-    kubectl version
-    whereis kubectl
+    #!/bin/bash
+    echo "Configuring kubectl: $install_dir"
+
+    if [ -d "$install_dir" ] && compgen -G "$install_dir/*" > /dev/null; then
+      mv "$install_dir/"* "$install_dir/kubectl"
+      chmod +x "$install_dir/kubectl"
+    fi
+    create_symlinks_to_bin $install_dir
+    info "Kubernetes $(kubectl version --client)"    
+    
