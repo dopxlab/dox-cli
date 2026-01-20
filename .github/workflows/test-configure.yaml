@@ -5,8 +5,6 @@ on:
     workflows: ["DOX CLI - Build"]
     types:
       - completed  # Trigger after the "DOX CLI - Build" workflow is completed
-    branches:
-      - '**'         # all branches      
 env:
   DEBUG_MODE: ${{ vars.DEBUG_MODE }}
 
@@ -20,12 +18,12 @@ jobs:
           curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh && bash install.sh
 
       # Step 2: Add the new path for DOX to the $PATH and verify the installation
-     # - name: Verify DOX CLI installation
-     #   run: |
-     #     cp $HOME/.dox/bin/* /usr/local/bin/
-     #     dox --version  # Verify that DOX CLI is now available
+      - name: Verify DOX CLI installation
+        run: |
+          cp $HOME/.dox/bin/* /usr/local/bin/
+          dox --version  # Verify that DOX CLI is now available
 
       # Step 3: Run DOX configure command to test functionality (Ensuring angular and manodeven are installed)
       - name: dox configure angular +node
         run: |
-          dox config -f ./test/tools.yaml
+          dox config -f ./test/to angular
