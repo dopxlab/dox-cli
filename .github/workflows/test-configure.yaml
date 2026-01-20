@@ -24,6 +24,6 @@ jobs:
           dox --version  # Verify that DOX CLI is now available
 
       # Step 3: Run DOX configure command to test functionality (Ensuring angular and manodeven are installed)
-      - name: dox configure angular +node
+      - name: dox build
         run: |
-          dox config -f ./test/to angular
+          dox config -f ./test/tools.yaml
