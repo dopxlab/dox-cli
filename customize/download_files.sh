@@ -7,7 +7,7 @@ function download_tool_to_configure() {
 
     # Download the file using curl
     #echo "Downloading from: $path"
-    #curl -sL "$path" -o "$temp_file"
+    curl -sL "$path" -o "$temp_file"
 
     # Check if the download was successful
     if [ $? -ne 0 ]; then
@@ -15,6 +15,6 @@ function download_tool_to_configure() {
         return 1
     fi
 
-    echo "Downloaded successfully to $temp_file"
+    #echo "Downloaded successfully to $temp_file"
     return 0
 }
