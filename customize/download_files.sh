@@ -6,8 +6,8 @@ function download_tool_to_configure() {
     local temp_file="$2"  # File path to save the downloaded file
 
     # Download the file using curl
-    echo "Downloading from: $path"
-    curl -sL "$path" -o "$temp_file"
+    #echo "Downloading from: $path"
+    #curl -sL "$path" -o "$temp_file"
 
     # Check if the download was successful
     if [ $? -ne 0 ]; then

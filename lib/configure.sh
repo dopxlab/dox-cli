@@ -99,8 +99,8 @@ function configure_from_file() {
             unset "$variable_name"
         else
             configure "$tool"
-            info "✓ Using default/latest version for $tool (no version override specified)"
-            echo ""
+            #info "✓ Using default/latest version for $tool (no version override specified)"
+            #echo ""
         fi
     done <<< "$tools"
     
@@ -337,57 +337,50 @@ function configure() {
     echo ""
 }
 
-function replace_install_dir_vars() {
-    local lib="$1"
-    local script_file="$2"
-    local lib_version="$3"
-
-    export lib_version=$(eval echo "$lib_version")
-    export install_dir="${DOX_RESOURCES_DIR}/${lib}/${lib_version}"
-    
-    # Use envsubst to replace variables
-    envsubst < "$script_file" > "${script_file}.tmp"
-    mv "${script_file}.tmp" "$script_file"
-    
-    # Clean up the exported variable
-    unset install_dir
-}
 
 function run_installation_script(){
     local lib=$1
     local script_path=$2
     local lib_version=$3
-
     local lib_config_file="$CONFIGURE_FILE_PATH/$lib.yaml"
+    
     check_file_exists $lib_config_file
-
+    
     # Extract the script value using yq
     script=$(yq eval "${script_path} // \"\"" "$lib_config_file")
-
+    
     # Check if the script is empty, if it's not, then run it
     if [[ -n "$script" ]]; then
         # Create a temporary file for the script
         temp_script_file=$(mktemp /tmp/temp_script.XXXXXX)
-
+        
         # Write the script to the temporary file
         echo "$script" > "$temp_script_file"
-
-        replace_install_dir_vars $lib $temp_script_file $lib_version
-
+        
         # Make the temporary script executable
         chmod +x "$temp_script_file"
-
+        
+        # Export variables that the script needs
+        export lib="$lib"
+        export lib_version=$(eval echo "$lib_version")
+        export install_dir="${DOX_RESOURCES_DIR}/${lib}/${lib_version}"
+        
         # Execute the temporary script
         source $temp_script_file
+        
         if [[ $? -ne 0 ]]; then
             error "Script execution failed: $script_path"
             exit 1
         fi
         
+        # Clean up exported variables
+        unset lib lib_version install_dir
+        
         # Remove the temporary script file
         rm -f "$temp_script_file"
     fi
 }
+
 
 # Main execution logic
 if [ $# -eq 0 ]; then
