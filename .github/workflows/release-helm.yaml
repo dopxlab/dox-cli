@@ -24,7 +24,6 @@ jobs:
         run: |
           curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh && bash install.sh
           echo "$HOME/.dox/bin" >> $GITHUB_PATH
-          dox --version  # Verify that DOX CLI is now available
 
       # Step 3: DOX Action for helm build and push
       - name: dox-cli helm release
