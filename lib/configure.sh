@@ -115,12 +115,17 @@ function configure_env_variables() {
     # Check if the 'envs' section exists in the YAML for this library
     local envs=$(yq eval ".configuration.environments // []" "$CONFIGURE_FILE_PATH/$lib.yaml")
     
+    # Export variables that might be referenced in the YAML values
+    export lib="$lib"
+    export version="$version"
     export install_dir="${DOX_RESOURCES_DIR}/${lib}/${version}"
 
     # If 'envs' exists, process and set the environment variables
     if [ "$envs" != "[]" ]; then
         while IFS="=" read -r key value; do
-            evaluated_value=$(envsubst <<< "$value")
+            # Use eval to resolve variables in the value
+            evaluated_value=$(eval echo "$value")
+            
             if [ "$key" == "PATH" ]; then
                 create_symlinks_to_bin "$evaluated_value"
             else
@@ -128,6 +133,9 @@ function configure_env_variables() {
             fi
         done < <(echo "$envs" | yq eval '. | to_entries | .[] | "\(.key)=\(.value)"' -)
     fi
+    
+    # Clean up exported variables
+    unset lib version install_dir
     
     # Source environment for post_installation_scripts
     if [[ -f "$DOX_ENV" ]]; then
