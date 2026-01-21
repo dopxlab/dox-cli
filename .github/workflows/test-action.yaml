@@ -30,7 +30,7 @@ jobs:
       - name: Install DOX CLI
         run: |
           curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh && bash install.sh
-          cp $HOME/.dox/bin/* /usr/local/bin/
+          echo "$HOME/.dox/bin" >> $GITHUB_PATH
 
       # Step 2: Add the new path for DOX to the $PATH and verify the installation
       - name: Verify DOX CLI installation

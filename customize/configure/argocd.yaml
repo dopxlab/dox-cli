@@ -1,40 +1,31 @@
-# Installation and Configuration
 installation:
   download:
-    # Define version download paths # https://github.com/argoproj/argo-cd/blob/master/docs/cli_installation.md
-    3.0.0:
-      x86_64: "https://github.com/argoproj/argo-cd/releases/download/v3.0.0/argocd-linux-amd64"
-      arm64:  "https://github.com/argoproj/argo-cd/releases/download/v3.0.0/argocd-linux-arm64"
-    2.14.9:
-      x86_64: "https://github.com/argoproj/argo-cd/releases/download/v2.14.9/argocd-linux-amd64"
-      arm64:  "https://github.com/argoproj/argo-cd/releases/download/v2.14.9/argocd-linux-arm64"
-    2.13.6: 
-      x86_64: "https://github.com/argoproj/argo-cd/releases/download/v2.13.6/argocd-linux-amd64"
-      arm64:  "https://github.com/argoproj/argo-cd/releases/download/v2.13.6/argocd-linux-arm64"
-    2.12.11: 
-      x86_64: "https://github.com/argoproj/argo-cd/releases/download/v2.12.11/argocd-linux-amd64"
-      arm64:  "https://github.com/argoproj/argo-cd/releases/download/v2.12.11/argocd-linux-arm64"
-  
-  post_installation_script: |
-    #!/bin/bash
-    echo "Configuring argocd cli"
-    source_folder=${DOX_RESOURCES_DIR}/argocd/${ARGOCD_VERSION}
+    template: "https://github.com/argoproj/argo-cd/releases/download/{version}/argocd-{os}-{arch}"
+    mappings:
+      os:
+        mac: "darwin"
+      arch:
+        x86_64: "amd64"
+        aarch64: "arm64"
 
-    mv "$source_folder/"* "$source_folder/argocd"
-    chmod +x "$source_folder/argocd"
-   
-    create_symlinks_to_bin $source_folder
+    # Optional explicit override (higher priority)
+    #"2.11.0":
+    #  mac-arm64:   "https://github.com/argoproj/argo-cd/releases/download/v2.11.0/argocd-darwin-arm64"
+    #  mac-x86_64:  "https://github.com/argoproj/argo-cd/releases/download/v2.11.0/argocd-darwin-amd64"
+    #  linux-arm64: "https://github.com/argoproj/argo-cd/releases/download/v2.11.0/argocd-linux-arm64"
+    #  linux-x86_64:"https://github.com/argoproj/argo-cd/releases/download/v2.11.0/argocd-linux-amd64"
 
 configuration:
-  # Default versioning using an environment variable or fallback to version 
-  default_version: "${ARGOCD_VERSION:-3.0.0}"
+  default_version: "${ARGOCD_VERSION:-$(curl -s https://api.github.com/repos/argoproj/argo-cd/releases/latest | jq -r '.tag_name')}"
 
-  # Environment variable mappings for the installation paths
   environments:
     PATH: "${install_dir}"
 
-  # Print the installed version of the package
   post_configuration_script: |
-    # Print the installed version
-    argocd version
-    whereis argocd
+    #!/bin/bash
+    if [ -d "$install_dir" ] && compgen -G "$install_dir/*" > /dev/null; then
+      mv "$install_dir/"* "$install_dir/argocd"
+      chmod +x "$install_dir/argocd"
+    fi
+    create_symlinks_to_bin $install_dir
+    info "✓ $(argocd version --client)"

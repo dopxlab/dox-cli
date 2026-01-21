@@ -1,35 +1,25 @@
 # Installation and Configuration
 installation:
   download:
-    # Define JDK version download paths based on version # https://jdk.java.net/archive/
-    "8": "https://download.java.net/openjdk/jdk8u44/ri/openjdk-8u44-linux-x64.tar.gz"
-    "9": "https://download.java.net/java/GA/jdk9/9/binaries/openjdk-9_linux-x64_bin.tar.gz"
-    "10": "https://download.java.net/java/GA/jdk10/10/binaries/openjdk-10_linux-x64_bin.tar.gz"
-    "11": "https://download.java.net/java/ga/jdk11/openjdk-11_linux-x64_bin.tar.gz"
-    "12": "https://download.java.net/java/GA/jdk12/33/GPL/openjdk-12_linux-x64_bin.tar.gz"
-    "13": "https://download.java.net/java/GA/jdk13/5b8a42f3905b406298b72d750b6919f6/33/GPL/openjdk-13_linux-x64_bin.tar.gz"
-    "14": "https://download.java.net/java/GA/jdk14/076bab302c7b4508975440c56f6cc26a/36/GPL/openjdk-14_linux-x64_bin.tar.gz"
-    "15": "https://download.java.net/java/GA/jdk15/779bf45e88a44cbd9ea6621d33e33db1/36/GPL/openjdk-15_linux-x64_bin.tar.gz"
-    "16": "https://download.java.net/java/GA/jdk16/7863447f0ab643c585b9bdebf67c69db/36/GPL/openjdk-16_linux-x64_bin.tar.gz"
-    "17": "https://download.java.net/java/GA/jdk17/0d483333a00540d886896bac774ff48b/35/GPL/openjdk-17_linux-x64_bin.tar.gz"
-    "18": "https://download.java.net/java/GA/jdk18/43f95e8614114aeaa8e8a5fcf20a682d/36/GPL/openjdk-18_linux-x64_bin.tar.gz"
-    "19": "https://download.java.net/java/GA/jdk19/877d6127e982470ba2a7faa31cc93d04/36/GPL/openjdk-19_linux-x64_bin.tar.gz"
-    "20": "https://download.java.net/java/GA/jdk20/bdc68b4b9cbc4ebcb30745c85038d91d/36/GPL/openjdk-20_linux-x64_bin.tar.gz"
-    "21": "https://download.java.net/java/GA/jdk21/fd2272bbf8e04c3dbaee13770090416c/35/GPL/openjdk-21_linux-x64_bin.tar.gz"
-    "22": "https://download.java.net/java/GA/jdk22/830ec9fcccef480bb3e73fb7ecafe059/36/GPL/openjdk-22_linux-x64_bin.tar.gz"
-    "23": "https://download.java.net/java/GA/jdk23/3c5b90190c68498b986a97f276efd28a/37/GPL/openjdk-23_linux-x64_bin.tar.gz"
-    "24": "https://download.java.net/java/GA/jdk24/1f9ff9062db4449d8ca828c504ffae90/36/GPL/openjdk-24_linux-x64_bin.tar.gz"
-
+    template: |
+      curl -s 'https://api.azul.com/metadata/v1/zulu/packages/?java_version={version}&os={os}&arch={arch}&java_package_type=jdk&availability_types=ca&latest=true' | jq -r '.[] | select(.download_url | endswith(".tar.gz")) | .download_url' | head -n 1
+    
+    mappings:
+      os:
+        mac: "macos"
+        linux: "linux"
+      arch:
+        x86_64: "x86"
+        aarch64: "arm"
 
   post_installation_script: |
     #!/bin/bash
     echo "install custom certificates"
     echo "JDK installed in ${install_dir}"
 
-
 configuration:
-  # Default JDK versioning using an environment variable or fallback to version 17
-  default_version: "${JDK_VERSION:-24}"
+  # Default JDK versioning using an environment variable or fallback to latest e.g. 25
+  default_version: "${JDK_VERSION:-$(curl -s 'https://api.azul.com/metadata/v1/zulu/packages/?java_package_type=jdk&availability_types=ca&latest=true' | jq -r '.[0].java_version[0]')}"
 
   # Environment variable mappings for installation paths
   environments:
@@ -38,6 +28,5 @@ configuration:
 
   # Print the installed version of the package
   post_configuration_script: |
-    # Print the installed Java version
-    java -version
-    whereis java
+    info "✓ JAVA_HOME: ${install_dir}"
+    info "✓ Java version: $(java -version 2>&1 | head -n 1)"

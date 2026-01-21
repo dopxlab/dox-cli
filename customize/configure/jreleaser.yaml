@@ -1,0 +1,27 @@
+installation:
+  download:
+    template: "https://github.com/jreleaser/jreleaser/releases/download/v{version}/jreleaser-standalone-{version}-{os}-{arch}.zip"
+
+    mappings:
+      os:
+        mac: "osx"
+        linux: "linux"
+
+      arch:
+        x86_64: "x86_64"
+        arm64: "aarch64"
+
+  # Optional checksum validation support
+  checksum:
+    template: "https://github.com/jreleaser/jreleaser/releases/download/{version}/checksums_sha256.txt"
+
+configuration:
+  # Get latest tag like: 1.22.0
+  default_version: "${JRELEASER_VERSION:-$(curl -s https://api.github.com/repos/jreleaser/jreleaser/releases/latest | jq -r '.tag_name' | sed 's/v//')}"
+
+  environments:
+    PATH: "${install_dir}/bin"
+
+  post_configuration_script: |
+    info "✓ JReleaser Installation: ${install_dir}"
+    info "$(jreleaser --version)"

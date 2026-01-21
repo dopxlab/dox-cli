@@ -12,80 +12,22 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      # Step 0: Ensure required utilities are installed
-#      - name: Ensure tar and unzip are available
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get install -y tar unzip
+      # Step 0: Checkout repo to access files
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       # Step 1: Download and run the installation script
       - name: Install DOX CLI
         run: |
           curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh && bash install.sh
+          echo "$HOME/.dox/bin" >> $GITHUB_PATH
 
       # Step 2: Add the new path for DOX to the $PATH and verify the installation
       - name: Verify DOX CLI installation
         run: |
-          cp $HOME/.dox/bin/* /usr/local/bin/
           dox --version  # Verify that DOX CLI is now available
 
-      # Step 3: Run DOX configure command to test functionality (Ensuring angular and manodeven are installed)
-      - name: dox configure angular +node
+      # Step 3: Run DOX configure command
+      - name: dox build
         run: |
-          dox configure angular
-
-      # Step 4: Run DOX configure command to test functionality (Ensuring helm installed)
-      - name: dox configure helm
-        run: |
-          dox configure helm
-
-      # Step 5: Run DOX configure command to test functionality (Ensuring java and maven are installed)
-      - name: dox configure maven +jdk
-        run: |
-          dox configure maven
-
-      # Step 6: Run DOX configure command to test functionality (Ensuring sonar-scanner installed)
-      - name: dox configure sonar-scanner
-        run: |
-          dox configure sonar-scanner
-
-      # Step 7: Run DOX configure command to test functionality (Ensuring java and maven are installed)
-      - name: dox configure syft
-        run: |
-          dox configure syft
-
-      # Step 8: Run DOX configure command to test functionality (Ensuring terraform installed)
-      - name: dox configure terraform
-        run: |
-          dox configure terraform
-
-      # Step 9: Run DOX configure command to test functionality (Ensuring yarn and node are installed)
-      - name: dox configure yarn +node
-        run: |
-          dox configure yarn
-
-      # Step 10: Run DOX configure command to test functionality (Ensuring docker installed)
-      - name: dox configure docker
-        run: |
-          dox configure docker
-
-      # Step 11: Run DOX configure command to test functionality (Ensuring kubectl installed)
-      - name: dox configure kubectl
-        run: |
-          dox configure kubectl
-
-      # Step 12: Run DOX configure command to test functionality (Ensuring argocd installed)
-      - name: dox configure argocd
-        run: |
-          dox configure argocd
-
-      # Step 13: Run DOX configure command to test functionality (Ensuring trivy installed)
-      - name: dox configure trivy
-        run: |
-          dox configure trivy
-
-      # Step 14: Run DOX configure command to test functionality (Ensuring aws installed)
-      - name: dox configure aws
-        run: |
-          dox configure aws
-          
+          dox config -f test/tools.yaml

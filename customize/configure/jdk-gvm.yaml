@@ -1,0 +1,36 @@
+installation:
+  download:
+    template: "https://github.com/graalvm/graalvm-ce-builds/releases/download/{version}/graalvm-community-{version}_{os}-{arch}_bin.tar.gz"
+    mappings:
+      os:
+        linux: "linux"
+        mac: "macos"
+      arch:
+        x86_64: "x64"
+        amd64: "x64"
+        arm64: "aarch64"
+        aarch64: "aarch64"
+
+  post_installation_script: |
+    #!/bin/bash
+    # Move Contents/Home to install_dir if macOS
+    if [[ "$OSTYPE" == "darwin"* ]] || [[ "$(uname -s)" == "Darwin" ]]; then
+      if [ -d "${install_dir}/Contents/Home" ]; then
+        mv "${install_dir}/Contents/Home"/* "${install_dir}/"
+        rm -rf "${install_dir}/Contents"
+        info "✓ Moved Contents/Home to ${install_dir}"
+      fi
+    fi
+
+configuration:
+  default_version: "${JDK_VERSION_GVM:-$(curl -s https://api.github.com/repos/graalvm/graalvm-ce-builds/releases/latest | jq -r '.tag_name')}"
+
+  environments:
+    JAVA_HOME: "${install_dir}"
+    GRAALVM_HOME: "${install_dir}"
+    PATH: "${install_dir}/bin"
+
+  post_configuration_script: |
+    info "✓ JAVA_HOME: ${install_dir}"
+    info "✓ GRAALVM_HOME: ${install_dir}"
+    info "✓ Java version: $(java -version 2>&1 | head -n 1)"
