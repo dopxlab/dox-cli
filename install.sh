@@ -145,6 +145,7 @@ echo ""
 echo "Current PATH: $PATH"
 echo ""
 echo "Testing DOX CLI..." 
+source $SHELL_CONFIG
 dox --version
 
 echo ""
