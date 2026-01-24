@@ -4,10 +4,9 @@
 export DOX_DIR="${DOX_DIR:-$HOME/.dox}"
 export DOX_CUSTOM_DIR="${DOX_CUSTOM_DIR:-$DOX_DIR/customize}"
 export DOX_RESOURCES_DIR="${DOX_RESOURCES_DIR:-$HOME/dox_resources}"
-export DOX_USER_BIN="${DOX_USER_BIN:-${DOX_DIR}/bin}"
-export DOX_ENV="dox_env"
+#export DOX_USER_BIN="${DOX_USER_BIN:-${DOX_DIR}/bin}"
 
-source ${DOX_DIR}/lib/shared/env_handler.sh
+#source ${DOX_DIR}/lib/shared/env_handler.sh
 source ${DOX_DIR}/lib/shared/print.sh
 source ${DOX_DIR}/lib/shared/url_resolver.sh
 source ${DOX_DIR}/lib/shared/version_handler.sh
@@ -112,78 +111,90 @@ function configure_env_variables() {
     local version=$2
     local install_dir=$3
 
-    # Check if the 'envs' section exists in the YAML for this library
+    # Check if the 'envs' section exists
     local envs=$(yq eval ".configuration.environments // []" "$CONFIGURE_FILE_PATH/$lib.yaml")
     
-    # Export variables that might be referenced in the YAML values
+    # Export variables for YAML evaluation
     export lib="$lib"
     export version="$version"
     export install_dir="${DOX_RESOURCES_DIR}/${lib}/${version}"
 
-    # If 'envs' exists, process and set the environment variables
+    # If environments exist, process them
     if [ "$envs" != "[]" ]; then
         while IFS="=" read -r key value; do
-            # Use eval to resolve variables in the value
+            # Evaluate variables in the value
             evaluated_value=$(eval echo "$value")
             
+            # ✅ CHANGE: Handle PATH specially, no symlinks
             if [ "$key" == "PATH" ]; then
-                create_symlinks_to_bin "$evaluated_value"
+                # Prepend to existing PATH
+                local new_path="${evaluated_value}:${PATH}"
+                update_dox_env "PATH" "$new_path"
+                export PATH="$new_path"
+                info "✅ Added to PATH: $evaluated_value"
             else
+                # Regular environment variable
                 update_dox_env "$key" "$evaluated_value"
+                export "$key=$evaluated_value"
+                info "✅ Set $key=$evaluated_value"
             fi
         done < <(echo "$envs" | yq eval '. | to_entries | .[] | "\(.key)=\(.value)"' -)
     fi
     
-    # Clean up exported variables
+    # Clean up
     unset lib version install_dir
     
-    # Source environment for post_installation_scripts
+    # Source environment for post scripts
     if [[ -f "$DOX_ENV" ]]; then
         source "$DOX_ENV"
     fi
 }
 
-function create_symlinks_to_bin() {
-    local source_folder="$1"
-    local bin_folder="${DOX_USER_BIN}"
+function update_dox_env() {
+  local key="$1"
+  local value="$2"
+  local file="${DOX_ENV}"
 
-    info "✓ Creating System Links from : $source_folder to bin: $bin_folder" >&2
+  # Create file if it doesn't exist
+  if [ ! -f "$file" ]; then
+    touch "$file"
+    echo "#!/bin/bash" > "$file"
+    echo "# DOX Environment Variables" >> "$file"
+    echo "# Source this file: source ./dox_env" >> "$file"
+    echo "" >> "$file"
+  fi
 
-    if [ ! -d "$source_folder" ]; then
-        error "Source folder '$source_folder' does not exist."
-        return 1
-    fi
+  # Remove existing key (if exists)
+  grep -v "^export $key=" "$file" > "${file}.tmp" 2>/dev/null || touch "${file}.tmp"
+  
+  # Preserve the header
+  if grep -q "^#!/bin/bash" "$file"; then
+    head -4 "$file" > "${file}.header"
+    grep -v "^#!/bin/bash" "${file}.tmp" | grep -v "^# DOX" | grep -v "^# Source" > "${file}.body"
+    cat "${file}.header" "${file}.body" > "${file}.tmp"
+    rm -f "${file}.header" "${file}.body"
+  fi
+  
+  # Add updated key=value with export
+  echo "export $key=\"$value\"" >> "${file}.tmp"
 
-    # Ensure bin folder exists
-    if [ ! -d "$bin_folder" ]; then
-        mkdir -p "$bin_folder" || {
-            error "Failed to create bin folder: $bin_folder"
-            exit 1
-        }
-    fi
-
-    for file in "$source_folder"/*; do
-        if [ -f "$file" ]; then
-            filename=$(basename "$file")
-            
-            # Skip non-executable or irrelevant files
-            case "$filename" in
-                *.txt|*.md|README|LICENSE) continue ;;
-            esac
-
-            if [[ -x "$file" ]]; then
-                ln -sf "$file" "$bin_folder/$filename"
-                info "✓ Linked $filename"
-            fi
-        fi
-    done
+  # Replace original file
+  mv "${file}.tmp" "$file"
+  chmod +x "$file"
 }
 
 function download_and_extract() {
     local lib_url=$1
     local install_dir=$2
+    local rename=$3
     local temp_file=$(mktemp)
-    local filename=$(basename "$lib_url")
+
+    local filename="${rename:-$(basename "$lib_url")}"
+
+    # Apply rename-pattern if specified (regex replacement on filename)
+    if [[ -n "$rename" ]]; then
+        info "✓ Renamed downloaded file to: $filename"
+    fi
 
     # Create target directory
     mkdir -p "$install_dir"
@@ -324,7 +335,9 @@ function configure() {
         if [ ! -d "$install_dir" ] || [ -z "$(ls -A "$install_dir")" ]; then
             rm -rf "$install_dir"
             #info "✓ Found default URL: $installation_url" >&2
-            download_and_extract "$installation_url" "$install_dir"
+            local rename=$(yq eval ".installation.download.rename // \"\"" "$lib_config_file")
+
+            download_and_extract "$installation_url" "$install_dir" "$rename"
             run_installation_script "$lib" ".installation.post_installation_script" $lib_version
         else
             info "✓ Already installed: $lib $lib_version"

@@ -1,0 +1,34 @@
+# Installation and Configuration
+installation:
+  # Docker is already installed as a dependency
+  dependencies:
+    - docker
+  
+  # Buildx plugin download
+  download:
+    template: "https://github.com/docker/buildx/releases/download/v{version}/buildx-v{version}.{os}-{arch}"
+    rename: "docker-buildx"  # renaming download filename to docker-buildx
+    mappings:
+      os:
+        mac: "darwin"
+        linux: "linux"
+      arch:
+        x86_64: "amd64"
+        arm64: "arm64"
+  post_installation_script: |
+    mkdir -p "${install_dir}/config/cli-plugins"
+    mv "${install_dir}/"docker-buildx "${install_dir}/config/cli-plugins/docker-buildx" 2>/dev/null
+    chmod +x "${install_dir}/config/cli-plugins/docker-buildx"
+configuration:
+  # Default version - fetches latest buildx release
+  default_version: "${DOCKER_BUILDX_VERSION:-$(curl -s https://api.github.com/repos/docker/buildx/releases/latest | jq -r '.tag_name' | sed 's/^v//')}"
+  
+  # Environment variable mappings for the installation paths
+  environments:
+    PATH: "${install_dir}/config/cli-plugins/"
+    DOCKER_CONFIG: "${install_dir}/config"
+  
+  # Install buildx as Docker CLI plugin and verify
+  post_configuration_script: |
+    # Print the installed version
+    info "✓ $(docker buildx version)"

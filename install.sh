@@ -59,6 +59,9 @@ curl -LO $DOX_RELEASE_URL && tar -xzf dox-cli.tar.gz -C "$DOX_DIR" && rm -f dox-
 echo "The DOX CLI version is: $DOX_CLI_VERSION"
 echo "$DOX_CLI_VERSION" > "$DOX_DIR/version.txt"
 
+# Rename the actual dox binary to dox-bin
+mv "$DOX_USER_BIN/dox" "$DOX_USER_BIN/dox-bin" 2>/dev/null || true
+
 # Set permissions for DOX directories
 chmod -R 755 "$DOX_DIR"
 chmod -R 777 "$DOX_RESOURCES_DIR"  # Allow all users to write to resources directory
@@ -84,15 +87,42 @@ fi
 
 echo "Detected shell config: $SHELL_CONFIG"
 
-# Append the bin directory to PATH in shell config if it's not already present
-if ! grep -q "$DOX_USER_BIN" "$SHELL_CONFIG" 2>/dev/null; then
+# Create the DOX wrapper function content
+DOX_WRAPPER='
+# DOX CLI - Added by installer
+export DOX_DIR="$HOME/.dox"
+export DOX_USER_BIN="${DOX_DIR}/bin"
+export DOX_RESOURCES_DIR="${DOX_RESOURCES_DIR:-$HOME/dox_resources}"
+export PATH="${DOX_USER_BIN}:$PATH"
+
+# DOX wrapper function that auto-loads environment after configure
+dox() {
+  # Define the env file path
+  local DOX_ENV="${DOX_DIR}/dox_env"
+  
+  # Run the actual dox-bin command
+  command "${DOX_USER_BIN}/dox-bin" "$@"
+  local exit_code=$?
+  
+  # If the command was successful and it was a configure action, source the env file
+  if [[ $exit_code -eq 0 ]]; then
+    if [[ "$1" == "config" || "$1" == "configure" ]]; then
+      if [[ -f "$DOX_ENV" ]]; then
+        source "$DOX_ENV"
+        echo "✓ Environment variables loaded into current shell"
+      fi
+    fi
+  fi
+  
+  return $exit_code
+}
+'
+
+# Append to shell config if not already present
+if ! grep -q "# DOX CLI - Added by installer" "$SHELL_CONFIG" 2>/dev/null; then
   echo "" >> "$SHELL_CONFIG"
-  echo "# DOX CLI - Added by installer" >> "$SHELL_CONFIG"
-  echo "export DOX_DIR=\"\$HOME/.dox\"" >> "$SHELL_CONFIG"
-  echo "export DOX_USER_BIN=\"\${DOX_DIR}/bin\"" >> "$SHELL_CONFIG"
-  echo "export DOX_RESOURCES_DIR=\"\${DOX_RESOURCES_DIR:-\$HOME/dox_resources}\"" >> "$SHELL_CONFIG"
-  echo "export PATH=\"\${DOX_USER_BIN}:\$PATH\"" >> "$SHELL_CONFIG"
-  echo "✅ Added DOX environment variables to $SHELL_CONFIG"
+  echo "$DOX_WRAPPER" >> "$SHELL_CONFIG"
+  echo "✅ Added DOX wrapper function to $SHELL_CONFIG"
 else
   echo "ℹ️  DOX already configured in $SHELL_CONFIG"
 fi
@@ -120,9 +150,8 @@ echo "Detected platform: $OS_TYPE-$ARCH"
 
 # Check if yq is installed, if not, install it
 if ! command -v yq &>/dev/null; then
-  YQ_VERSION="v4.45.1"
   YQ_BINARY="yq_${OS_TYPE}_${ARCH}"
-  YQ_URL="https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/${YQ_BINARY}.tar.gz"
+  YQ_URL="https://github.com/mikefarah/yq/releases/latest/download/${YQ_BINARY}.tar.gz"
   
   echo "Installing yq from: $YQ_URL"
   curl -sL "$YQ_URL" -o yq.tar.gz
@@ -137,15 +166,13 @@ fi
 
 echo "✅ DOX CLI installed successfully!"
 
-# Export path for current session
+# Export path and load wrapper for current session
 export PATH="$DOX_USER_BIN:$PATH"
+source "$SHELL_CONFIG"
 
 # Test if DOX CLI is working
 echo ""
-echo "Current PATH: $PATH"
-echo ""
 echo "Testing DOX CLI..." 
-source $SHELL_CONFIG
 dox --version
 
 echo ""
@@ -153,8 +180,15 @@ echo "================================================"
 echo "Installation complete! 🎉"
 echo "================================================"
 echo ""
+echo "DOX is ready to use! The wrapper function automatically"
+echo "loads environment variables after 'dox config' commands."
+echo ""
 echo "To use DOX in the current session, run:"
 echo "  source $SHELL_CONFIG"
 echo ""
 echo "Or start a new terminal session."
+echo ""
+echo "Example usage:"
+echo "  dox config docker-buildx"
+echo "  echo \$DOCKER_CONFIG  # Variables auto-loaded!"
 echo "================================================"

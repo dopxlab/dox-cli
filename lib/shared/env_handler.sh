@@ -1,60 +1,77 @@
 #!/usr/bin/env bash
 
-# Define the environment file where environment variables will be stored
-DOX_ENV="dox_env"  # This is the environment file
-BEFORE_FILE="env_before.txt"
-AFTER_FILE="env_after.txt"
+# ✅ CHANGE: DOX_ENV is now in current directory
+DOX_ENV="${DOX_ENV:-${PWD}/dox_env}"
 
-# Export DOX_ENV variable (this will be part of the environment)
-export DOX_ENV="dox_env"
+# Use current directory for temporary files
+DOX_ENV_DIR="$(dirname "$DOX_ENV")"
+BEFORE_FILE="${DOX_ENV_DIR}/.env_before.txt"
+AFTER_FILE="${DOX_ENV_DIR}/.env_after.txt"
 
-# Function to capture environment variables and save them to a file
-capture_env() {
-    local env_file="$1"
-    env > "$env_file"
-}
+# ... keep capture_env function as-is ...
 
-# Function to extract newly added environment variables from the diff
+# ✅ UPDATE: extract_added_vars function
 extract_added_vars() {
     local before="$1"
     local after="$2"
     
-    # Use diff and grep to capture only the added environment variables
-    diff "$before" "$after" | grep "^>" | sed 's/^> //' >> "$DOX_ENV"
+    # Create header if file doesn't exist
+    if [ ! -f "$DOX_ENV" ]; then
+        echo "#!/bin/bash" > "$DOX_ENV"
+        echo "# DOX Environment Variables" >> "$DOX_ENV"
+        echo "# Source this file: source ./dox_env" >> "$DOX_ENV"
+        echo "" >> "$DOX_ENV"
+    fi
+    
+    # Add new variables with export
+    diff "$before" "$after" | grep "^>" | sed 's/^> /export /' >> "$DOX_ENV"
 }
 
-# Function to remove duplicates and update the DOX_ENV file with the latest values
+# ✅ UPDATE: update_env_file function
 update_env_file() {
-    # Create a temporary file to store the updated environment variables
     local temp_env_file=$(mktemp)
 
-    # Iterate through the DOX_ENV file and update or append the variables
+    # Preserve header
+    if [ -f "$DOX_ENV" ]; then
+        head -4 "$DOX_ENV" > "$temp_env_file"
+    fi
+
+    # Process variables
     while IFS='=' read -r key value; do
-        # If the key is already in the current environment, use the latest value
+        # Skip header lines
+        [[ "$key" =~ ^# ]] && continue
+        [[ "$key" =~ ^#!/ ]] && continue
+        
+        # Strip 'export ' prefix if present
+        key="${key#export }"
+        key="${key## }"  # Trim leading spaces
+        
+        # Skip empty keys
+        [ -z "$key" ] && continue
+        
+        # Get current value
         eval "current_value=\$$key"
 
         if [[ -n "$current_value" ]]; then
-            #IMPORTANT - to fix with spaced names "John Rambo" needs to be in double quotes
+            # Quote non-numeric values
             if [[ ! "$current_value" =~ ^-?[0-9]+(\.[0-9]+)?$ && ! "$current_value" =~ ^\".*\"$ ]]; then
                 current_value="\"$current_value\""
             fi
-            # Update the variable with the latest value
-            echo "$key=$current_value" >> "$temp_env_file"
+            echo "export $key=$current_value" >> "$temp_env_file"
         else
-            #IMPORTANT - to fix with spaced names "John Rambo" needs to be in double quotes
+            # Use last known value
             if [[ ! "$value" =~ ^-?[0-9]+(\.[0-9]+)?$ && ! "$value" =~ ^\".*\"$ ]]; then
                 value="\"$value\""
             fi
-            # If the variable doesn't exist, append it with the last known value from DOX_ENV
-            echo "$key=$value" >> "$temp_env_file"
+            echo "export $key=$value" >> "$temp_env_file"
         fi
-    done < "$DOX_ENV"
+    done < <(grep "^export" "$DOX_ENV" 2>/dev/null)
 
-    # Sort and remove duplicate entries
-    sort "$temp_env_file" | uniq > "$DOX_ENV"
+    # Sort and remove duplicates (keep header at top)
+    (head -4 "$temp_env_file"; tail -n +5 "$temp_env_file" | sort | uniq) > "$DOX_ENV"
 
-    # Clean up the temporary file
     rm -f "$temp_env_file"
+    chmod +x "$DOX_ENV"
 }
 
 # Step 1: Before execution
@@ -84,20 +101,4 @@ function on_after_execution() {
     rm -f "$BEFORE_FILE" "$AFTER_FILE"
 }
 
-function update_dox_env() {
-  local key="$1"
-  local value="$2"
-  local file="${DOX_ENV}"
 
-  # Create file if it doesn't exist
-  [ -f "$file" ] || touch "$file"
-
-  # Remove existing key (if exists)
-  grep -v "^$key=" "$file" > "${file}.tmp"
-  
-  # Add updated key=value
-  echo "$key=\"$value\"" >> "${file}.tmp"
-
-  # Replace original file
-  mv "${file}.tmp" "$file"
-}

@@ -73,7 +73,10 @@ export DOX_DIR="${DOX_DIR:-$HOME/.dox}"
 export DOX_CLI_VERSION=$(cat "$DOX_DIR/version.txt" 2>/dev/null || echo "v0.1.0")
 export DOX_CUSTOM_DIR="${DOX_CUSTOM_DIR:-$DOX_DIR/customize}"
 export DOX_RESOURCES_DIR="${DOX_RESOURCES_DIR:-$HOME/dox_resources}"
-export DOX_ENV="dox_env"
+
+# Set DOX_ENV to absolute path in DOX_DIR
+# This ensures all scripts use the same env file location
+export DOX_ENV="${PWD}/dox_env"
 
 source ${DOX_DIR}/lib/shared/print.sh
 source ${DOX_DIR}/lib/shared/env_handler.sh
@@ -125,13 +128,23 @@ case "$action" in
   configure | config)
     # For 'configure' action, handle new options
     ${DOX_DIR}/lib/configure.sh "${action_values[@]}"
+    # ✅ Source in current shell
+    if [[ -f "$DOX_ENV" ]]; then
+      source "$DOX_ENV"
+      echo ""
+      echo "✅ Environment loaded. Variables are now available in this shell."
+      echo "   To use in new shells, run: source ./dox_env"
+    fi
     ;;
   
   *)
     # For any other action, call the action.sh script
     validate_args 1 -1 ${#action_values[@]} || exit 1
-    # Capture the environment before the action
     source ${DOX_DIR}/lib/action.sh "$action" "${action_values[@]}"
+    # ✅ Source in current shell
+    if [[ -f "$DOX_ENV" ]]; then
+      source "$DOX_ENV"
+    fi
     ;;
 esac
 
