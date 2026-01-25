@@ -164,16 +164,49 @@ function update_dox_env() {
     echo "" >> "$file"
   fi
 
+  # ✅ Special handling for PATH - avoid duplicates
+  if [ "$key" == "PATH" ]; then
+    # Extract the new path component (before the first colon)
+    local new_path_component="${value%%:*}"
+    
+    # Check if this path is already in the file
+    if grep -q "export PATH=.*${new_path_component}" "$file" 2>/dev/null; then
+      info "ℹ️  PATH already contains: $new_path_component (skipping)"
+      return 0
+    fi
+    
+    # Check if PATH variable exists in file
+    if grep -q "^export PATH=" "$file" 2>/dev/null; then
+      # Update existing PATH by prepending new component
+      local existing_path=$(grep "^export PATH=" "$file" | head -1 | sed 's/^export PATH="//' | sed 's/"$//')
+      local updated_path="${new_path_component}:${existing_path}"
+      
+      # Remove old PATH lines
+      grep -v "^export PATH=" "$file" > "${file}.tmp" 2>/dev/null || touch "${file}.tmp"
+      
+      # Add updated PATH
+      echo "export PATH=\"${updated_path}\"" >> "${file}.tmp"
+      
+      mv "${file}.tmp" "$file"
+      info "✅ Updated PATH with: $new_path_component"
+      return 0
+    fi
+  fi
+
+  # ✅ For non-PATH variables: check if already exists with same value
+  if grep -q "^export ${key}=" "$file" 2>/dev/null; then
+    local existing_value=$(grep "^export ${key}=" "$file" | head -1 | sed "s/^export ${key}=//" | tr -d '"')
+    
+    if [ "$existing_value" == "$value" ]; then
+      info "ℹ️  $key already set to: $value (skipping)"
+      return 0
+    else
+      info "🔄 Updating $key: $existing_value → $value"
+    fi
+  fi
+
   # Remove existing key (if exists)
   grep -v "^export $key=" "$file" > "${file}.tmp" 2>/dev/null || touch "${file}.tmp"
-  
-  # Preserve the header
-  if grep -q "^#!/bin/bash" "$file"; then
-    head -4 "$file" > "${file}.header"
-    grep -v "^#!/bin/bash" "${file}.tmp" | grep -v "^# DOX" | grep -v "^# Source" > "${file}.body"
-    cat "${file}.header" "${file}.body" > "${file}.tmp"
-    rm -f "${file}.header" "${file}.body"
-  fi
   
   # Add updated key=value with export
   echo "export $key=\"$value\"" >> "${file}.tmp"
@@ -315,6 +348,10 @@ function configure() {
 
     # Retrieve the default version of the library (already evaluated)
     local lib_version=$(get_default_version "$lib")
+
+    # Update DOX_ENV with the version variable
+    local get_default_version_key=$(get_default_version_key "$lib")
+    update_dox_env $get_default_version_key "$lib_version"
 
     local installation_url=$(get_installation_url "$lib_version" "$lib_config_file")
 
