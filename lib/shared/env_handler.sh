@@ -8,7 +8,11 @@ DOX_ENV_DIR="$(dirname "$DOX_ENV")"
 BEFORE_FILE="${DOX_ENV_DIR}/.env_before.txt"
 AFTER_FILE="${DOX_ENV_DIR}/.env_after.txt"
 
-# ... keep capture_env function as-is ...
+# Function to capture environment variables and save them to a file
+capture_env() {
+    local env_file="$1"
+    env > "$env_file"
+}
 
 # ✅ UPDATE: extract_added_vars function
 extract_added_vars() {

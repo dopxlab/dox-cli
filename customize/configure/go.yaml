@@ -18,6 +18,6 @@ configuration:
     PATH: "${install_dir}/bin"
 
   post_configuration_script: |
-    info "✓ Go version: $($install_dir/bin/go version)"
-    info "✓ GOROOT: $install_dir"
-    info "✓ GOPATH: $HOME"
+    version "Go" "$(go version)"
+    version "GOROOT" "$install_dir"
+    version "GOPATH" "$HOME"

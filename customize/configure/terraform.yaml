@@ -18,5 +18,5 @@ configuration:
     PATH: "${install_dir}"
 
   post_configuration_script: |
-    info "✓ TERRAFORM_HOME: ${install_dir}"
-    info "✓ Terraform version: $(terraform version | head -n 1)"
+    version "TERRAFORM_HOME" "${install_dir}"
+    version "Terraform version" "$(terraform version | head -n 1)"

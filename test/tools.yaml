@@ -1,6 +1,7 @@
 angular:
 argocd:
 docker:
+docker-buildx:
 go:
 gradle:
 grype:

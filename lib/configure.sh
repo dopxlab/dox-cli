@@ -4,9 +4,7 @@
 export DOX_DIR="${DOX_DIR:-$HOME/.dox}"
 export DOX_CUSTOM_DIR="${DOX_CUSTOM_DIR:-$DOX_DIR/customize}"
 export DOX_RESOURCES_DIR="${DOX_RESOURCES_DIR:-$HOME/dox_resources}"
-#export DOX_USER_BIN="${DOX_USER_BIN:-${DOX_DIR}/bin}"
 
-#source ${DOX_DIR}/lib/shared/env_handler.sh
 source ${DOX_DIR}/lib/shared/print.sh
 source ${DOX_DIR}/lib/shared/url_resolver.sh
 source ${DOX_DIR}/lib/shared/version_handler.sh
@@ -68,7 +66,7 @@ function configure_from_file() {
         exit 1
     fi
     
-    info "📄 Reading configuration from: $config_file"
+    info "📄 Configuring from: $config_file"
     echo ""
     
     # Read the YAML file and extract tool configurations
@@ -82,28 +80,20 @@ function configure_from_file() {
     # Process each tool
     while IFS= read -r tool; do
         local version=$(yq eval ".$tool.version" "$config_file")
-        
         local variable_name=$(get_default_version_key "$tool")
 
         if [ -n "$version" ] && [ "$version" != "null" ] && [ -n "$variable_name" ] && [ "$variable_name" != "null" ]; then
-            info "Configuring $tool with $variable_name=$version"
-            
             # Export the version variable temporarily for this configuration
             export "$variable_name=$version"
-            
-            # Call configure for this tool
             configure "$tool"
-            
-            # Unset the variable after configuration
             unset "$variable_name"
         else
             configure "$tool"
-            #info "✓ Using default/latest version for $tool (no version override specified)"
-            #echo ""
         fi
     done <<< "$tools"
     
-    info "✓ Configuration from file completed"
+    echo ""
+    info "✓ Configuration complete"
 }
 
 function configure_env_variables() {
@@ -125,18 +115,17 @@ function configure_env_variables() {
             # Evaluate variables in the value
             evaluated_value=$(eval echo "$value")
             
-            # ✅ CHANGE: Handle PATH specially, no symlinks
             if [ "$key" == "PATH" ]; then
                 # Prepend to existing PATH
                 local new_path="${evaluated_value}:${PATH}"
                 update_dox_env "PATH" "$new_path"
                 export PATH="$new_path"
-                info "✅ Added to PATH: $evaluated_value"
+                debug "PATH updated: $evaluated_value"
             else
                 # Regular environment variable
                 update_dox_env "$key" "$evaluated_value"
                 export "$key=$evaluated_value"
-                info "✅ Set $key=$evaluated_value"
+                debug "$key set: $evaluated_value"
             fi
         done < <(echo "$envs" | yq eval '. | to_entries | .[] | "\(.key)=\(.value)"' -)
     fi
@@ -164,14 +153,14 @@ function update_dox_env() {
     echo "" >> "$file"
   fi
 
-  # ✅ Special handling for PATH - avoid duplicates
+  # Special handling for PATH - avoid duplicates
   if [ "$key" == "PATH" ]; then
     # Extract the new path component (before the first colon)
     local new_path_component="${value%%:*}"
     
     # Check if this path is already in the file
     if grep -q "export PATH=.*${new_path_component}" "$file" 2>/dev/null; then
-      info "ℹ️  PATH already contains: $new_path_component (skipping)"
+      debug "PATH already contains: $new_path_component"
       return 0
     fi
     
@@ -188,20 +177,20 @@ function update_dox_env() {
       echo "export PATH=\"${updated_path}\"" >> "${file}.tmp"
       
       mv "${file}.tmp" "$file"
-      info "✅ Updated PATH with: $new_path_component"
+      debug "PATH updated with: $new_path_component"
       return 0
     fi
   fi
 
-  # ✅ For non-PATH variables: check if already exists with same value
+  # For non-PATH variables: check if already exists with same value
   if grep -q "^export ${key}=" "$file" 2>/dev/null; then
     local existing_value=$(grep "^export ${key}=" "$file" | head -1 | sed "s/^export ${key}=//" | tr -d '"')
     
     if [ "$existing_value" == "$value" ]; then
-      info "ℹ️  $key already set to: $value (skipping)"
+      debug "$key already set: $value"
       return 0
     else
-      info "🔄 Updating $key: $existing_value → $value"
+      debug "Updating $key: $existing_value → $value"
     fi
   fi
 
@@ -220,20 +209,16 @@ function download_and_extract() {
     local lib_url=$1
     local install_dir=$2
     local rename=$3
+    local make_executable=$4
     local temp_file=$(mktemp)
 
     local filename="${rename:-$(basename "$lib_url")}"
-
-    # Apply rename-pattern if specified (regex replacement on filename)
-    if [[ -n "$rename" ]]; then
-        info "✓ Renamed downloaded file to: $filename"
-    fi
 
     # Create target directory
     mkdir -p "$install_dir"
 
     # Download the file
-    info "⬇ Downloading $filename..."
+    info "⬇ Downloading $filename from $lib_url"
     download_tool_to_configure "$lib_url" "$temp_file"
 
     # Get file size and print it
@@ -241,7 +226,7 @@ function download_and_extract() {
 
     # Check if downloaded file is empty
     if [[ $file_size -lt 1024 ]]; then
-        error "✖ Empty file downloaded, please check the URL: $lib_url" >&2
+        error "Download failed: $lib_url" >&2
         rm -f "$temp_file"
         exit 1
     fi
@@ -253,7 +238,14 @@ function download_and_extract() {
     if [[ "$filename" == "$extension" ]]; then
         # No extension, assume it's a regular file and copy
         mv "$temp_file" "$install_dir/$filename"
-        info "✓ Download complete"
+
+        # If make_executable is true, set executable permission
+        if [[ "$make_executable" == "true"  ]]; then
+            info "⚙ Making $filename executable"
+            chmod +x "${install_dir}/${filename}"
+        fi
+
+        debug "Download complete: $filename"
     else
         # File has an extension, extract accordingly
         case "$extension" in
@@ -272,7 +264,7 @@ function download_and_extract() {
                 return 1
                 ;;
         esac
-        info "✓ Extraction complete"
+        debug "Extraction complete: $filename"
     fi
 
     # Clean up temp file if it still exists
@@ -320,7 +312,7 @@ function install_dependencies() {
         cleaned_dependencies=$(echo $dependencies | tr -d '[]" ')
         for dep in $cleaned_dependencies; do
             dep="${dep#-}"
-            info "Installing dependency: $dep"
+            debug "Installing dependency: $dep"
             configure "$dep"
         done
     fi
@@ -341,8 +333,6 @@ function configure() {
     # Install dependencies first if they're required by other libs
     install_dependencies "$lib"   
     
-    print_step "Configuring $lib"
-
     lib_config_file="$CONFIGURE_FILE_PATH/$lib.yaml"
     check_file_exists $lib_config_file
 
@@ -371,28 +361,26 @@ function configure() {
     if [ -n "$installation_url" ]; then
         if [ ! -d "$install_dir" ] || [ -z "$(ls -A "$install_dir")" ]; then
             rm -rf "$install_dir"
-            #info "✓ Found default URL: $installation_url" >&2
-            local rename=$(yq eval ".installation.download.rename // \"\"" "$lib_config_file")
+            download_rename=$(yq eval '.installation.download.rename // ""' "$lib_config_file")
+            download_executable=$(yq eval '.installation.download.executable // false' "$lib_config_file")
 
-            download_and_extract "$installation_url" "$install_dir" "$rename"
+            download_and_extract "$installation_url" "$install_dir" "$download_rename" "$download_executable"
             run_installation_script "$lib" ".installation.post_installation_script" $lib_version
-        else
-            info "✓ Already installed: $lib $lib_version"
         fi
+        info "✓ Configuring $lib $lib_version"
     else
         if [ -n "$installation_script_template" ]; then
             installation_script=$(echo "$installation_script_template" | sed "s/{version}/$lib_version/g")
         fi
-        info "✓ Using installation script: $installation_script"
+        debug "Using installation script for $lib"
         eval "$installation_script"
+        info "✓ Configuring $lib $lib_version"
     fi
 
     # Set environment variables for the library
     configure_env_variables "$lib" "$lib_version" "$install_dir"
     
     run_installation_script "$lib" ".configuration.post_configuration_script" $lib_version
-
-    echo ""
 }
 
 

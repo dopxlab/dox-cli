@@ -125,7 +125,7 @@ function get_default_version() {
         
         # Show version info with override hint
         if [ -n "$variable_name" ]; then
-            info "✓ Using $lib version: $evaluated_version (override: export $variable_name=<version>)" >&2
+            info "✓ Using  $variable_name=$evaluated_version" >&2
         else
             info "✓ Using $lib version: $evaluated_version" >&2
         fi

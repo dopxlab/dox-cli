@@ -13,4 +13,4 @@ configuration:
   environments:
     PATH: "${install_dir}"
   post_configuration_script: |
-    info "✓ Grype version : $(grype version)"
+    version "Grype" "$(grype version)"

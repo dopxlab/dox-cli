@@ -94,11 +94,11 @@ function get_installation_url_from_template() {
     local installation_url=$(generate_url_from_template "$template" "$lib_version" "$mapped_os" "$mapped_arch")
     # Check if it's a direct URL or needs script execution
     if [[ ! "$installation_url" =~ ^https?:// ]]; then
-        info "✓ Template result is not a URL, executing as script" >&2
+        debug "✓ Template result is not a URL, executing as script" >&2
         installation_url=$(eval "$installation_url") >&2
     fi
 
-    info "✓ Generated URL: $installation_url" >&2
+    debug "✓ Generated URL: $installation_url" >&2
     echo "$installation_url"
     return 0
 }
@@ -119,7 +119,7 @@ function get_installation_url_from_url() {
     local installation_url=$(yq eval ".installation.download.\"$lib_version\".\"$platform_key\" // \"\"" "$lib_config_file")
 
     if [[ -n "$installation_url" ]]; then
-        info "✓ Found URL for: $platform_key" >&2
+        debug "✓ Found URL for: $platform_key" >&2
         echo "$installation_url"
         return 0
     fi
@@ -129,7 +129,7 @@ function get_installation_url_from_url() {
     installation_url=$(yq eval ".installation.download.\"$lib_version\".\"$architecture\" // \"\"" "$lib_config_file")
 
     if [[ -n "$installation_url" ]]; then
-        info "✓ Found URL for: $architecture" >&2
+        debug "✓ Found URL for: $architecture" >&2
         echo "$installation_url"
         return 0
     fi
@@ -158,7 +158,7 @@ function get_installation_url() {
     local os_type=$(detect_os)
     local architecture=$(detect_architecture)
 
-    info "✓ Detected: $os_type/$architecture" >&2
+    debug "✓ Detected: $os_type/$architecture" >&2
 
     local installation_url=""
     

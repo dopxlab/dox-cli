@@ -25,4 +25,4 @@ configuration:
     PATH: "${install_dir}/"  # Helm extracts to os-arch folder
 
   post_configuration_script: |
-    info "✓ Helm version : $(helm version --short)"
+    version "Helm" "$(helm version --short)"

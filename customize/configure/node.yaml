@@ -13,5 +13,5 @@ configuration:
   environments:
     PATH: "${install_dir}/bin"
   post_configuration_script: |
-    info "✓ Node version : $(node -v)"
-    info "✓ NPM version : $(npm -v)"
+    version "Node" "$(node -v)"
+    version "NPM " "$(npm -v)"

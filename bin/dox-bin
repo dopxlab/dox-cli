@@ -131,9 +131,8 @@ case "$action" in
     # ✅ Source in current shell
     if [[ -f "$DOX_ENV" ]]; then
       source "$DOX_ENV"
-      echo ""
-      echo "✅ Environment loaded. Variables are now available in this shell."
-      echo "   To use in new shells, run: source ./dox_env"
+      info "✓ Environment loaded. Variables are now available in this shell. To use in new shells, run:"
+      print "   source ./dox_env"
     fi
     ;;
   

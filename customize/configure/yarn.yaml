@@ -13,5 +13,5 @@ configuration:
   environments:
     PATH: "${install_dir}/bin"
   post_configuration_script: |
-    info "✓ Yarn Installation: ${install_dir}"
-    info "✓ Yarn Version: $(yarn -v)"
+    debug "✓ Yarn Installation: ${install_dir}"
+    debug "✓ Yarn Version: $(yarn -v)"

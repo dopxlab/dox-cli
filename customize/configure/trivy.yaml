@@ -13,5 +13,4 @@ configuration:
   environments:
     PATH: "${install_dir}"
   post_configuration_script: |
-    info "✓ Trivy Installation: ${install_dir}"
-    info "✓ Trivy Version: $(trivy --version | head -n 1)"
+    version "Trivy Version" "$(trivy --version | head -n 1)"

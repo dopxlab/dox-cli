@@ -1,6 +1,9 @@
 installation:
   download:
     template: "https://github.com/argoproj/argo-cd/releases/download/{version}/argocd-{os}-{arch}"
+    rename: "argocd"  # renaming download filename to docker-buildx
+    executable: true
+
     mappings:
       os:
         mac: "darwin"
@@ -22,10 +25,4 @@ configuration:
     PATH: "${install_dir}"
 
   post_configuration_script: |
-    #!/bin/bash
-    if [ -d "$install_dir" ] && compgen -G "$install_dir/*" > /dev/null; then
-      mv "$install_dir/"* "$install_dir/argocd"
-      chmod +x "$install_dir/argocd"
-    fi
-    create_symlinks_to_bin $install_dir
-    info "✓ $(argocd version --client)"
+    version "ArgoCD" "$(argocd version --client)"

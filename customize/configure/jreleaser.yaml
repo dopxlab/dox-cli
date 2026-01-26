@@ -23,5 +23,5 @@ configuration:
     PATH: "${install_dir}/bin"
 
   post_configuration_script: |
-    info "✓ JReleaser Installation: ${install_dir}"
-    info "$(jreleaser --version)"
+    version "JReleaser Installation" "${install_dir}"
+    version "JReleaser Version" "$(jreleaser --version)"

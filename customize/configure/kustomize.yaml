@@ -16,7 +16,4 @@ configuration:
     PATH: "${install_dir}"
 
   post_configuration_script: |
-    #!/bin/bash
-
-    #create_symlinks_to_bin $install_dir
-    info "✓ kustomize version: $(kustomize version)"
+    debug "✓ kustomize version: $(kustomize version)"
