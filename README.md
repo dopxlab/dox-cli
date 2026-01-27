@@ -24,31 +24,79 @@ Modern engineering organizations face critical tooling challenges:
 
 ---
 
+
 ## 🚀 Quick Start
 
+### Installation
+
 ```bash
-# Install DOX CLI
 curl -s -L https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh | bash
-source ~/.bashrc
-
-# Create configuration
-cat > tools.yaml << EOF
-kubectl:
-  version: v1.29.0
-helm:
-  version: v3.14.0
-maven:
-  version: 3.9.5
-docker:
-EOF
-
-# Configure all tools
-dox config -f tools.yaml
-
-# Done - start using tools immediately
-kubectl version
 ```
 
+**Note:** Reload your shell configuration after installation:(if you use same shell)
+```bash
+source ~/.bashrc  # For bash
+source ~/.zshrc   # For zsh
+```
+
+---
+
+## 📦 Usage
+
+### Single Tool Installation
+
+Install the latest version of a tool:
+```bash
+dox config terraform
+```
+
+Install a specific version:
+```bash
+export TERRAFORM_VERSION=1.7.0
+dox config terraform
+```
+
+### Multiple Tools Installation
+
+Install multiple tools in one command:
+```bash
+dox config terraform kubectl jdk
+```
+
+With specific versions:
+```bash
+export TERRAFORM_VERSION=1.7.0
+export KUBECTL_VERSION=v1.29.0
+dox config terraform kubectl jdk
+```
+
+---
+
+## 📄 Installation from File
+
+Create a `tools.yaml` configuration file:
+
+### Example with and without versions
+
+```yaml
+# Tools with specific versions
+aws: 2.15.0
+terraform: 1.7.0
+kubectl: v1.29.0
+helm: v3.14.0
+maven: 3.9.5
+
+# Tools without version (uses latest)
+docker:
+jdk:
+gradle:
+```
+
+### Apply configuration from file
+
+```bash
+dox config -f tools.yaml
+```
 ---
 
 ## 💼 Enterprise Use Cases
