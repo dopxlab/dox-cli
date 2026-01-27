@@ -33,7 +33,7 @@ Modern engineering organizations face critical tooling challenges:
 curl -s -L https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh | bash
 ```
 
-**Note:** Reload your shell configuration after installation:(if you use same shell)
+**Note:** Reload your shell configuration after installation (if you use same shell):
 ```bash
 source ~/.bashrc  # For bash
 source ~/.zshrc   # For zsh
@@ -112,18 +112,14 @@ dox config -f tools.yaml
 
 ```yaml
 # service-legacy/.dox/tools.yaml
-jdk:
-  version: "11.0.21"
-maven:
-  version: "3.8.6"
+jdk: "11.0.21"
+maven: "3.8.6"
 ```
 
 ```yaml
 # service-api/.dox/tools.yaml
-jdk:
-  version: "17.0.9"
-maven:
-  version: "3.9.5"
+jdk: "17.0.9"
+maven: "3.9.5"
 ```
 
 **GitHub Actions:**
@@ -163,20 +159,16 @@ jobs:
 
 ```yaml
 # infrastructure/aws/.dox/tools.yaml
-terraform:
-  version: "1.6.6"
-kubectl:
-  version: "v1.28.0"
+terraform: "1.6.6"
+kubectl: "v1.28.0"
 trivy:
 tfsec:
 ```
 
 ```yaml
 # infrastructure/azure/.dox/tools.yaml
-terraform:
-  version: "1.7.0"
-kubectl:
-  version: "v1.29.0"
+terraform: "1.7.0"
+kubectl: "v1.29.0"
 ```
 
 **Azure DevOps:**
@@ -213,18 +205,15 @@ stages:
 
 ```yaml
 # templates/go-service/.dox/tools.yaml
-go:
-  version: "1.21.5"
+go: "1.21.5"
 docker:
-kubectl:
-  version: "v1.29.0"
+kubectl: "v1.29.0"
 grype:
 ```
 
 ```yaml
 # templates/node-service/.dox/tools.yaml
-node:
-  version: "20.10.0"
+node: "20.10.0"
 yarn:
 docker:
 sonar-scanner:
@@ -273,16 +262,11 @@ dox config -f .dox/tools.yaml  # Ready in seconds
 # Approved by Security: 2024-01-15
 # Audit Reference: SEC-2024-001
 
-jdk:
-  version: "17.0.9"  # CVE-2023-XXXXX patched
-maven:
-  version: "3.9.5"
-docker:
-  version: "24.0.7"
-trivy:
-  version: "0.48.0"
-terraform:
-  version: "1.6.6"  # Production approved
+jdk: "17.0.9"  # CVE-2023-XXXXX patched
+maven: "3.9.5"
+docker: "24.0.7"
+trivy: "0.48.0"
+terraform: "1.6.6"  # Production approved
 ```
 
 **Enforcement pipeline:**
@@ -525,11 +509,8 @@ kubectl:
 helm:
 
 # Specify exact version
-terraform:
-  version: "1.7.0"
-
-maven:
-  version: "3.9.5"
+terraform: "1.7.0"
+maven: "3.9.5"
 
 # Override via environment
 # KUBECTL_VERSION=v1.28.0 dox config kubectl
