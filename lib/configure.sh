@@ -79,7 +79,7 @@ function configure_from_file() {
     
     # Process each tool
     while IFS= read -r tool; do
-        local version=$(yq eval ".$tool.version" "$config_file")
+        local version=$(yq eval ".$tool" "$config_file")
         local variable_name=$(get_default_version_key "$tool")
 
         if [ -n "$version" ] && [ "$version" != "null" ] && [ -n "$variable_name" ] && [ "$variable_name" != "null" ]; then
@@ -303,15 +303,14 @@ function install_dependencies() {
     local lib=$1
     local lib_config_file="$CONFIGURE_FILE_PATH/$lib.yaml"
     check_file_exists $lib_config_file
-
+    
     # Get the dependencies for the library (if they exist)
-    local dependencies=$(yq eval ".installation.dependencies // []" "$lib_config_file")
+    local dependencies=$(yq eval ".installation.dependencies // []" "$lib_config_file")    
 
     # If there are dependencies, install them
     if [ "$dependencies" != "null" ] && [ "$dependencies" != "[]" ]; then
-        cleaned_dependencies=$(echo $dependencies | tr -d '[]" ')
-        for dep in $cleaned_dependencies; do
-            dep="${dep#-}"
+        # Use yq to iterate over array elements properly
+        yq eval '.installation.dependencies[]' "$lib_config_file" | while read -r dep; do
             debug "Installing dependency: $dep"
             configure "$dep"
         done
