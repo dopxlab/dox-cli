@@ -26,6 +26,7 @@ jobs:
           rm -rf "$HOME/.dox/*"          
           cp -r bin lib customize "$HOME/.dox/"
           echo "preview-${{ github.job }}-${{ github.sha }}" > "$HOME/.dox/version.txt"
+          echo "$DOX_USER_BIN" >> $GITHUB_PATH
           
       - name: Verify DOX CLI installation
         run: dox --version

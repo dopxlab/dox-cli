@@ -1,0 +1,18 @@
+#!/bin/bash
+export DOX_DIR="$HOME/.dox"
+export DOX_USER_BIN="${DOX_DIR}/bin"
+export DOX_RESOURCES_DIR="${DOX_RESOURCES_DIR:-$HOME/dox_resources}"
+DOX_ENV="${DOX_DIR}/dox_env"
+"${DOX_USER_BIN}/dox-bin" "$@"
+exit_code=$?
+if [[ $exit_code -eq 0 ]]; then
+  if [[ "$1" == "config" || "$1" == "configure" ]]; then
+    if [[ -f "$DOX_ENV" ]]; then
+      if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
+        source "$DOX_ENV"
+        echo "✓ Environment variables loaded into current shell"
+      fi
+    fi
+  fi
+fi
+exit $exit_code
