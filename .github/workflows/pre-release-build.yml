@@ -31,6 +31,8 @@ jobs:
           name: dox-cli.tar.gz
           tag_name: preview-release
           files: dox-cli.tar.gz
+          prerelease: true
+          make_latest: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
@@ -40,5 +42,7 @@ jobs:
           name: install.sh
           tag_name: preview-release
           files: install.sh
+          prerelease: true
+          make_latest: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
