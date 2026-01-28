@@ -19,21 +19,14 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install DOX CLI
-        run: |
-          bash install.sh
-          source "$HOME/.bashrc"
+        run: bash install.sh
 
       - name: Configure with local files for preview test
         run: |
-          # Remove downloaded files
-          rm -rf "$HOME/.dox/*"
-          
-          # Copy local files from repo
+          rm -rf "$HOME/.dox/*"          
           cp -r bin lib customize "$HOME/.dox/"
-          
-          # Update version for preview
           echo "preview-${{ github.job }}-${{ github.sha }}" > "$HOME/.dox/version.txt"
-
+          
       - name: Verify DOX CLI installation
         run: dox --version
 
