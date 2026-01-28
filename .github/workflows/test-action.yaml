@@ -65,7 +65,7 @@ jobs:
       - name: dox same shell test
         run: |
           export JDK_VERSION=23
-          . dox configure maven # Same Shell Test
+          dox configure maven # Same Shell Test
           echo ""
           echo "----------------------------------------"
           echo "dox_env"
