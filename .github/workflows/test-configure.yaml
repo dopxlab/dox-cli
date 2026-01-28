@@ -19,7 +19,7 @@ jobs:
       # Step 1: Run the installation script
       - name: Install DOX CLI
         run: |
-          bash bin/install.sh
+          bash install.sh
 
       # Step 2: Configure with local files for preview test
       - name: Configure with local files for preview test

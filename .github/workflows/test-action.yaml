@@ -22,7 +22,7 @@ jobs:
       # Step 1: Run the installation script
       - name: Install DOX CLI
         run: |
-          bash bin/install.sh
+          bash install.sh
 
       # Step 2: Setup DOX CLI from repo files
       - name: Setup DOX CLI
