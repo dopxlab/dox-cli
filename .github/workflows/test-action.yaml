@@ -21,17 +21,15 @@ jobs:
 
       # Step 1: Run the installation script
       - name: Install DOX CLI
-        run: |
-          bash install.sh
+        run: bash install.sh
 
       # Step 2: Setup DOX CLI from repo files
-      - name: Setup DOX CLI
+      - name: Configure with local files for preview test
         run: |
-          rm -rf "$HOME/.dox/*"
+          rm -rf "$HOME/.dox/*"          
           cp -r bin lib customize "$HOME/.dox/"
-
-          echo "preview-${{ github.job }}" > "$HOME/.dox/version.txt"
-          echo "$DOX_USER_BIN" >> $GITHUB_PATH
+          echo "preview-${{ github.job }}-${{ github.sha }}" > "$HOME/.dox/version.txt"
+          echo "$HOME/.dox/bin" >> $GITHUB_PATH
 
       # Step 3: DOX Action for dockerfile
       - name: dox docker cat_dockerfile (for jdk 21)
