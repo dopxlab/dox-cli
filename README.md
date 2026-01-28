@@ -1,4 +1,4 @@
-[![Build](https://github.com/dopxlab/dox-cli/actions/workflows/build.yml/badge.svg)](https://github.com/dopxlab/dox-cli/actions/workflows/build.yml)
+[![Build](https://github.com/dopxlab/dox-cli/actions/workflows/preview-build.yml/badge.svg)](https://github.com/dopxlab/dox-cli/actions/workflows/preview-build.yml)
 [![Configure Test](https://github.com/dopxlab/dox-cli/actions/workflows/test-configure.yaml/badge.svg)](https://github.com/dopxlab/dox-cli/actions/workflows/test-configure.yaml)
 [![Action Test](https://github.com/dopxlab/dox-cli/actions/workflows/test-action.yaml/badge.svg)](https://github.com/dopxlab/dox-cli/actions/workflows/test-action.yaml)
 [![Latest Release](https://img.shields.io/github/v/release/dopxlab/dox-cli?style=flat-square)](https://github.com/dopxlab/dox-cli/releases)
