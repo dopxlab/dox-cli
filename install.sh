@@ -2,8 +2,8 @@
 
 set -e
 
-# Check if DOX is already installed
-if command -v dox &>/dev/null; then
+# Check if DOX is already installed (skip in CI environments)
+if command -v dox &>/dev/null && [ -z "$CI" ]; then
   INSTALLED_VERSION=$(dox --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "unknown")
   echo "✅ DOX CLI is already installed (version: $INSTALLED_VERSION)"
   echo ""
@@ -168,12 +168,20 @@ echo "✅ DOX CLI installed successfully!"
 
 # Export path and load wrapper for current session
 export PATH="$DOX_USER_BIN:$PATH"
-source "$SHELL_CONFIG"
+
+# Source shell config if it exists and is readable
+if [ -f "$SHELL_CONFIG" ] && [ -r "$SHELL_CONFIG" ]; then
+  source "$SHELL_CONFIG" 2>/dev/null || true
+fi
 
 # Test if DOX CLI is working
 echo ""
 echo "Testing DOX CLI..." 
-dox --version
+if command -v dox &>/dev/null; then
+  dox --version
+else
+  echo "⚠️  dox command not found in PATH. Please run: source $SHELL_CONFIG"
+fi
 
 echo ""
 echo "================================================"

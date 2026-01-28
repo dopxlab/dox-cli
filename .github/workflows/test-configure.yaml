@@ -10,32 +10,32 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
     
     steps:
-      # Step 0: Checkout repo to access files
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 1: Run the installation script
       - name: Install DOX CLI
         run: |
           bash install.sh
+          source "$HOME/.bashrc"
 
-      # Step 2: Configure with local files for preview test
       - name: Configure with local files for preview test
         run: |
+          # Remove downloaded files
           rm -rf "$HOME/.dox/*"
+          
+          # Copy local files from repo
           cp -r bin lib customize "$HOME/.dox/"
+          
+          # Update version for preview
+          echo "preview-${{ github.job }}-${{ github.sha }}" > "$HOME/.dox/version.txt"
 
-          echo "preview-${{ github.job }}" > "$HOME/.dox/version.txt"
-          echo "$DOX_USER_BIN" >> $GITHUB_PATH
-
-      # Step 3: Verify the installation
       - name: Verify DOX CLI installation
-        run: |
-          dox --version
+        run: dox --version
 
-      # Step 4: Run DOX configure command
       - name: dox build
-        run: |
-          dox config -f test/tools.yaml
+        run: dox config -f test/tools.yaml
