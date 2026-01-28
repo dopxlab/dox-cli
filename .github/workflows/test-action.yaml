@@ -1,10 +1,8 @@
 name: DOX CLI - Actions Test
 
 on:
-  workflow_run:
-    workflows: ["DOX CLI - Build"]  # Trigger this workflow after "DOX CLI - Build" is completed
-    types:
-      - completed  # Trigger after the workflow completes
+  push:
+#    branches: [main]
       
 env:
   DEBUG_MODE: ${{ vars.DEBUG_MODE }}
@@ -12,30 +10,28 @@ env:
   OCI_REG_PASSWORD: ${{ secrets.OCI_REG_PASSWORD }}
   HELM_OCI_URL: ${{ vars.HELM_OCI_URL }}
 
-
 jobs:
   test:
     runs-on: ubuntu-latest
+    
     steps:
-      # Step 0: Ensure required utilities are installed
-#      - name: Ensure tar and unzip are available
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get install -y tar unzip
-
+      # Step 0: Checkout repo to access files
       - name: Checkout Repo
         uses: actions/checkout@v3
 
-      # Step 1: Download and run the installation script
-      - name: Install DOX CLI
+      # Step 1: Setup DOX CLI from repo files
+      - name: Setup DOX CLI
         run: |
-          curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh && bash install.sh
-          echo "$HOME/.dox/bin" >> $GITHUB_PATH
+          rm -rf "$HOME/.dox/*"
+          cp -r bin lib customize "$HOME/.dox/"
 
-      # Step 2: Add the new path for DOX to the $PATH and verify the installation
+          echo "preview-${{ github.job }}" > "$HOME/.dox/version.txt"
+          echo "$DOX_USER_BIN" >> $GITHUB_PATH
+
+      # Step 2: Verify the installation
       - name: Verify DOX CLI installation
         run: |
-          dox --version  # Verify that DOX CLI is now available
+          dox --version
 
       # Step 3: DOX Action for dockerfile
       - name: dox docker cat_dockerfile (for jdk 21)

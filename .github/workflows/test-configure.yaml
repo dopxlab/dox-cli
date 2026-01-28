@@ -1,33 +1,41 @@
 name: DOX CLI - Configuration Test
 
 on:
-  workflow_run:
-    workflows: ["DOX CLI - Build"]
-    types:
-      - completed  # Trigger after the "DOX CLI - Build" workflow is completed
+  push:
+#    branches: [main]
+
 env:
   DEBUG_MODE: ${{ vars.DEBUG_MODE }}
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    
     steps:
       # Step 0: Checkout repo to access files
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 1: Download and run the installation script
+      # Step 1: Run the installation script
       - name: Install DOX CLI
         run: |
-          curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh && bash install.sh
-          echo "$HOME/.dox/bin" >> $GITHUB_PATH
+          bash install.sh
 
-      # Step 2: Add the new path for DOX to the $PATH and verify the installation
+      # Step 2: Configure with local files for preview test
+      - name: Configure with local files for preview test
+        run: |
+          rm -rf "$HOME/.dox/*"
+          cp -r bin lib customize "$HOME/.dox/"
+
+          echo "preview-${{ github.job }}" > "$HOME/.dox/version.txt"
+          echo "$DOX_USER_BIN" >> $GITHUB_PATH
+
+      # Step 3: Verify the installation
       - name: Verify DOX CLI installation
         run: |
-          dox --version  # Verify that DOX CLI is now available
+          dox --version
 
-      # Step 3: Run DOX configure command
+      # Step 4: Run DOX configure command
       - name: dox build
         run: |
           dox config -f test/tools.yaml

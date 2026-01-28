@@ -1,8 +1,12 @@
-name: DOX CLI - Build
+name: DOX CLI - Preview Build
 
 on:
-  push:
-#    branches: [main]
+  workflow_run:
+    workflows: 
+      - "DOX CLI - Configuration Test"
+      - "DOX CLI - Actions Test"
+    types:
+      - completed
 
 permissions:
   contents: write   # Required to create releases
@@ -10,6 +14,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Only run if BOTH workflows succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -19,19 +26,19 @@ jobs:
           tar -czf dox-cli.tar.gz bin/ lib/ customize/
 
       - name: Upload Release Asset
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: dox-cli.tar.gz
-          tag_name: monthly-release
+          tag_name: preview-release
           files: dox-cli.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Upload Install Script
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: install.sh
-          tag_name: monthly-release
+          tag_name: preview-release
           files: install.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
