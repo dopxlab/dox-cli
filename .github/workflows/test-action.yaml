@@ -1,10 +1,8 @@
 name: DOX CLI - Actions Test
 
 on:
-  workflow_run:
-    workflows: ["DOX CLI - Build"]  # Trigger this workflow after "DOX CLI - Build" is completed
-    types:
-      - completed  # Trigger after the workflow completes
+  push:
+#    branches: [main]
       
 env:
   DEBUG_MODE: ${{ vars.DEBUG_MODE }}
@@ -12,30 +10,26 @@ env:
   OCI_REG_PASSWORD: ${{ secrets.OCI_REG_PASSWORD }}
   HELM_OCI_URL: ${{ vars.HELM_OCI_URL }}
 
-
 jobs:
   test:
     runs-on: ubuntu-latest
+    
     steps:
-      # Step 0: Ensure required utilities are installed
-#      - name: Ensure tar and unzip are available
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get install -y tar unzip
-
+      # Step 0: Checkout repo to access files
       - name: Checkout Repo
         uses: actions/checkout@v3
 
-      # Step 1: Download and run the installation script
+      # Step 1: Run the installation script
       - name: Install DOX CLI
-        run: |
-          curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh && bash install.sh
-          echo "$HOME/.dox/bin" >> $GITHUB_PATH
+        run: bash install.sh
 
-      # Step 2: Add the new path for DOX to the $PATH and verify the installation
-      - name: Verify DOX CLI installation
+      # Step 2: Setup DOX CLI from repo files
+      - name: Configure with local files for preview test
         run: |
-          dox --version  # Verify that DOX CLI is now available
+          rm -rf "$HOME/.dox/*"          
+          cp -r bin lib customize "$HOME/.dox/"
+          echo "preview-${{ github.job }}-${{ github.sha }}" > "$HOME/.dox/version.txt"
+          echo "BASH_ENV=$HOME/.dox/bin/dox-wrapper" >> $GITHUB_ENV
 
       # Step 3: DOX Action for dockerfile
       - name: dox docker cat_dockerfile (for jdk 21)
@@ -54,6 +48,7 @@ jobs:
       # Step 4: DOX Action for helm build and push
       - name: dox helm template
         run: |
+          export HELM_VERSION=v3.19.4
           dox helm template package
 
       # Step 5: DOX Action for argocd deploy

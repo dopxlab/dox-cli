@@ -31,6 +31,6 @@ configuration:
     PATH: "${install_dir}/bin"
 
   post_configuration_script: |
-    info "✓ JAVA_HOME: ${install_dir}"
-    info "✓ GRAALVM_HOME: ${install_dir}"
-    info "✓ Java version: $(java -version 2>&1 | head -n 1)"
+    version "JAVA_HOME" "${install_dir}"
+    version "GRAALVM_HOME" "${install_dir}"
+    version "Java version" "$(java -version 2>&1 | head -n 1)"

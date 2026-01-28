@@ -1,0 +1,20 @@
+# Open Policy Agent CLI
+installation:
+  dependencies: []
+  download:
+    template: "https://github.com/open-policy-agent/opa/releases/download/v{version}/opa_{os}_{arch}"
+    rename: "opa"
+    executable: true
+    mappings:
+      os:
+        mac: "darwin"
+        linux: "linux"
+      arch:
+        x86_64: "amd64"
+        arm64: "arm64"
+configuration:
+  default_version: "${OPA_VERSION:-$(curl -s https://api.github.com/repos/open-policy-agent/opa/releases/latest | jq -r '.tag_name' | sed 's/^v//')}"
+  environments:
+    PATH: "${install_dir}"
+  post_configuration_script: |
+    version "OPA" "$(opa version)"

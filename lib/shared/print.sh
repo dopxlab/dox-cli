@@ -76,10 +76,14 @@ print_step() {
     print "33" "----------------------------------------------------"
     echo ""
 }
-
+version() {
+    if [ "${DEBUG_MODE:-false}" = "true" ] || [ "${PRINT_VERSION:-false}" = "true" ]; then
+        print "90" "$(printf '%-15s : %s' "$1" "$2")"
+    fi  
+}
 # Debug function: prints only if DEBUG_MODE is true
 debug() {
-    if [ -n "$DEBUG_MODE" ] && [ "$DEBUG_MODE" = "true" ]; then
+    if [ "${DEBUG_MODE:-false}" = "true" ]; then
         # Print message line by line with yellow text
         while IFS= read -r line; do
             printf "\033[93m  %s\033[0m\n" "$line"

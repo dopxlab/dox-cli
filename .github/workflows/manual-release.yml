@@ -28,7 +28,14 @@ jobs:
       - name: Get Latest Tag
         id: get_version
         run: |
-          latest_tag=$(git describe --tags $(git rev-list --tags --max-count=1) 2>/dev/null || echo "v0.0.0")
+          # Get all tags, filter out preview releases, sort and get the latest
+          latest_tag=$(git tag -l | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
+          
+          # Fallback to v0.0.0 if no valid tags found
+          if [[ -z "$latest_tag" ]]; then
+            latest_tag="v0.0.0"
+          fi
+          
           echo "Latest tag: $latest_tag"
           version=${latest_tag#v}
           IFS='.' read -r major minor patch <<< "$version"
@@ -87,12 +94,9 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.version.outputs.new_version }}
-          name: |
-            dox-cli.tar.gz
-            install.sh
+          name: Release ${{ steps.version.outputs.new_version }}
           files: |
             dox-cli.tar.gz
             install.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        

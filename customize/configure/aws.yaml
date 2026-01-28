@@ -1,0 +1,20 @@
+installation:
+  dependencies:
+    - python
+  download:
+    template: "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip"
+    rename: "awscli-bundle.zip"
+
+  post_installation_script: |
+    #!/bin/bash
+    ${install_dir}/install -b ${install_dir}/aws | while IFS= read -r line; do
+      info "$line"
+    done
+
+configuration:
+  default_version: "latest"
+  environments:
+    PATH: "${install_dir}"
+
+  post_configuration_script: |
+    version "AWS CLI Version" "$(aws --version 2>&1 | awk '{print $1}' | cut -d/ -f2)"

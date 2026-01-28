@@ -1,4 +1,4 @@
-[![Build](https://github.com/dopxlab/dox-cli/actions/workflows/build.yml/badge.svg)](https://github.com/dopxlab/dox-cli/actions/workflows/build.yml)
+[![Build](https://github.com/dopxlab/dox-cli/actions/workflows/preview-build.yml/badge.svg)](https://github.com/dopxlab/dox-cli/actions/workflows/preview-build.yml)
 [![Configure Test](https://github.com/dopxlab/dox-cli/actions/workflows/test-configure.yaml/badge.svg)](https://github.com/dopxlab/dox-cli/actions/workflows/test-configure.yaml)
 [![Action Test](https://github.com/dopxlab/dox-cli/actions/workflows/test-action.yaml/badge.svg)](https://github.com/dopxlab/dox-cli/actions/workflows/test-action.yaml)
 [![Latest Release](https://img.shields.io/github/v/release/dopxlab/dox-cli?style=flat-square)](https://github.com/dopxlab/dox-cli/releases)
@@ -33,10 +33,10 @@ Modern engineering organizations face critical tooling challenges:
 curl -s -L https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh | bash
 ```
 
-**Note:** Reload your shell configuration after installation (if you use same shell):
+**Note:** Source the wrapper only when using the same shell. (Skip this step for a new shell session.)
+
 ```bash
-source ~/.bashrc  # For bash
-source ~/.zshrc   # For zsh
+source $HOME/.dox/bin/dox-wrapper
 ```
 
 ---
@@ -131,8 +131,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Setup DOX
         run: |
-          curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh
-          bash install.sh && echo "$HOME/.dox/bin" >> $GITHUB_PATH
+          curl -fsSL https://raw.githubusercontent.com/dopxlab/dox-cli/main/install.sh | bash
+          echo "BASH_ENV=$HOME/.dox/bin/dox-wrapper" >> $GITHUB_ENV
       - name: Configure Tools
         working-directory: ./service-legacy
         run: dox config -f .dox/tools.yaml
@@ -179,8 +179,8 @@ stages:
   - job: Deploy
     steps:
     - bash: |
-        curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh
-        bash install.sh && echo "##vso[task.prependpath]$HOME/.dox/bin"
+        curl -fsSL https://raw.githubusercontent.com/dopxlab/dox-cli/main/install.sh | bash
+        source $HOME/.dox/bin/dox-wrapper
     - bash: dox config -f infrastructure/aws/.dox/tools.yaml
     - bash: terraform apply -auto-approve
       workingDirectory: infrastructure/aws
@@ -223,8 +223,8 @@ sonar-scanner:
 ```yaml
 .dox-setup:
   before_script:
-    - curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh
-    - bash install.sh && export PATH="$HOME/.dox/bin:$PATH"
+    - curl -fsSL https://raw.githubusercontent.com/dopxlab/dox-cli/main/install.sh | bash
+    - source $HOME/.dox/bin/dox-wrapper
     - dox config -f .dox/tools.yaml
 
 build:
@@ -301,17 +301,17 @@ Works with all major platforms:
 <summary><b>GitHub Actions</b></summary>
 
 ```yaml
-- name: Setup DOX CLI
+- name: Setup DOX
   run: |
-    curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh
-    bash install.sh
-    echo "$HOME/.dox/bin" >> $GITHUB_PATH
+    curl -fsSL https://raw.githubusercontent.com/dopxlab/dox-cli/main/install.sh | bash
+    echo "BASH_ENV=$HOME/.dox/bin/dox-wrapper" >> $GITHUB_ENV
+    dox config helm kubectl
 
-- name: Configure Tools
-  run: dox config -f .dox/tools.yaml
+- name: Build
+  run: |
+    helm version
+    kubectl version --client
 ```
-
-📖 **[Full GitHub Actions guide →](docs/ci-cd/github-actions.md)**
 
 </details>
 
@@ -320,13 +320,15 @@ Works with all major platforms:
 
 ```yaml
 before_script:
-  - curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh
-  - bash install.sh
-  - export PATH="$HOME/.dox/bin:$PATH"
-  - dox config -f .dox/tools.yaml
-```
+  - curl -fsSL https://raw.githubusercontent.com/dopxlab/dox-cli/main/install.sh | bash
+  - source $HOME/.dox/bin/dox-wrapper
+  - dox config helm kubectl
 
-📖 **[Full GitLab CI guide →](docs/ci-cd/gitlab.md)**
+build:
+  script:
+    - helm version
+    - kubectl version --client
+```
 
 </details>
 
@@ -335,16 +337,14 @@ before_script:
 
 ```yaml
 - bash: |
-    curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh
-    bash install.sh
-    echo "##vso[task.prependpath]$HOME/.dox/bin"
-  displayName: 'Install DOX CLI'
+    curl -fsSL https://raw.githubusercontent.com/dopxlab/dox-cli/main/install.sh | bash
+    source $HOME/.dox/bin/dox-wrapper
+    dox config helm kubectl
 
-- bash: dox config -f .dox/tools.yaml
-  displayName: 'Configure Tools'
+    helm version
+    kubectl version --client
+  displayName: 'Build with DOX'
 ```
-
-📖 **[Full Azure DevOps guide →](docs/ci-cd/azure-devops.md)**
 
 </details>
 
@@ -352,23 +352,37 @@ before_script:
 <summary><b>Jenkins</b></summary>
 
 ```groovy
-stage('Setup Tools') {
+stage('Build') {
     steps {
         sh '''
-            curl -s -L -o install.sh https://github.com/dopxlab/dox-cli/releases/latest/download/install.sh
-            bash install.sh
-            export PATH="$HOME/.dox/bin:$PATH"
-            dox config -f .dox/tools.yaml
+            curl -fsSL https://raw.githubusercontent.com/dopxlab/dox-cli/main/install.sh | bash
+            source $HOME/.dox/bin/dox-wrapper
+            dox config helm kubectl
+
+            helm version
+            kubectl version --client
         '''
     }
 }
 ```
 
-📖 **[Full Jenkins guide →](docs/ci-cd/jenkins.md)**
-
 </details>
 
----
+<details>
+<summary><b>CircleCI</b></summary>
+
+```yaml
+- run: |
+    curl -fsSL https://raw.githubusercontent.com/dopxlab/dox-cli/main/install.sh | bash
+    echo 'source $HOME/.dox/bin/dox-wrapper' >> $BASH_ENV
+    dox config helm kubectl
+    
+- run: |    
+    helm version
+    kubectl version --client
+```
+
+</details>
 
 ## 🛠️ Supported Tools
 

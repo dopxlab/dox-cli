@@ -22,6 +22,6 @@ configuration:
     PATH: "${install_dir}/bin"
 
   post_configuration_script: |
-    info "✓ M2_HOME: ${install_dir}"
-    info "✓ MAVEN_HOME: ${install_dir}"
-    info "✓ Maven version: $(mvn --version | head -n 1)"
+    debug "✓ M2_HOME: ${install_dir}"
+    debug "✓ MAVEN_HOME: ${install_dir}"
+    debug "✓ Maven version: $(mvn --version | head -n 1)"

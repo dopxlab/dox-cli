@@ -21,5 +21,5 @@ configuration:
     PATH: "${install_dir}/bin"
 
   post_configuration_script: |
-    info "✓ SONAR_SCANNER_HOME: ${install_dir}"
-    info "✓ SonarScanner version: $(sonar-scanner --version | head -n 1)"
+    version "SONAR_SCANNER_HOME" "${install_dir}"
+    version "SonarScanner version" "$(sonar-scanner --version | head -n 1)"

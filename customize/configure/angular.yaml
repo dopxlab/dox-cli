@@ -13,4 +13,4 @@ configuration:
   # Print the installed version of the package
   post_configuration_script: |
     # Print the installed Angular version
-    info "✓ $(npx ng version | grep 'Angular CLI')"
+    version "Angular CLI" "$(npx ng version | grep 'Angular CLI' | cut -d':' -f2 | xargs)"

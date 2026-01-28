@@ -1,6 +1,9 @@
 installation:
   download:
     template: "https://dl.k8s.io/release/{version}/bin/{os}/{arch}/kubectl"
+    rename: "kubectl"
+    executable: true
+
     mappings:
       os:
         mac: "darwin"
@@ -16,13 +19,4 @@ configuration:
     PATH: "${install_dir}"
 
   post_configuration_script: |
-    #!/bin/bash
-    echo "Configuring kubectl: $install_dir"
-
-    if [ -d "$install_dir" ] && compgen -G "$install_dir/*" > /dev/null; then
-      mv "$install_dir/"* "$install_dir/kubectl"
-      chmod +x "$install_dir/kubectl"
-    fi
-    create_symlinks_to_bin $install_dir
-    info "Kubernetes $(kubectl version --client)"    
-    
+    version "Kubernetes" "$(kubectl version --client)"    

@@ -10,5 +10,5 @@ configuration:
   environments:
     PATH: "${install_dir}/bin"
   post_configuration_script: |
-    info "✓ Python version : $(python3 --version)"
-    info "✓ Pip version : $(pip3 --version)"
+    version "Python version" "$(python3 --version)"
+    version "Pip version" "$(pip3 --version)"

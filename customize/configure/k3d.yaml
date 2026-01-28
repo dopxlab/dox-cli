@@ -1,0 +1,20 @@
+# K3d - Lightweight Kubernetes cluster
+installation:
+  dependencies: ["kind"] # k3d depends on kind and docker ( kind is already a dependency of docker )
+  download:
+    template: "https://github.com/rancher/k3d/releases/download/v{version}/k3d-{os}-{arch}"
+    rename: "k3d"
+    executable: true
+    mappings:
+      os:
+        mac: "darwin"
+        linux: "linux"
+      arch:
+        x86_64: "amd64"
+        arm64: "arm64"
+configuration:
+  default_version: "${K3D_VERSION:-$(curl -s https://api.github.com/repositories/179063508/releases/latest | jq -r '.tag_name' | sed 's/^v//')}"
+  environments:
+    PATH: "${install_dir}"
+  post_configuration_script: |
+    version "K3d" "$(k3d version)"

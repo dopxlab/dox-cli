@@ -6,4 +6,4 @@ configuration:
   environments:
     PATH: "${install_dir}/bin"
   post_configuration_script: |
-    info "✓ Gradle version : $(gradle -v)"
+    version "Gradle" "$(gradle -v)"

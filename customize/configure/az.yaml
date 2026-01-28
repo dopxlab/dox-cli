@@ -1,0 +1,19 @@
+installation:
+  dependencies:
+    - python
+  script:
+    template: |
+      if [ ! -d "${install_dir}" ] || [ -z "$(ls -A "${install_dir}" 2>/dev/null)" ]; then
+        info "⬇ Downloading azure-cli..."
+        python3 -m venv "${install_dir}"
+        source "${install_dir}/bin/activate"
+        python -m pip install --upgrade pip -qq
+        python -m pip install azure-cli -qq
+      fi
+configuration:
+  default_version: "latest"
+  environments:
+    PATH: "${install_dir}/bin"
+
+  post_configuration_script: |
+    version "Azure CLI Version" "$(${install_dir}/bin/az --version | head -n 1)"

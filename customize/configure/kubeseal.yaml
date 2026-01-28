@@ -16,5 +16,4 @@ configuration:
     PATH: "${install_dir}"
 
   post_configuration_script: |
-    #!/bin/bash
-    info "Kubeseal $(kubeseal --version 2>&1 | head -n1)"
+    version "Kubeseal" "$(kubeseal --version 2>&1 | head -n1)"

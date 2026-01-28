@@ -30,5 +30,4 @@ configuration:
   
   # Install buildx as Docker CLI plugin and verify
   post_configuration_script: |
-    # Print the installed version
-    info "✓ $(docker buildx version)"
+    version "Docker Buildx" "$(docker buildx version)"

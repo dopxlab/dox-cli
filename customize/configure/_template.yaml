@@ -8,7 +8,9 @@ installation:
   # URL template for downloads (uses placeholders)
   download:
     template: "https://example.com/releases/{version}/tool-{version}-{os}-{arch}.tar.gz"
-    
+    rename: "myapp"  # renaming download filename to docker-buildx
+    executable: true
+
     # Architecture and OS mappings for URL generation
     # These override the default values when generating URLs from template
     mappings:

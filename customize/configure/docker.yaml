@@ -14,4 +14,4 @@ configuration:
 
   # Print the installed version of the package
   post_configuration_script: |
-    info "✓ $(docker --version)"
+    version "Docker" "$(docker --version)"
