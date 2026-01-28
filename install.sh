@@ -58,9 +58,6 @@ curl -LO $DOX_RELEASE_URL && tar -xzf dox-cli.tar.gz -C "$DOX_DIR" && rm -f dox-
 echo "The DOX CLI version is: $DOX_CLI_VERSION"
 echo "$DOX_CLI_VERSION" > "$DOX_DIR/version.txt"
 
-# Rename the actual dox binary to dox-bin
-mv "$DOX_USER_BIN/dox" "$DOX_USER_BIN/dox-bin" 2>/dev/null || true
-
 # Set permissions for DOX directories
 chmod -R 755 "$DOX_DIR"
 chmod -R 777 "$DOX_RESOURCES_DIR"  # Allow all users to write to resources directory
@@ -86,15 +83,15 @@ fi
 echo "Detected shell config: $SHELL_CONFIG"
 
 # Minimal shell config - just add bin to PATH
-DOX_PATH_EXPORT='# DOX CLI - Added by installer
-export PATH="$HOME/.dox/bin:$PATH"
+DOX_SHELL_CONFIG='# DOX CLI - Added by installer
+source "$HOME/.dox/bin/dox-wrapper"
 '
 
-# Add DOX bin to PATH if not already present
+# Add DOX configuration to shell config if not already present
 if ! grep -q "# DOX CLI - Added by installer" "$SHELL_CONFIG" 2>/dev/null; then
     echo "" >> "$SHELL_CONFIG"
-    echo "$DOX_PATH_EXPORT" >> "$SHELL_CONFIG"
-    echo "✅ Added DOX bin to PATH in $SHELL_CONFIG"
+    echo "$DOX_SHELL_CONFIG" >> "$SHELL_CONFIG"
+    echo "✅ Added DOX wrapper to $SHELL_CONFIG"
 else
     echo "ℹ️  DOX already configured in $SHELL_CONFIG"
 fi

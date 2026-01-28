@@ -29,7 +29,7 @@ jobs:
           rm -rf "$HOME/.dox/*"          
           cp -r bin lib customize "$HOME/.dox/"
           echo "preview-${{ github.job }}-${{ github.sha }}" > "$HOME/.dox/version.txt"
-          echo "$HOME/.dox/bin" >> $GITHUB_PATH
+          echo "BASH_ENV=$HOME/.dox/bin/dox-wrapper" >> $GITHUB_ENV
 
       # Step 3: DOX Action for dockerfile
       - name: dox docker cat_dockerfile (for jdk 21)
