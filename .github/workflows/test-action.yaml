@@ -19,7 +19,12 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
 
-      # Step 1: Setup DOX CLI from repo files
+      # Step 1: Run the installation script
+      - name: Install DOX CLI
+        run: |
+          bash bin/install.sh
+
+      # Step 2: Setup DOX CLI from repo files
       - name: Setup DOX CLI
         run: |
           rm -rf "$HOME/.dox/*"
@@ -27,11 +32,6 @@ jobs:
 
           echo "preview-${{ github.job }}" > "$HOME/.dox/version.txt"
           echo "$DOX_USER_BIN" >> $GITHUB_PATH
-
-      # Step 2: Verify the installation
-      - name: Verify DOX CLI installation
-        run: |
-          dox --version
 
       # Step 3: DOX Action for dockerfile
       - name: dox docker cat_dockerfile (for jdk 21)
