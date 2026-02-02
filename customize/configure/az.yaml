@@ -4,14 +4,14 @@ installation:
   script:
     template: |
       if [ ! -d "${install_dir}" ] || [ -z "$(ls -A "${install_dir}" 2>/dev/null)" ]; then
-        info "⬇ Downloading azure-cli..."
+        info "⬇ Downloading azure-cli ..."
         python3 -m venv "${install_dir}"
         source "${install_dir}/bin/activate"
         python -m pip install --upgrade pip -qq
-        python -m pip install azure-cli -qq
+        python -m pip install azure-cli==${version} -qq
       fi
 configuration:
-  default_version: "latest"
+  default_version: "${AZ_VERSION:-$(curl -s https://pypi.org/pypi/azure-cli/json | jq -r '.info.version')}"
   environments:
     PATH: "${install_dir}/bin"
 

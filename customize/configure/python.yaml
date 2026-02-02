@@ -1,14 +1,26 @@
 installation:
   download:
-    "3.10.19":
-      mac-arm64:   "https://github.com/astral-sh/python-build-standalone/releases/download/20260114/cpython-3.10.19+20260114-aarch64-apple-darwin-install_only.tar.gz"
-      mac-x86_64:  "https://github.com/astral-sh/python-build-standalone/releases/download/20260114/cpython-3.10.19+20260114-x86_64-apple-darwin-install_only.tar.gz"
-      linux-arm64: "https://github.com/astral-sh/python-build-standalone/releases/download/20260114/cpython-3.10.19+20260114-aarch64-unknown-linux-gnu-install_only.tar.gz"
-      linux-x86_64: "https://github.com/astral-sh/python-build-standalone/releases/download/20260114/cpython-3.10.19+20260114-x86_64-unknown-linux-gnu-install_only.tar.gz"
+    template: |
+        echo $(curl -s "https://api.github.com/repos/astral-sh/python-build-standalone/releases/tags/{version}" | jq -r 'last(.assets[] | select(.name | endswith("'"{version}-{arch}-{os}-install_only.tar.gz"'")) | .browser_download_url)')
+    mappings:
+      os:
+        mac: "apple-darwin"
+        linux: "unknown-linux-gnu"
+      arch:
+        arm64: "aarch64"
+        amd64: "x86_64"  
+# Python tags are based on build versions not python versions in git you could do the following config for python version based download
+# The above config give latest build version with latest python        
+#    "3.10.19":
+#      mac-arm64:   "https://github.com/astral-sh/python-build-standalone/releases/download/20260114/cpython-3.10.19+20260114-aarch64-apple-darwin-install_only.tar.gz"
+#      mac-x86_64:  "https://github.com/astral-sh/python-build-standalone/releases/download/20260114/cpython-3.10.19+20260114-x86_64-apple-darwin-install_only.tar.gz"
+#      linux-arm64: "https://github.com/astral-sh/python-build-standalone/releases/download/20260114/cpython-3.10.19+20260114-aarch64-unknown-linux-gnu-install_only.tar.gz"
+#      linux-x86_64: "https://github.com/astral-sh/python-build-standalone/releases/download/20260114/cpython-3.10.19+20260114-x86_64-unknown-linux-gnu-install_only.tar.gz"
+
 configuration:
-  default_version: "${PYTHON_VERSION:-3.10.19}"
+  default_version: "${PYTHON_BUILD_VERSION:-$(curl -s https://api.github.com/repos/astral-sh/python-build-standalone/releases/latest | jq -r '.tag_name')}"
   environments:
     PATH: "${install_dir}/bin"
+
   post_configuration_script: |
-    version "Python version" "$(python3 --version)"
-    version "Pip version" "$(pip3 --version)"
+    info "Python Version $(${install_dir}/bin/python3 --version)"

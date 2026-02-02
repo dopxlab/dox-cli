@@ -369,7 +369,7 @@ function configure() {
         info "✓ Configuring $lib $lib_version"
     else
         if [ -n "$installation_script_template" ]; then
-            installation_script=$(echo "$installation_script_template" | sed "s/{version}/$lib_version/g")
+            installation_script=$(echo "$installation_script_template" | sed "s/\${version}/$lib_version/g")
         fi
         debug "Using installation script for $lib"
         eval "$installation_script"
